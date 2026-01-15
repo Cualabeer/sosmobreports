@@ -3,231 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mechanics - Emergency Mobile Car Repairs</title>
-<style>
-:root {
-  --neon: #39ff14;
-  --red: #e60000;
-  --white: #fff;
-  --bg: #000;
-  --phi: 1.618;
-}
-
-body {
-  margin:0;
-  font-family: system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--white);
-}
-
-/* HEADER */
-header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:16px 24px;
-  background:#000;
-  position: sticky;
-  top:0;
-  z-index:100;
-  border-bottom:1px solid #111;
-}
-
-.logo h1 {
-  margin:0;
-  font-size:1.5rem;
-  color: var(--neon);
-  text-shadow:0 0 5px var(--neon);
-  animation: pulse 2s infinite alternate;
-}
-
-nav {
-  display:flex;
-  gap:24px;
-  align-items:center;
-}
-
-nav a {
-  color:#fff;
-  text-decoration:none;
-  font-weight:500;
-}
-
-nav button {
-  background: var(--neon);
-  color: var(--bg);
-  font-weight:700;
-  padding:8px 16px;
-  border:none;
-  border-radius:6px;
-  box-shadow:0 0 15px var(--neon);
-  cursor:pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-nav button:hover { 
-  transform: scale(1.05); 
-  box-shadow:0 0 25px var(--neon);
-}
-
-/* HERO */
-section.hero {
-  text-align:center;
-  padding:calc(64px * var(--phi)) 16px;
-}
-.hero h2 {
-  font-size:2rem;
-  color: var(--neon);
-  text-shadow: 0 0 5px var(--neon), 0 0 10px var(--neon);
-  animation: pulse 2s infinite alternate;
-  margin-bottom:16px;
-}
-.hero p {
-  font-size:1rem;
-  color:#fff;
-}
-
-/* SERVICES */
-.services {
-  padding:48px 16px;
-  max-width: 720px;
-  margin:auto;
-}
-.services h2 {
-  color: var(--neon);
-  font-size:1.8rem;
-  margin-bottom:24px;
-}
-.services .service-item {
-  background:#111;
-  padding:16px;
-  border-left: 4px solid var(--neon);
-  border-radius:6px;
-  text-shadow:0 0 3px #000;
-  margin-bottom:16px;
-  transition: transform 0.2s;
-}
-.services .service-item:hover { transform: scale(1.02); }
-
-/* ABOUT */
-.about {
-  padding:48px 16px;
-  max-width:720px;
-  margin:auto;
-}
-.about h2 { color: var(--neon); font-size:1.8rem; margin-bottom:24px; }
-.about p { line-height:1.6; }
-
-/* CAROUSEL */
-.carousel-container {
-  padding:48px 16px;
-}
-.carousel-container h2 {
-  color: var(--neon);
-  font-size:1.8rem;
-  margin-bottom:24px;
-  text-align:center;
-}
-.carousel {
-  display:flex;
-  overflow-x:auto;
-  gap:16px;
-  scroll-behavior:smooth;
-  padding-bottom:16px;
-}
-.carousel::-webkit-scrollbar { display:none; }
-.carousel-item {
-  min-width:200px;
-  flex:0 0 auto;
-  border: 3px solid var(--neon);
-  border-radius:8px;
-  box-shadow:0 0 15px var(--neon);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.carousel-item:hover {
-  transform: scale(1.05);
-  box-shadow:0 0 30px var(--neon);
-}
-.carousel-item img {
-  width:100%;
-  border-radius:5px;
-}
-
-/* CONTACT */
-.contact {
-  padding:48px 16px;
-  max-width:720px;
-  margin:auto;
-}
-.contact h2 { color: var(--neon); font-size:1.8rem; margin-bottom:16px; }
-.contact p { margin-bottom:8px; }
-a.phone { color:var(--neon); font-weight:bold; text-decoration:none; }
-
-/* FOOTER */
-footer {
-  text-align:center;
-  font-size:0.7rem;
-  opacity:0.6;
-  padding:32px 16px;
-}
-
-/* PULSE ANIMATION */
-@keyframes pulse {
-  0% { text-shadow:0 0 5px var(--neon),0 0 10px var(--neon);}
-  50% { text-shadow:0 0 10px var(--neon),0 0 20px var(--neon);}
-  100% { text-shadow:0 0 5px var(--neon),0 0 10px var(--neon);}
-}
-
-</style>
+<title>SOS Mechanics</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="scripts/home.js"></script>
 </head>
 <body>
 
 <header>
   <div class="logo"><h1>SOS Mechanics</h1></div>
-  <nav>
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
+  <nav id="menu">
     <a href="#services">Services</a>
     <a href="#about">About</a>
-    <a href="#portfolio">Portfolio</a>
     <a href="#contact">Contact</a>
-    <a href="sosmobilereport.html"><button>Get Report</button></a>
+    <a href="sosmobilereports.html"><button>Get Report</button></a>
   </nav>
 </header>
 
-<section class="hero">
-  <h2>Emergency Mobile Car Repairs – We Come To You Fast</h2>
-  <p>No waiting. No towing. Just fast, reliable repairs at your location.</p>
-</section>
+<main>
+  <section id="hero">
+    <h2>Emergency Mobile Car Repairs – We Come To You Fast</h2>
+  </section>
 
-<section class="services" id="services">
-  <h2>Our Emergency Services</h2>
-  <div class="service-item">Diagnostics & ECU Checks</div>
-  <div class="service-item">Brake & Suspension Repairs</div>
-  <div class="service-item">Engine & Cooling System Repairs</div>
-  <div class="service-item">On-the-Spot Emergency Call-Outs</div>
-</section>
+  <section id="services">
+    <h3>Our Emergency Services</h3>
+    <ul>
+      <li>Diagnostics & ECU Checks</li>
+      <li>Brake & Suspension Repairs</li>
+      <li>Engine & Cooling System Repairs</li>
+      <li>On-the-Spot Emergency Call-Outs</li>
+    </ul>
+  </section>
 
-<section class="about" id="about">
-  <h2>Why Choose SOS Mechanics?</h2>
-  <p>Professional, fully equipped mobile mechanics responding quickly to your emergency.  
-  No waiting. No towing. Just fast, reliable repairs at your location.</p>
-</section>
-
-<section class="carousel-container" id="portfolio">
-  <h2>Past Jobs / Examples</h2>
-  <div class="carousel">
-    <div class="carousel-item"><img src="job1.jpg" alt="Job 1"></div>
-    <div class="carousel-item"><img src="job2.jpg" alt="Job 2"></div>
-    <div class="carousel-item"><img src="job3.jpg" alt="Job 3"></div>
-  </div>
-</section>
-
-<section class="contact" id="contact">
-  <h2>Contact Us</h2>
-  <p>Call or WhatsApp directly:</p>
-  <a href="tel:YOURNUMBER" class="phone">+44 1234 567890</a>
-</section>
+  <section id="about">
+    <h3>Why Choose SOS Mechanics?</h3>
+    <p>Professional, fully equipped mobile mechanics responding quickly to your emergency.  
+       No waiting. No towing. Just fast, reliable repairs at your location.</p>
+  </section>
+</main>
 
 <footer>
-  &copy; 2026 SOS Mechanics – Mobile Service | Trusted & Transparent
+  &copy; 2026 SOS Mechanics
 </footer>
 
 </body>

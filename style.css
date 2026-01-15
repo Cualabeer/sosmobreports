@@ -5,15 +5,16 @@
   --phi: 1.618;
 }
 
+/* General */
 body {
   font-family: system-ui, sans-serif;
   background: #fff;
   color: var(--text);
   margin: 0;
-  padding-top: 64px; /* header offset */
+  padding-top: 64px; /* fixed header offset */
 }
 
-/* Fixed header & logo */
+/* Fixed Header */
 header {
   position: fixed;
   top: 0;
@@ -28,17 +29,10 @@ header {
   z-index: 1000;
 }
 
-.logo img {
-  height: 40px;
-}
+.logo img { height: 40px; }
 
-.hamburger {
-  display: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
+.hamburger { display: none; font-size: 1.5rem; cursor: pointer; }
 
-/* Navigation menu */
 nav#menu {
   display: flex;
   gap: 24px;
@@ -55,13 +49,12 @@ nav#menu a, nav#menu button {
   font-size: 1rem;
 }
 
-/* Highlight current page */
 nav#menu a.current {
   color: var(--accent);
   text-shadow: 0 0 8px var(--accent);
 }
 
-/* Mobile responsive menu */
+/* Mobile */
 @media(max-width:768px){
   .hamburger { display: block; }
   nav#menu {
@@ -76,32 +69,41 @@ nav#menu a.current {
     padding: 0;
   }
   nav#menu.active { display: flex; }
-  nav#menu a, nav#menu button {
-    padding: 12px 32px;
-    width: 100%;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-  }
+  nav#menu a, nav#menu button { padding: 12px 32px; width: 100%; text-align: left; border-bottom: 1px solid #eee; }
 }
 
-/* Header image for home or page top */
-.header-image img {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: cover;
+/* Hero Section */
+.hero {
+  background: #f4f4f4;
+  padding: 80px 32px 40px;
+  text-align: center;
 }
 
-/* Page container */
-.container {
-  max-width: 720px;
-  margin: auto;
-  padding: 32px;
-  position: relative;
-  z-index: 2;
+.hero h1 {
+  font-size: 2rem;
+  margin-bottom: 16px;
 }
 
-/* Sections spacing using Golden Ratio */
-section {
-  margin-bottom: calc(24px * var(--phi));
+.hero p {
+  font-size: 1.1rem;
+  margin-bottom: 24px;
 }
+
+.cta-button {
+  display: inline-block;
+  background: var(--accent);
+  color: #000;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Container */
+.container { max-width: 720px; margin: auto; padding: 32px; }
+
+/* Sections */
+section { margin-bottom: calc(24px * var(--phi)); }
+
+ul { padding-left: 20px; }
+li { margin-bottom: 8px; }

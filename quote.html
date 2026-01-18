@@ -23,7 +23,7 @@ h1 {
     border:1px solid #39FF14; 
     padding:15px; 
     margin-top:15px; 
-    background:#e0e0e0; /* section background */
+    background:#e0e0e0;
 }
 label { display:block; margin-top:10px; }
 input, select { width:100%; padding:8px; margin-top:4px; background:#fff; border:1px solid #39FF14; color:#000; }
@@ -57,57 +57,57 @@ tr:nth-child(odd){background:#e0e0e0;}
 
 <label>Engine Size:
 <select id="engineSize">
-<option value="1.4">Up to 1.4L</option>
-<option value="2.0">1.5 – 2.0L</option>
-<option value="3.0">2.1 – 3.0L</option>
-<option value="3.1">3.1L+</option>
+  <option value="" selected disabled>Select engine size</option>
+  <option value="1.4">Up to 1.4L</option>
+  <option value="2.0">1.5 – 2.0L</option>
+  <option value="3.0">2.1 – 3.0L</option>
+  <option value="3.1">3.1L+</option>
 </select></label>
 
 <label>Job:
 <select id="jobSelect">
-<option value="" selected disabled>Select a job</option>
+  <option value="" selected disabled>Select a job</option>
 
-<!-- High-profit jobs first -->
-<option value="clutch">Clutch Replacement</option>
-<option value="starter_motor">Starter Motor Replacement</option>
-<option value="brakes">Brake Pads/Discs</option>
-<option value="suspension">Suspension / Steering</option>
-<option value="battery">Battery / Electrical</option>
-<option value="diagnostics">Diagnostics / ECU / AdBlue Reset</option>
-<option value="minor_gasket">Minor Gaskets / Oil Leaks</option>
-<option value="roadside_fix">Emergency / Roadside Fix</option>
+  <!-- High-profit jobs first -->
+  <option value="clutch">Clutch Replacement</option>
+  <option value="starter_motor">Starter Motor Replacement</option>
+  <option value="brakes">Brake Pads/Discs</option>
+  <option value="suspension">Suspension / Steering</option>
+  <option value="battery">Battery / Electrical</option>
+  <option value="diagnostics">Diagnostics / ECU / AdBlue Reset</option>
+  <option value="minor_gasket">Minor Gaskets / Oil Leaks</option>
+  <option value="roadside_fix">Emergency / Roadside Fix</option>
 
-<!-- Rest of jobs -->
-<option value="oil_change">Oil Change</option>
-<option value="coolant_change">Coolant System</option>
-<option value="spark_plugs">Spark Plugs</option>
-<option value="ignition_coils">Ignition Coils</option>
-<option value="lights">Headlights / Bulbs</option>
-<option value="filters">Air/Fuel/Cabin Filter</option>
-<option value="tyres">Tyre Fitting / Rotation</option>
-<option value="wipers">Wipers</option>
-<option value="belts">Drive/Timing Belts</option>
-<option value="hoses">Hoses</option>
-<option value="fuel_system">Fuel System Work</option>
-<option value="transmission_fluid">Transmission Fluid</option>
-<option value="coolant_sensor">Coolant Sensor</option>
-<option value="oil_sensor">Oil Sensor</option>
-<option value="adblue_reset">AdBlue Reset</option>
-<option value="ecu_coding">ECU Coding</option>
-<option value="diagnostic_map">Real-Time Mapping</option>
-<option value="inspection_light">Inspection Light</option>
-<option value="lights_adjustment">Headlight Alignment</option>
-<option value="fuel_filter">Fuel Filter</option>
-<option value="brake_fluid">Brake Fluid</option>
-<option value="clutch_fluid">Clutch Fluid</option>
-<option value="manual_adjustments">Minor Adjustments</option>
-<option value="emergency_towing">Towing / Recovery</option>
-<option value="wheel_alignment">Wheel Alignment</option>
-<option value="diagnostic_reset">Fault Reset</option>
-<option value="battery_check">Battery Check</option>
-<option value="coolant_flush">Coolant Flush</option>
-<option value="lights_upgrade">Lighting Upgrade</option>
-
+  <!-- Rest of jobs -->
+  <option value="oil_change">Oil Change</option>
+  <option value="coolant_change">Coolant System</option>
+  <option value="spark_plugs">Spark Plugs</option>
+  <option value="ignition_coils">Ignition Coils</option>
+  <option value="lights">Headlights / Bulbs</option>
+  <option value="filters">Air/Fuel/Cabin Filter</option>
+  <option value="tyres">Tyre Fitting / Rotation</option>
+  <option value="wipers">Wipers</option>
+  <option value="belts">Drive/Timing Belts</option>
+  <option value="hoses">Hoses</option>
+  <option value="fuel_system">Fuel System Work</option>
+  <option value="transmission_fluid">Transmission Fluid</option>
+  <option value="coolant_sensor">Coolant Sensor</option>
+  <option value="oil_sensor">Oil Sensor</option>
+  <option value="adblue_reset">AdBlue Reset</option>
+  <option value="ecu_coding">ECU Coding</option>
+  <option value="diagnostic_map">Real-Time Mapping</option>
+  <option value="inspection_light">Inspection Light</option>
+  <option value="lights_adjustment">Headlight Alignment</option>
+  <option value="fuel_filter">Fuel Filter</option>
+  <option value="brake_fluid">Brake Fluid</option>
+  <option value="clutch_fluid">Clutch Fluid</option>
+  <option value="manual_adjustments">Minor Adjustments</option>
+  <option value="emergency_towing">Towing / Recovery</option>
+  <option value="wheel_alignment">Wheel Alignment</option>
+  <option value="diagnostic_reset">Fault Reset</option>
+  <option value="battery_check">Battery Check</option>
+  <option value="coolant_flush">Coolant Flush</option>
+  <option value="lights_upgrade">Lighting Upgrade</option>
 </select></label>
 </div>
 
@@ -171,18 +171,20 @@ const jobData = {
 
 // Total calculation
 function updateTotal(){
-    let jobKey = document.getElementById('jobSelect').value;
-    if(!jobKey){ document.getElementById('total').innerText='Total: £0 (+ parts)'; return; }
-    let cond=document.getElementById('conditionsFactor').checked;
-    let emerg=document.getElementById('emergency').checked;
+    let jobKey=document.getElementById('jobSelect').value;
     let engine=parseFloat(document.getElementById('engineSize').value);
+    if(!jobKey || isNaN(engine)){
+        document.getElementById('total').innerText='Total: £0 (+ parts)';
+        return;
+    }
     let job=jobData[jobKey];
     let total=(typeof job.labour==='function')?job.labour(engine):job.labour;
-    if(cond) total*=1.15;
-    if(emerg) total*=1.25;
+    if(document.getElementById('conditionsFactor').checked) total*=1.15;
+    if(document.getElementById('emergency').checked) total*=1.25;
     document.getElementById('total').innerText='Total: £'+total.toFixed(2)+' (+ parts)';
 }
 document.getElementById('jobSelect').addEventListener('change',updateTotal);
+document.getElementById('engineSize').addEventListener('change',updateTotal);
 document.getElementById('conditionsFactor').addEventListener('change',updateTotal);
 document.getElementById('emergency').addEventListener('change',updateTotal);
 

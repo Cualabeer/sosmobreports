@@ -2,257 +2,182 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mechanics Quote</title>
+<title>SOS Mechanics – Instant Quote</title>
 
 <style>
-body { 
-    margin:0; 
-    padding:20px; 
-    font-family:Arial,sans-serif; 
-    background:#f5f5f5; /* light background */
-    color:#000;
+body{
+  font-family: Arial, sans-serif;
+  background:#f5f5f5;
+  color:#000;
+  padding:20px;
 }
-h1 { 
-    color:#39FF14; 
-    font-size:28px; 
-    border-bottom:3px solid #39FF14; 
-    padding-bottom:8px;
+
+h1{
+  color:#39FF14;
+  border-bottom:3px solid #39FF14;
+  padding-bottom:8px;
 }
-.section { 
-    border:1px solid #39FF14; 
-    padding:15px; 
-    margin-top:15px; 
-    background:#e0e0e0;
+
+.section{
+  background:#eaeaea;
+  border:1px solid #39FF14;
+  padding:15px;
+  margin-top:15px;
 }
-label { display:block; margin-top:10px; }
-input, select { width:100%; padding:8px; margin-top:4px; background:#fff; border:1px solid #39FF14; color:#000; }
-.checkbox { display:inline-block; margin-right:15px; }
-#total { font-size:26px; font-weight:bold; margin-top:20px; color:#39FF14; text-align:center; }
-button { width:100%; padding:12px; background:#39FF14; border:none; color:#000; font-size:18px; cursor:pointer; margin-top:15px; }
-table { width:100%; border-collapse:collapse; margin-top:10px;}
-th, td { border:1px solid #39FF14; padding:8px; text-align:left;}
-th { background-color:#c8ffc8; color:#000;}
-tr:nth-child(even){background:#f0f0f0;}
-tr:nth-child(odd){background:#e0e0e0;}
-.small-note { font-size:12px; color:#555; }
+
+label{
+  display:block;
+  margin-top:12px;
+  font-weight:bold;
+}
+
+select,input{
+  width:100%;
+  padding:8px;
+  margin-top:5px;
+}
+
+#total{
+  font-size:26px;
+  font-weight:bold;
+  color:#39FF14;
+  text-align:center;
+  margin-top:20px;
+}
+
+button{
+  background:#39FF14;
+  border:none;
+  padding:12px;
+  font-size:16px;
+  width:100%;
+  cursor:pointer;
+  margin-top:15px;
+}
+
+.small-btn{
+  width:auto;
+  padding:4px 8px;
+  font-size:12px;
+  margin-left:10px;
+}
 </style>
 </head>
+
 <body>
 
-<h1>SOS Mechanics – Quote Dashboard</h1>
+<h1>SOS Mechanics – Instant Quote</h1>
 
 <div class="section">
-    <p id="currentDate"></p>
-    <p id="currentTime"></p>
-    <p id="currentLocation"></p>
+  <p id="dateTime"></p>
+  <p>
+    <span id="locationText">Location: Not set</span>
+    <button class="small-btn" id="locBtn">Auto-locate</button>
+  </p>
 </div>
 
 <div class="section">
-<label>Customer Name:
-<input type="text" id="customerName" placeholder="Enter customer name"></label>
 
-<label>Number Plate:
-<input type="text" id="numberPlate" placeholder="Enter number plate"></label>
+  <label>Customer / Registration</label>
+  <input type="text" placeholder="Name or number plate">
 
-<label>Engine Size:
-<select id="engineSize">
-  <option value="" selected disabled>Select engine size</option>
-  <option value="1.4">Up to 1.4L</option>
-  <option value="2.0">1.5 – 2.0L</option>
-  <option value="3.0">2.1 – 3.0L</option>
-  <option value="3.1">3.1L+</option>
-</select></label>
+  <label>Vehicle Type</label>
+  <select id="vehicleType" onchange="updateTotal()">
+    <option value="" selected disabled>Select vehicle type</option>
+    <option value="car">Car</option>
+    <option value="van">Van / Commercial</option>
+  </select>
 
-<label>Job:
-<select id="jobSelect">
-  <option value="" selected disabled>Select a job</option>
+  <label>Engine Size</label>
+  <select id="engineSize" onchange="updateTotal()">
+    <option value="" selected disabled>Select engine size</option>
+    <option value="1.6">Up to 2.0L</option>
+    <option value="2.3">Above 2.0L</option>
+  </select>
 
-  <!-- High-profit jobs first -->
-  <option value="clutch">Clutch Replacement</option>
-  <option value="starter_motor">Starter Motor Replacement</option>
-  <option value="brakes">Brake Pads/Discs</option>
-  <option value="suspension">Suspension / Steering</option>
-  <option value="battery">Battery / Electrical</option>
-  <option value="diagnostics">Diagnostics / ECU / AdBlue Reset</option>
-  <option value="minor_gasket">Minor Gaskets / Oil Leaks</option>
-  <option value="roadside_fix">Emergency / Roadside Fix</option>
+  <label>Job</label>
+  <select id="job" onchange="updateTotal()">
+    <option value="" selected disabled>Select job</option>
+    <option value="clutch">Clutch Replacement</option>
+    <option value="starter">Starter Motor Replacement</option>
+    <option value="brakes">Brake Pads / Discs</option>
+    <option value="suspension">Suspension / Steering</option>
+    <option value="diagnostics">Diagnostics / ECU</option>
+    <option value="battery">Battery / Electrical</option>
+  </select>
 
-  <!-- Rest of jobs -->
-  <option value="oil_change">Oil Change</option>
-  <option value="coolant_change">Coolant System</option>
-  <option value="spark_plugs">Spark Plugs</option>
-  <option value="ignition_coils">Ignition Coils</option>
-  <option value="lights">Headlights / Bulbs</option>
-  <option value="filters">Air/Fuel/Cabin Filter</option>
-  <option value="tyres">Tyre Fitting / Rotation</option>
-  <option value="wipers">Wipers</option>
-  <option value="belts">Drive/Timing Belts</option>
-  <option value="hoses">Hoses</option>
-  <option value="fuel_system">Fuel System Work</option>
-  <option value="transmission_fluid">Transmission Fluid</option>
-  <option value="coolant_sensor">Coolant Sensor</option>
-  <option value="oil_sensor">Oil Sensor</option>
-  <option value="adblue_reset">AdBlue Reset</option>
-  <option value="ecu_coding">ECU Coding</option>
-  <option value="diagnostic_map">Real-Time Mapping</option>
-  <option value="inspection_light">Inspection Light</option>
-  <option value="lights_adjustment">Headlight Alignment</option>
-  <option value="fuel_filter">Fuel Filter</option>
-  <option value="brake_fluid">Brake Fluid</option>
-  <option value="clutch_fluid">Clutch Fluid</option>
-  <option value="manual_adjustments">Minor Adjustments</option>
-  <option value="emergency_towing">Towing / Recovery</option>
-  <option value="wheel_alignment">Wheel Alignment</option>
-  <option value="diagnostic_reset">Fault Reset</option>
-  <option value="battery_check">Battery Check</option>
-  <option value="coolant_flush">Coolant Flush</option>
-  <option value="lights_upgrade">Lighting Upgrade</option>
-</select></label>
-</div>
+  <label>
+    <input type="checkbox" id="conditions" onchange="updateTotal()">
+    Night / difficult conditions (+15%)
+  </label>
 
-<div class="section">
-<span class="small-note">Price shown is labour only, plus parts if needed.</span>
-<span class="checkbox">
-<input type="checkbox" id="conditionsFactor"> Conditions Factor (+15%)
-</span>
-<span class="checkbox">
-<input type="checkbox" id="emergency"> Emergency / Weekend (+25%)
-</span>
-<p class="small-note">Two mechanics used for speed — price remains based on job.</p>
+  <label>
+    <input type="checkbox" id="emergency" onchange="updateTotal()">
+    Weekend / emergency (+25%)
+  </label>
+
 </div>
 
 <div id="total">Total: £0 (+ parts)</div>
-<button id="downloadBtn">Download Quote PDF</button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<button onclick="window.print()">Download / Save Quote</button>
+
 <script>
-// Job data with engine-dependent labour
-const jobData = {
-'clutch': {labour: (eng)=> eng<=2?300:450, notes:'Clutch replacement, labour only. Parts extra.'},
-'starter_motor': {labour: (eng)=> eng<=2?150:250, notes:'Starter motor replacement, labour only. Parts extra.'},
-'brakes': {labour:120, notes:'Brake pads/discs per axle, labour only. Parts extra.'},
-'suspension': {labour:150, notes:'Suspension/steering labour only. Parts extra.'},
-'battery': {labour:120, notes:'Battery/electrical labour only. Parts extra.'},
-'diagnostics': {labour:50, notes:'Diagnostics/ECU/AdBlue, labour only. Parts extra.'},
-'minor_gasket': {labour:85, notes:'Minor oil leak, labour only. Parts extra.'},
-'roadside_fix': {labour:100, notes:'Emergency roadside fix, labour only. Parts extra.'},
-'oil_change': {labour:55, notes:'Oil & filter, labour only.'},
-'coolant_change': {labour:60, notes:'Coolant system service, labour only.'},
-'spark_plugs': {labour:85, notes:'Spark plugs replacement, labour only.'},
-'ignition_coils': {labour:85, notes:'Ignition coils, labour only.'},
-'lights': {labour:40, notes:'Lighting work, labour only.'},
-'filters': {labour:35, notes:'Filter replacements, labour only.'},
-'tyres': {labour:50, notes:'Tyre fitting/rotation, labour only.'},
-'wipers': {labour:20, notes:'Wiper blades, labour only.'},
-'belts': {labour:100, notes:'Drive/timing belts, labour only.'},
-'hoses': {labour:60, notes:'Hoses, labour only.'},
-'fuel_system': {labour:120, notes:'Fuel system work, labour only.'},
-'transmission_fluid': {labour:55, notes:'Transmission fluid, labour only.'},
-'coolant_sensor': {labour:60, notes:'Coolant sensor, labour only.'},
-'oil_sensor': {labour:55, notes:'Oil sensor, labour only.'},
-'adblue_reset': {labour:50, notes:'AdBlue reset, labour only.'},
-'ecu_coding': {labour:80, notes:'ECU coding, labour only.'},
-'diagnostic_map': {labour:60, notes:'Real-time mapping, labour only.'},
-'inspection_light': {labour:40, notes:'Inspection light, labour only.'},
-'lights_adjustment': {labour:35, notes:'Headlight alignment, labour only.'},
-'fuel_filter': {labour:50, notes:'Fuel filter replacement, labour only.'},
-'brake_fluid': {labour:45, notes:'Brake fluid change, labour only.'},
-'clutch_fluid': {labour:40, notes:'Clutch fluid top-up, labour only.'},
-'manual_adjustments': {labour:30, notes:'Minor adjustments, labour only.'},
-'emergency_towing': {labour:150, notes:'Towing/recovery, labour only.'},
-'wheel_alignment': {labour:90, notes:'Wheel alignment, labour only.'},
-'diagnostic_reset': {labour:40, notes:'Fault reset, labour only.'},
-'battery_check': {labour:35, notes:'Battery check, labour only.'},
-'coolant_flush': {labour:60, notes:'Coolant flush, labour only.'},
-'lights_upgrade': {labour:70, notes:'Lighting upgrade, labour only.'}
+// date & time
+document.getElementById("dateTime").innerText =
+  "Quote generated: " + new Date().toLocaleString();
+
+// auto location
+document.getElementById("locBtn").onclick = () => {
+  if(!navigator.geolocation){
+    locationText.innerText = "Location: Not supported";
+    return;
+  }
+  locationText.innerText = "Location: locating…";
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      locationText.innerText =
+        "Location: " +
+        pos.coords.latitude.toFixed(4) + ", " +
+        pos.coords.longitude.toFixed(4);
+    },
+    () => locationText.innerText = "Location: denied"
+  );
 };
 
-// Total calculation
+// base pricing
+function getBase(job, engine){
+  if(job === "clutch") return engine <= 2 ? 300 : 450;
+  if(job === "starter") return engine <= 2 ? 150 : 250;
+  if(job === "brakes") return 120;
+  if(job === "suspension") return 180;
+  if(job === "diagnostics") return 80;
+  if(job === "battery") return 70;
+  return 0;
+}
+
+// calculation
 function updateTotal(){
-    let jobKey=document.getElementById('jobSelect').value;
-    let engine=parseFloat(document.getElementById('engineSize').value);
-    if(!jobKey || isNaN(engine)){
-        document.getElementById('total').innerText='Total: £0 (+ parts)';
-        return;
-    }
-    let job=jobData[jobKey];
-    let total=(typeof job.labour==='function')?job.labour(engine):job.labour;
-    if(document.getElementById('conditionsFactor').checked) total*=1.15;
-    if(document.getElementById('emergency').checked) total*=1.25;
-    document.getElementById('total').innerText='Total: £'+total.toFixed(2)+' (+ parts)';
+  let vehicle = vehicleType.value;
+  let engine = parseFloat(engineSize.value);
+  let job = document.getElementById("job").value;
+
+  if(!vehicle || !engine || !job){
+    total.innerText = "Total: £0 (+ parts)";
+    return;
+  }
+
+  let price = getBase(job, engine);
+
+  // van resource factor
+  if(vehicle === "van") price *= 1.15;
+
+  if(conditions.checked) price *= 1.15;
+  if(emergency.checked) price *= 1.25;
+
+  total.innerText = "Total: £" + price.toFixed(2) + " (+ parts)";
 }
-document.getElementById('jobSelect').addEventListener('change',updateTotal);
-document.getElementById('engineSize').addEventListener('change',updateTotal);
-document.getElementById('conditionsFactor').addEventListener('change',updateTotal);
-document.getElementById('emergency').addEventListener('change',updateTotal);
-
-// Date & Time
-function showDateTime(){
-    let n=new Date();
-    document.getElementById('currentDate').innerText='Date: '+n.toLocaleDateString();
-    document.getElementById('currentTime').innerText='Time: '+n.toLocaleTimeString();
-}
-showDateTime();
-
-// Location
-if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos=>{
-        document.getElementById('currentLocation').innerText=
-        `Location: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
-    },()=>{document.getElementById('currentLocation').innerText='Location: Not available';});
-}else document.getElementById('currentLocation').innerText='Location: Not supported';
-
-// Auto conditions/emergency
-function autoApplyRates(){
-    const now=new Date();
-    const hour=now.getHours();
-    const day=now.getDay();
-    document.getElementById('conditionsFactor').checked=(hour>=18 || hour<7);
-    document.getElementById('emergency').checked=(day===0 || day===6 || hour<8 || hour>18);
-    updateTotal();
-}
-autoApplyRates();
-setInterval(autoApplyRates,60000);
-
-// PDF Download
-document.getElementById('downloadBtn').addEventListener('click',()=>{
-    const { jsPDF } = window.jspdf;
-    let doc=new jsPDF();
-    let cust=document.getElementById('customerName').value||'N/A';
-    let plate=document.getElementById('numberPlate').value||'N/A';
-    let jobKey=document.getElementById('jobSelect').value;
-    if(!jobKey){ alert('Please select a job first'); return; }
-    let job=jobData[jobKey];
-    let engine=parseFloat(document.getElementById('engineSize').value);
-    let cond=document.getElementById('conditionsFactor').checked;
-    let emerg=document.getElementById('emergency').checked;
-    let total=(typeof job.labour==='function')?job.labour(engine):job.labour;
-    if(cond) total*=1.15;
-    if(emerg) total*=1.25;
-
-    doc.setFontSize(14);
-    doc.text('SOS Mechanics – Quote',20,20);
-    doc.setFontSize(10);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`,20,30);
-    doc.text(`Time: ${new Date().toLocaleTimeString()}`,20,36);
-    doc.text(`Customer: ${cust}`,20,42);
-    doc.text(`Number Plate: ${plate}`,20,48);
-    doc.text(`Location: ${document.getElementById('currentLocation').innerText}`,20,54);
-
-    doc.autoTable({
-        startY:60,
-        head:[['Job','Labour (£)','Notes']],
-        body:[[jobKey.replace(/_/g,' ').toUpperCase(), (typeof job.labour==='function'?job.labour(engine):job.labour).toFixed(2), job.notes]],
-        theme:'grid',
-        headStyles:{fillColor:[57,255,20], textColor:[0,0,0]},
-        styles:{fontSize:8}
-    });
-
-    doc.text(`Total: £${total.toFixed(2)} (+ parts)`,20,doc.lastAutoTable.finalY+10);
-    doc.save(`SOS_Quote_${plate}_${new Date().toISOString().slice(0,10)}.pdf`);
-});
 </script>
+
 </body>
 </html>

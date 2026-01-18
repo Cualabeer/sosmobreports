@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request a Quote - SOS Mechanics</title>
+<link rel="stylesheet" href="homepage.css"> <!-- Homepage styling -->
+<style>
+  body { margin:0; font-family: Arial, sans-serif; }
+  .section { width:100%; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:40px 20px; box-sizing:border-box; }
+  .hero { background-color:#f2f2f2; } /* Light grey hero */
+  .content { background-color:#fff; width:100%; max-width:700px; border-radius:8px; padding:30px; box-shadow:0 4px 12px rgba(0,0,0,0.1); color:#000; }
+  h1,h2 { text-align:center; margin-bottom:25px; }
+  form { display:flex; flex-direction:column; gap:15px; }
+  input, select, textarea, button { width:100%; padding:14px; font-size:16px; border-radius:5px; border:1px solid #ccc; box-sizing:border-box; }
+  textarea { resize:vertical; }
+  button { background-color:#39ff14; color:#000; border:none; font-weight:bold; cursor:pointer; transition:0.3s; }
+  button:hover { background-color:#28e20f; }
+  .location-wrapper { position:relative; }
+  .location-wrapper input { padding-right:50px; }
+  .location-wrapper button { position:absolute; right:0; top:0; bottom:0; width:50px; background:#39ff14; color:#000; border:none; border-radius:0 5px 5px 0; cursor:pointer; }
+  @media (max-width:500px) { .content { padding:20px; } input, select, textarea, button { font-size:14px; padding:12px; } }
+</style>
+</head>
+<body>
+
+<!-- Hero Section -->
+<div class="section hero">
+  <div class="content">
+    <h1>Request Your Quote</h1>
+    <p style="text-align:center; margin-bottom:20px;">Fast, professional service for all vehicles. Fill in your details and we’ll get back to you promptly.</p>
+    <form action="/submit-quote" method="POST">
+      <input type="text" name="name" placeholder="Full Name" required>
+      <input type="tel" name="phone" placeholder="Phone Number" required>
+      <input type="email" name="email" placeholder="Email Address" required>
+      <input type="text" name="vehicle" placeholder="Vehicle Make & Model" required>
+
+      <div class="location-wrapper">
+        <input type="text" name="location" placeholder="Your Location" required>
+        <button type="button" title="Use Current Location">📍</button>
+      </div>
+
+      <input type="datetime-local" name="serviceTime" required>
+      <textarea name="details" rows="4" placeholder="Describe the issue / service required" required></textarea>
+      <button type="submit">Submit Quote</button>
+    </form>
+    <p style="text-align:center; margin-top:15px; font-size:0.9em; color:#666;">Your data is safe. We never share your info with third parties.</p>
+  </div>
+</div>
+
+<!-- Optional Additional Info Section -->
+<div class="section">
+  <div class="content">
+    <h2>Why Choose SOS Mechanics?</h2>
+    <ul>
+      <li>Fast, reliable mobile service across the Medway area</li>
+      <li>Experienced mechanics for cars and vans</li>
+      <li>Professional, fully equipped with high-grade tools</li>
+      <li>Transparent pricing and accurate quotes</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

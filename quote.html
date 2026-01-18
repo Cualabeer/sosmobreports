@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOS Mechanics Full Quote Dashboard</title>
+<style>
+    body { font-family: Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 20px; }
+    h1 { color: #ff0000; }
+    label { display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 8px; margin-top: 4px; }
+    .checkbox { display: inline-block; margin-right: 15px; }
+    #total { font-size: 24px; font-weight: bold; margin-top: 20px; color: #ff0000; }
+    button { padding: 10px 20px; background: #ff0000; border: none; color: #fff; cursor: pointer; margin-top: 15px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #fff; padding: 8px; text-align: left; }
+</style>
+</head>
+<body>
+
+<h1>SOS Mechanics – Full Quote Dashboard</h1>
+
+<div id="datetime-location">
+    <p id="currentDate"></p>
+    <p id="currentTime"></p>
+    <p id="currentLocation"></p>
+</div>
+
+<label>Customer Name:
+<input type="text" id="customerName" placeholder="Enter customer name"></label>
+
+<label>Number Plate:
+<input type="text" id="numberPlate" placeholder="Enter number plate"></label>
+
+<label>Engine Size:
+<select id="engineSize">
+    <option value="1.4">Up to 1.4L</option>
+    <option value="2.0">1.5–2.0L</option>
+    <option value="3.0">2.1–3.0L</option>
+    <option value="3.1">3.1L+</option>
+</select></label>
+
+<label>Job:
+<select id="jobSelect">
+    <!-- Full Master List of Jobs -->
+    <option value="clutch_small">Clutch Replacement ≤2.0L</option>
+    <option value="clutch_large">Clutch Replacement >2.0L</option>
+    <option value="brake_pads">Brake Pads (per axle)</option>
+    <option value="brake_discs">Brake Discs Replacement</option>
+    <option value="oil_change">Engine Oil + Filter</option>
+    <option value="coolant_change">Coolant Change / Flush</option>
+    <option value="spark_plugs">Spark Plugs Replacement</option>
+    <option value="ignition_coils">Ignition Coils Replacement</option>
+    <option value="battery">Battery / Alternator</option>
+    <option value="lights">Headlights / Bulbs</option>
+    <option value="minor_gasket">Minor Oil Leak / Gasket</option>
+    <option value="diagnostics">Diagnostics / Fault Reading</option>
+    <option value="suspension">Suspension / Shock Absorbers</option>
+    <option value="steering">Steering / Linkages</option>
+    <option value="exhaust">Exhaust / Catalytic Converter</option>
+    <option value="filters">Air / Fuel / Cabin Filters</option>
+    <option value="tyres">Tyre Fitting / Rotation</option>
+    <option value="wipers">Wiper Blades Replacement</option>
+    <option value="belts">Timing / Drive Belt Replacement</option>
+    <option value="hoses">Hose Replacement / Leaks</option>
+    <option value="fuel_system">Fuel Pump / Injectors</option>
+    <option value="transmission_fluid">Transmission Fluid</option>
+    <option value="coolant_sensor">Coolant Sensor / Housing</option>
+    <option value="oil_sensor">Oil Pressure / Sensor</option>
+    <option value="adblue_reset">AdBlue / SCR Reset</option>
+    <option value="ecu_coding">ECU / Part Coding</option>
+    <option value="roadside_fix">Emergency Roadside Fix</option>
+    <option value="diagnostic_map">Real-Time Data Mapping</option>
+    <option value="inspection_light">Under-Hood Inspection Light Work</option>
+    <option value="lights_adjustment">Headlight Alignment / Adjustment</option>
+    <option value="fuel_filter">Fuel Filter Replacement</option>
+    <option value="brake_fluid">Brake Fluid Replacement</option>
+    <option value="clutch_fluid">Clutch Fluid Top-Up</option>
+    <option value="manual_adjustments">Manual Minor Adjustments</option>
+    <option value="emergency_towing">Towing / Recovery Assistance</option>
+    <option value="wheel_alignment">Wheel Alignment / Tracking</option>
+    <option value="diagnostic_reset">Fault Code Reset</option>
+    <option value="battery_check">Battery Health / Charging Check</option>
+    <option value="coolant_flush">Coolant Flush & System Check</option>
+    <option value="lights_upgrade">LED / Halogen Light Upgrade</option>
+</select></label>
+
+<div>
+    <span class="checkbox"><input type="checkbox" id="labourOnly"> Labour Only</span>
+    <span class="checkbox"><input type="checkbox" id="conditionsFactor"> Conditions Factor (+15%)</span>
+    <span class="checkbox"><input type="checkbox" id="emergency"> Emergency / Weekend (+25%)</span>
+</div>
+
+<p id="mechanicsNote">Two mechanics used for speed (price remains the same)</p>
+
+<p id="total">Total: £0</p>
+
+<button id="downloadBtn">Download Quote PDF</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script>
+const jobData = {
+    'clutch_small': {labour: 300, parts: 300, notes: 'Gearbox stays in; roadside/dark/cold/wet may apply.'},
+    'clutch_large': {labour: 450, parts: 450, notes: 'Larger engine; two mechanics used.'},
+    'brake_pads': {labour: 75, parts: 75, notes: 'Per axle; customer-supplied pads.'},
+    'brake_discs': {labour: 120, parts: 120, notes: 'Per axle; includes inspection.'},
+    'oil_change': {labour: 55, parts: 55, notes: 'Includes oil & filter; fluids topped up.'},
+    'coolant_change': {labour: 60, parts: 60, notes: 'Coolant system check included.'},
+    'spark_plugs': {labour: 85, parts: 85, notes: 'Diagnostics included.'},
+    'ignition_coils': {labour: 85, parts: 85, notes: 'Diagnostics included.'},
+    'battery': {labour: 120, parts: 120, notes: 'Electrical diagnostics included.'},
+    'lights': {labour: 40, parts: 40, notes: 'Minor wiring; inspection included.'},
+    'minor_gasket': {labour: 85, parts: 85, notes: 'Oil top-up included; customer supplies parts.'},
+    'diagnostics': {labour: 50, parts: 50, notes: 'Scans, sensor resets, part matching.'},
+    'suspension': {labour: 150, parts: 150, notes: 'Shock absorbers / bushings included.'},
+    'steering': {labour: 120, parts: 120, notes: 'Linkages & joints inspected.'},
+    'exhaust': {labour: 100, parts: 100, notes: 'Catalytic converter / muffler checks.'},
+    'filters': {labour: 35, parts: 35, notes: 'Air, fuel, cabin filters.'},
+    'tyres': {labour: 50, parts: 50, notes: 'Fitting / rotation included.'},
+    'wipers': {labour: 20, parts: 20, notes: 'Front/rear wipers.'},
+    'belts': {labour: 100, parts: 100, notes: 'Timing / drive belt replacement.'},
+    'hoses': {labour: 60, parts: 60, notes: 'Leaks & hose replacement.'},
+    'fuel_system': {labour: 120, parts: 120, notes: 'Pump & injectors inspected.'},
+    'transmission_fluid': {labour: 55, parts: 55, notes: 'Fluid top-up / check.'},
+    'coolant_sensor': {labour: 60, parts: 60, notes: 'Coolant sensor replacement.'},
+    'oil_sensor': {labour: 55, parts: 55, notes: 'Oil pressure sensor replacement.'},
+    'adblue_reset': {labour: 50, parts: 50, notes: 'AdBlue / SCR reset.'},
+    'ecu_coding': {labour: 80, parts: 80, notes: 'ECU / TCU part coding.'},
+    'roadside_fix': {labour: 100, parts: 100, notes: 'Emergency roadside repair.'},
+    'diagnostic_map': {labour: 60, parts: 60, notes: 'Real-time sensor mapping.'},
+    'inspection_light': {labour: 40, parts: 40, notes: 'Under-hood inspection work.'},
+    'lights_adjustment': {labour: 35, parts: 35, notes: 'Headlight alignment/adjustment.'},
+    'fuel_filter': {labour: 50, parts: 50, notes: 'Fuel filter replacement.'},
+    'brake_fluid': {labour: 45, parts: 45, notes: 'Brake fluid replacement.'},
+    'clutch_fluid': {labour: 40, parts: 40, notes: 'Clutch fluid top-up.'},
+    'manual_adjustments': {labour: 30, parts: 30, notes: 'Minor manual adjustments.'},
+    'emergency_towing': {labour: 150, parts: 150, notes: 'Towing / recovery assistance.'},
+    'wheel_alignment': {labour: 90, parts: 90, notes: 'Wheel alignment/tracking.'},
+    'diagnostic_reset': {labour: 40, parts: 40, notes: 'Fault code reset.'},
+    'battery_check': {labour: 35, parts: 35, notes: 'Battery health & charging.'},
+    'coolant_flush': {labour: 60, parts: 60, notes: 'Full coolant flush & check.'},
+    'lights_upgrade': {labour: 70, parts: 70, notes: 'LED/Halogen upgrade.'}
+};
+
+function updateTotal() {
+    const jobKey = document.getElementById('jobSelect').value;
+    const labourOnly = document.getElementById('labourOnly').checked;
+    const conditions = document.getElementById('conditionsFactor').checked;
+    const emergency = document.getElementById('emergency').checked;
+
+    let job = jobData[jobKey];
+    let total = labourOnly ? job.labour : job.parts;
+    if (conditions) total *= 1.15;
+    if (emergency) total *= 1.25;
+    document.getElementById('total').innerText = 'Total: £' + total.toFixed(2);
+}
+document.getElementById('jobSelect').addEventListener('change', updateTotal);
+document.getElementById('labourOnly').addEventListener('change', updateTotal);
+document.getElementById('conditionsFactor').addEventListener('change', updateTotal);
+document.getElementById('emergency').addEventListener('change', updateTotal);
+
+updateTotal();
+
+// Date & Time
+function updateDateTime() {
+    const now = new Date();
+    document.getElementById('currentDate').innerText = 'Date: ' + now.toLocaleDateString();
+    document.getElementById('currentTime').innerText = 'Time: ' + now.toLocaleTimeString();
+}
+updateDateTime();
+setInterval(updateDateTime, 60000);
+
+// Location
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((pos) => {
+        document.getElementById('currentLocation').innerText = `Location: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+    }, () => { document.getElementById('currentLocation').innerText = 'Location: Not available'; });
+} else {
+    document.getElementById('currentLocation').innerText = 'Location: Not supported';
+}
+
+// PDF Download
+document.getElementById('downloadBtn').addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const customer = document.getElementById('customerName').value || 'N/A';
+    const plate = document.getElementById('numberPlate').value || 'N/A';
+    const jobKey = document.getElementById('jobSelect').value;
+    const job = jobData[jobKey];
+    const labourOnly = document.getElementById('labourOnly').checked;
+    const conditions = document.getElementById('conditionsFactor').checked;
+    const emergency = document.getElementById('emergency').checked;
+    let total = labourOnly ? job.labour : job.parts;
+    if (conditions) total *= 1.15;
+    if (emergency) total *= 1.25;
+
+    doc.setFontSize(16);
+    doc.text('SOS Mechanics – Quote', 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 30);
+    doc.text(`Time: ${new Date().toLocaleTimeString()}`, 20, 36);
+    doc.text(`Customer: ${customer}`, 20, 42);
+    doc.text(`Number Plate: ${plate}`, 20, 48);
+    doc.text(`Location: ${document.getElementById('currentLocation').innerText}`, 20, 54);
+
+    doc.text('Job Details:', 20, 64);
+    doc.autoTable({
+        startY: 68,
+        head: [['Job', 'Labour Only (£)', 'Parts + Labour (£)', 'Notes']],
+        body: [[jobKey.replace(/_/g,' ').toUpperCase(), job.labour.toFixed(2), job.parts.toFixed(2), job.notes]],
+        theme: 'grid',
+        headStyles: { fillColor: [255, 0, 0] },
+        styles: { fontSize: 10, textColor: [0,0,0] }
+    });
+
+    doc.text(`Total: £${total.toFixed(2)}`, 20, doc.lastAutoTable.finalY + 10);
+
+    doc.save(`SOS_Quote_${plate}_${new Date().toISOString().slice(0,10)}.pdf`);
+});
+</script>
+
+</body>
+</html>

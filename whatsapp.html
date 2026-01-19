@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SOS Mechanics | QR Scan</title>
-
 <style>
   body {
     margin: 0;
@@ -18,7 +17,6 @@
     overflow: hidden;
   }
 
-  /* Dark overlay for readability */
   body::before {
     content: "";
     position: absolute;
@@ -32,21 +30,38 @@
     z-index: 1;
     padding: 24px;
     max-width: 360px;
+    color: #fff;
   }
 
   h1 {
     color: #39ff14;
     font-size: 2.2rem;
     margin-bottom: 12px;
-    animation: fadeDown 0.8s ease forwards;
     opacity: 0;
+    transform: translateY(-20px);
+    animation: fadeDown 0.8s forwards;
   }
 
-  p {
-    color: #fff;
+  p#welcomeText {
     font-size: 1.05rem;
-    margin-bottom: 24px;
-    animation: fadeUp 0.8s 0.4s ease forwards;
+    margin-bottom: 12px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+
+  p#prompt {
+    opacity: 0;
+    font-size: 1rem;
+    margin-top: 16px;
+    line-height: 1.4;
+    color: #39ff14;
+  }
+
+  p#countdown {
+    color: #39ff14;
+    font-weight: 700;
+    margin-top: 12px;
     opacity: 0;
   }
 
@@ -59,31 +74,39 @@
     border-radius: 10px;
     text-decoration: none;
     font-size: 1.05rem;
-    animation: fadeIn 0.8s 0.9s ease forwards;
+    margin-top: 20px;
     opacity: 0;
+    transform: translateY(20px);
+    transition: transform 0.5s ease, opacity 0.5s ease;
   }
 
-  @keyframes fadeDown {
-    to { opacity: 1; transform: translateY(0); }
-    from { transform: translateY(-20px); }
+  /* Attention flash effect */
+  @keyframes flash {
+    0%, 100% { background-color: #39ff14; }
+    50% { background-color: #ffffff; }
   }
 
-  @keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
-    from { transform: translateY(20px); }
-  }
+  @keyframes fadeDown { to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
 
-  @keyframes fadeIn {
-    to { opacity: 1; }
+  @media(max-width:480px){
+    h1 { font-size:2rem; }
+    p { font-size:0.95rem; }
+    a.button { font-size:1rem; padding:12px 24px; }
   }
 </style>
 </head>
 
 <body>
-
 <div class="wrap">
   <h1>👋 Welcome</h1>
-  <p>You scanned the SOS Mechanics QR code.<br>Chat directly with a mechanic now.</p>
+  <p id="welcomeText">You scanned the SOS Mechanics QR code.<br>Chat directly with a mechanic now.</p>
+
+  <p id="countdown">Next step in 10s</p>
+  <p id="prompt">
+    Please prepare the following details to make our response faster:<br>
+    Name, Vehicle Registration, Location, Issue.
+  </p>
 
   <a id="waLink" class="button" target="_blank">
     Chat with a Mechanic
@@ -91,17 +114,36 @@
 </div>
 
 <script>
-  // --- SOURCE CONTROL ---
-  const source = "QR";
-  const phone = "447405937104";
+  // --- Use your short/burly link here ---
+  const shortLink = "https://bit.ly/3LSGcQ4"; // <-- replace with your actual link
+  const waLink = document.getElementById("waLink");
+  waLink.href = shortLink;
 
-  const message = encodeURIComponent(
-    `Hi, I scanned your SOS Mechanics ${source} code and need assistance.`
-  );
+  // --- Countdown and prompt ---
+  const countdownEl = document.getElementById("countdown");
+  const promptEl = document.getElementById("prompt");
+  promptEl.style.opacity = 0; // hidden initially
+  waLink.style.opacity = 0; // hide button initially
+  let seconds = 10;
 
-  document.getElementById("waLink").href =
-    `https://wa.me/${phone}?text=${message}`;
+  countdownEl.style.opacity = 1;
+  const interval = setInterval(() => {
+    seconds--;
+    if(seconds > 0){
+      countdownEl.textContent = `Next step in ${seconds}s`;
+    } else {
+      clearInterval(interval);
+      countdownEl.style.display = "none"; // hide countdown
+      promptEl.style.opacity = 1; // show prompt smoothly
+
+      // Show button with slide up
+      waLink.style.opacity = 1;
+      waLink.style.transform = "translateY(0)";
+
+      // Flash effect to grab attention
+      waLink.style.animation = "flash 1s ease 0s 3";
+    }
+  }, 1000);
 </script>
-
 </body>
 </html>

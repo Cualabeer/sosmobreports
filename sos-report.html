@@ -306,24 +306,34 @@ async function generatePDF(){
   if(images.length){
     pdf.addPage();
     y=10;
-    const scaleFactor=0.25; // quarter size
+    const maxWidth = 180;
+    const spacing = 5;
     for(let img of images){
-      const imgProps = pdf.getImageProperties(img);
-      const imgWidth = imgProps.width*scaleFactor;
-      const imgHeight = imgProps.height*scaleFactor;
-      if(y+imgHeight>270) break;
-      pdf.addImage(img,"JPEG",10,y,imgWidth,imgHeight);
-      y+=imgHeight+5;
+        const imgProps = pdf.getImageProperties(img);
+        let imgWidth = imgProps.width;
+        let imgHeight = imgProps.height;
+
+        if(imgWidth > maxWidth){
+            const ratio = maxWidth / imgWidth;
+            imgWidth = maxWidth;
+            imgHeight = imgHeight * ratio;
+        }
+
+        if(y + imgHeight > 270){
+            pdf.addPage();
+            y=10;
+        }
+
+        pdf.addImage(img,"JPEG",10,y,imgWidth,imgHeight);
+        y += imgHeight + spacing;
     }
   }
 
-  // Footer/Disclaimer
   pdf.setFontSize(7);
   pdf.text("Disclaimer: This report reflects vehicle condition at the time of inspection only. Fixes cannot be guaranteed.",10,280);
 
   pdf.save(`SOS_Report_${plate}.pdf`);
 }
 </script>
-
 </body>
 </html>

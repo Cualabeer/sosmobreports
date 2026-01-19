@@ -12,12 +12,16 @@
   --muted: #666;
 }
 
+/* Body */
 body {
   font-family: system-ui, sans-serif;
   background: #fff;
   color: var(--text);
   margin:0;
-  padding-top:64px;
+  padding-top:64px; /* space for fixed header */
+  overflow-x: hidden; /* prevent horizontal scroll */
+  -webkit-text-size-adjust: 100%; /* prevent zoom on mobile */
+  -ms-text-size-adjust: 100%;
 }
 
 /* Header */
@@ -29,7 +33,7 @@ header {
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:16px 16px; /* flush mobile padding */
+  padding:16px 16px;
   border-bottom:1px solid #eee;
   background:#fff;
   z-index:1000;
@@ -62,18 +66,28 @@ nav#menu a.current {
   text-shadow:0 0 8px var(--accent);
 }
 
-/* Container and form fields */
+/* Container & Form */
 .container {
   max-width:720px;
+  width:100%;
   margin:auto;
-  padding:32px;
+  padding:32px 16px;
+  box-sizing:border-box;
 }
 
 label {font-weight:600; display:block; margin-bottom:6px;}
-input, select, textarea {width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box;}
+input, select, textarea, button {
+  width:100%;
+  padding:12px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
+  margin-bottom:12px;
+  font-size:16px; /* prevents zoom on mobile focus */
+}
 textarea {min-height:90px;}
-button {background:var(--accent); border:none; padding:12px; font-weight:700; border-radius:8px; cursor:pointer;}
-img.preview {width:100%; margin-top:10px; border-radius:6px;}
+button {background:var(--accent); border:none; padding:14px; font-weight:700; border-radius:8px; cursor:pointer;}
+img.preview {width:100%; display:block; margin-top:10px; border-radius:6px;}
 footer {font-size:0.75rem; color:var(--muted); margin-top:48px;}
 h3 {margin-top:24px;}
 
@@ -95,33 +109,15 @@ h3 {margin-top:24px;}
   }
 
   nav#menu a {
-    padding:14px 16px; /* full width tap area */
+    padding:14px 16px;
     border-bottom:1px solid #eee;
     display:block;
   }
 
   nav#menu.active {display:flex;}
 
-  /* Full width mobile with assistance form spacing */
-  .container {
-    width:100%;
-    padding:20px;
-    margin:0;
-  }
-
   section {margin-bottom:24px;}
-  label {margin-bottom:6px; display:block; font-weight:600;}
-  input, select, textarea, button {
-    width:100%;
-    box-sizing:border-box;
-    padding:12px;
-    margin-bottom:12px;
-    font-size:0.95rem;
-  }
-
   h3 {margin-top:20px; margin-bottom:12px; font-size:1.1rem;}
-  img.preview {width:100%; max-width:100%; margin-top:10px; border-radius:6px;}
-  button {padding:14px; font-size:1rem; border-radius:8px;}
 }
 </style>
 </head>
@@ -240,7 +236,9 @@ This report reflects vehicle condition at the time of inspection only. Findings 
 <script>
 let images = [];
 let locationCoords = "";
+
 function toggleMenu(){document.getElementById("menu").classList.toggle("active");}
+
 function previewImages(event){
   const files = event.target.files;
   const previews = document.getElementById("previews");
@@ -255,6 +253,7 @@ function previewImages(event){
     reader.readAsDataURL(file);
   }
 }
+
 function toggleFull(){
   const full = document.getElementById("type").value==="full";
   document.getElementById("battery-full").style.display = full?"block":"none";

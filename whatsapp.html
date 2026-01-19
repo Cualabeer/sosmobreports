@@ -3,121 +3,226 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mechanics | QR Scan</title>
+<title>SOS Mechanics - Call a Mechanic</title>
 <style>
-  body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: system-ui, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: url("assets/header-image.jpg") center / cover no-repeat;
-    overflow: hidden;
-  }
-  body::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.65);
-    z-index: 0;
-  }
-  .wrap {
-    position: relative;
-    z-index: 1;
-    padding: 24px;
-    max-width: 360px;
-    color: #fff;
-  }
-  h1 { color:#39ff14; font-size:2.2rem; margin-bottom:12px; opacity:0; transform:translateY(-20px); animation:fadeDown 0.8s forwards; }
-  p#welcomeText { font-size:1.05rem; margin-bottom:12px; opacity:0; transform:translateY(20px); animation:fadeUp 0.8s 0.5s forwards; }
-  p#countdown { color:#39ff14; font-weight:700; margin-top:12px; opacity:0; }
-  p#info { margin-top:12px; color:#39ff14; font-size:0.95rem; display:none; }
-  form { display:none; margin-top:16px; text-align:left; }
-  form input, form textarea { width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:none; font-size:1rem; }
-  a.button { display:inline-block; background:#39ff14; color:#111; font-weight:700; padding:14px 28px; border-radius:10px; text-decoration:none; font-size:1.05rem; margin-top:20px; opacity:0; transform:translateY(20px); transition: transform 0.5s ease, opacity 0.5s ease; }
-  @keyframes flash { 0%,100%{background-color:#39ff14;} 50%{background-color:#fff;} }
-  @keyframes fadeDown { to{opacity:1;transform:translateY(0);} }
-  @keyframes fadeUp { to{opacity:1;transform:translateY(0);} }
+:root{--accent:#39ff14;--text:#fff;}
+body{margin:0;font-family:system-ui,sans-serif;background:#111;color:#fff;overflow-x:hidden;}
+header{background:url('assets/header.jpg') no-repeat center/cover;height:180px;display:flex;align-items:center;justify-content:center;}
+header h1{color:var(--accent);text-shadow:0 0 12px #000;}
+.container{max-width:480px;margin:auto;padding:20px;}
+input, select, textarea, button{width:100%;padding:14px;margin:6px 0;border-radius:6px;border:1px solid #ccc;font-size:1rem;}
+textarea{min-height:80px;}
+button{background:var(--accent);color:#111;font-weight:700;border:none;cursor:pointer;opacity:0;transform: translateY(20px);transition: all 0.5s ease;}
+#waLink.show{opacity:1;transform:translateY(0);animation: flash 1s infinite alternate;}
+@keyframes flash{0%{background:#39ff14}50%{background:#a6ff7a}100%{background:#39ff14}}
+#countdown{font-weight:700;color:var(--accent);text-align:center;font-size:1.2rem;margin:12px 0;}
+#scheduleFields{display:none;}
+#upgradePrompt{display:none;color:var(--accent);font-weight:700;font-size:0.9rem;margin:6px 0;}
+.service-highlight{animation: highlight 0.7s ease;}
+@keyframes highlight{0%{background:#39ff14;color:#111;}50%{background:#a6ff7a;color:#111;}100%{background:#39ff14;color:#111;}}
+
+/* Status ticker */
+#statusBar{background:#111;color:#39ff14;font-size:0.8rem;padding:4px 12px;display:flex;justify-content:space-between;align-items:center;position:fixed;top:0;left:0;width:100%;z-index:1000;font-family:monospace;box-shadow:0 1px 3px rgba(0,0,0,0.5);}
+#ticker{overflow:hidden;white-space:nowrap;flex:1;text-align:right;}
+#ticker a{color:var(--accent);text-decoration:none;}
+
+/* Overlay */
+#overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2000;transition:opacity 0.7s;}
+#overlay h2{font-size:1.6rem;color:var(--accent);margin-bottom:20px;}
+#overlay p{text-align:center;margin-bottom:30px;}
+#overlay button{padding:12px 20px;font-size:1rem;border:none;border-radius:8px;cursor:pointer;}
+#overlay button:first-child{background:var(--accent);color:#111;margin-right:10px;}
+#overlay button:last-child{background:#fff;color:#111;}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>👋 Welcome</h1>
-  <p id="welcomeText">You scanned the SOS Mechanics QR code.<br>We aim to call you within 15 mins to confirm your call-out.</p>
 
-  <p id="countdown">Next step in 10s</p>
+<!-- Live Ticker -->
+<div id="statusBar">
+  <div id="timeDate">Loading time...</div>
+  <div id="ticker">Loading ticker...</div>
+</div>
 
-  <form id="detailsForm">
-    <input type="text" id="name" placeholder="Your Name" required>
-    <input type="text" id="vehicle" placeholder="Vehicle Registration" required>
-    <input type="text" id="location" placeholder="Location" required>
-    <textarea id="issue" placeholder="Describe your issue" required></textarea>
-    <button type="button" id="submitBtn">Send to WhatsApp</button>
-  </form>
+<header><h1>SOS Mechanics</h1></header>
 
-  <p id="info">Click the button below to chat with a mechanic now.</p>
+<!-- Welcome Overlay -->
+<div id="overlay">
+  <h2>Welcome to SOS Mechanics</h2>
+  <p>Scan confirmed. Are you booking an urgent call-out or prebooking for later?</p>
+  <div style="display:flex;gap:20px;">
+    <button id="btnUrgent">Urgent / ASAP</button>
+    <button id="btnPrebook">Prebook</button>
+  </div>
+</div>
 
-  <a id="waLink" class="button" target="_blank">Chat with a Mechanic</a>
+<div class="container" style="margin-top:220px;">
+<div id="countdown">Preparing your service form...</div>
+
+<form id="detailsForm" style="display:none;opacity:0;transform:translateY(30px);transition:all 0.7s ease;">
+  <input type="text" id="name" placeholder="Your Name" required>
+  <input type="text" id="vehicle" placeholder="Vehicle Registration" required>
+  <input type="text" id="location" placeholder="Location" required>
+  <textarea id="issue" placeholder="Describe your issue" required></textarea>
+
+  <select id="service" required>
+    <option value="" disabled selected>Select Service Required</option>
+    <option value="Battery Check / Jump Start" data-price="£50-£60" data-upgrade="Engine Diagnostics">Battery Check / Jump Start</option>
+    <option value="Brake / Pad Inspection" data-price="£60-£75" data-upgrade="Full Vehicle Check">Brake / Pad Inspection</option>
+    <option value="Oil / Fluid Top-Up" data-price="£50-£70" data-upgrade="Full Vehicle Check">Oil / Fluid Top-Up</option>
+    <option value="Engine Diagnostics" data-price="£80-£100">Engine Diagnostics</option>
+    <option value="Full Vehicle Check" data-price="£100-£150">Full Vehicle Check</option>
+  </select>
+
+  <div id="priceEstimate" style="margin-bottom:12px;color:var(--accent);font-weight:700;">Estimated Call-out: £50-£100</div>
+  <div id="upgradePrompt">Consider upgrading for maximum coverage!</div>
+
+  <select id="urgency" required>
+    <option value="" disabled selected>Is this urgent or prebook?</option>
+    <option value="Urgent – ASAP call-out">Urgent – ASAP call-out</option>
+    <option value="Prebook – schedule later">Prebook – schedule later</option>
+  </select>
+
+  <div id="scheduleFields">
+    <input type="date" id="scheduleDate">
+    <input type="time" id="scheduleTime">
+  </div>
+
+  <button id="waLink" style="display:none;">Chat with a Mechanic</button>
+</form>
 </div>
 
 <script>
+// ⏱ Countdown Welcome
+const countdown = document.getElementById("countdown");
 const form = document.getElementById("detailsForm");
-const submitBtn = document.getElementById("submitBtn");
-const waLink = document.getElementById("waLink");
-const info = document.getElementById("info");
-
-// --- Countdown before showing form ---
-let seconds = 10;
-const countdownEl = document.getElementById("countdown");
-countdownEl.style.opacity = 1;
-const interval = setInterval(() => {
-  seconds--;
-  if(seconds > 0){
-    countdownEl.textContent = `Next step in ${seconds}s`;
-  } else {
+let counter = 5;
+const interval = setInterval(()=>{
+  counter--;
+  if(counter>0){countdown.textContent=`Preparing your service form in ${counter} seconds...`;}
+  else{
     clearInterval(interval);
-    countdownEl.style.display = "none";
-    form.style.display = "block"; // show input form
+    countdown.style.opacity=0;
+    setTimeout(()=>countdown.style.display="none",500);
   }
-}, 1000);
+},1000);
 
-// --- On form submit ---
-submitBtn.addEventListener("click", ()=>{
-  const name = document.getElementById("name").value.trim();
-  const vehicle = document.getElementById("vehicle").value.trim();
-  const location = document.getElementById("location").value.trim();
-  const issue = document.getElementById("issue").value.trim();
+// Overlay Urgent vs Prebook
+const overlay = document.getElementById("overlay");
+const scheduleFields = document.getElementById("scheduleFields");
+const btnUrgent = document.getElementById("btnUrgent");
+const btnPrebook = document.getElementById("btnPrebook");
 
-  if(!name || !vehicle || !location || !issue){
-    alert("Please fill all details before proceeding.");
-    return;
-  }
+btnUrgent.addEventListener("click", ()=>{
+  scheduleFields.style.display="none";
+  overlay.style.opacity=0;
+  setTimeout(()=>overlay.style.display="none",700);
+  form.style.display="block";
+  setTimeout(()=>form.style.opacity=1,50);
+});
 
-  // Pre-fill WhatsApp link using burly link + message
-  const source = "QR";
-  const shortLink = "https://bit.ly/3LSGcQ4"; // your link
-  const message = encodeURIComponent(
-`Hi, I scanned your SOS Mechanics ${source} code.
+btnPrebook.addEventListener("click", ()=>{
+  scheduleFields.style.display="block";
+  overlay.style.opacity=0;
+  setTimeout(()=>overlay.style.display="none",700);
+  form.style.display="block";
+  setTimeout(()=>form.style.opacity=1,50);
+});
+
+// Service selection
+const serviceSelect = document.getElementById("service");
+const priceDiv = document.getElementById("priceEstimate");
+const upgradePrompt = document.getElementById("upgradePrompt");
+const urgencySelect = document.getElementById("urgency");
+const waLink = document.getElementById("waLink");
+
+serviceSelect.addEventListener("change", ()=>{
+  const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+  const price = selectedOption.getAttribute("data-price");
+  const upgrade = selectedOption.getAttribute("data-upgrade");
+  priceDiv.textContent = `Estimated Call-out: ${price}`;
+  if(upgrade){upgradePrompt.style.display="block";upgradePrompt.textContent=`Consider upgrading to ${upgrade} for maximum coverage!`;}
+  else{upgradePrompt.style.display="none";}
+  waLink.style.display="block";
+  setTimeout(()=>waLink.classList.add("show"),50);
+});
+
+urgencySelect.addEventListener("change", ()=>{
+  if(urgencySelect.value.includes("Prebook")){scheduleFields.style.display="block";}
+  else{scheduleFields.style.display="none";}
+});
+
+// WhatsApp Button
+waLink.addEventListener("click", (e)=>{
+  e.preventDefault();
+  const name=document.getElementById("name").value.trim();
+  const vehicle=document.getElementById("vehicle").value.trim();
+  const location=document.getElementById("location").value.trim();
+  const issue=document.getElementById("issue").value.trim();
+  const service=document.getElementById("service").value;
+  const urgency=document.getElementById("urgency").value;
+  const date=document.getElementById("scheduleDate").value;
+  const time=document.getElementById("scheduleTime").value;
+
+  if(!name||!vehicle||!location||!issue||!service||!urgency){alert("Please fill all required fields.");return;}
+
+  let message=`Hi, I scanned your SOS Mechanics QR code.
 
 Name: ${name}
 Vehicle: ${vehicle}
 Location: ${location}
-Issue: ${issue}`
-  );
+Issue: ${issue}
+Service Required: ${service}
+Urgency: ${urgency}
+Source: QR`;
 
-  waLink.href = `${shortLink}?text=${message}`;
+  if(urgency.includes("Prebook")){
+    if(!date||!time){alert("Select date/time for prebooking.");return;}
+    message+=`\nScheduled Date: ${date}\nScheduled Time: ${time}`;
+  }
 
-  // Show info + animate button
-  info.style.display = "block";
-  waLink.style.opacity = 1;
-  waLink.style.transform = "translateY(0)";
-  waLink.style.animation = "flash 1s ease 0s 3";
-
-  // Optionally hide the form
-  form.style.display = "none";
+  const shortLink="https://bit.ly/3LSGcQ4"; // your burly link
+  window.open(`${shortLink}?text=${encodeURIComponent(message)}`,"_blank");
 });
+
+// ✅ Status Bar: Time/Date + Ticker
+const timeEl = document.getElementById("timeDate");
+const tickerEl = document.getElementById("ticker");
+
+// Time & Date
+function updateTime(){
+  const now = new Date();
+  const day = now.toLocaleDateString('en-GB', { weekday: 'short' });
+  const date = now.toLocaleDateString('en-GB');
+  const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute:'2-digit' });
+  timeEl.textContent = `${day} ${date} ${time}`;
+}
+setInterval(updateTime,1000);
+updateTime();
+
+// Ticker Messages
+let tickerMessages = [
+  { text:"Battery Check from £50 🔋", link:"https://amzn.to/xxxx" },
+  { text:"Brake / Pad Inspection £60-£75 🛠️", link:"https://bit.ly/xxxx" },
+  { text:"Oil / Fluid Top-Up £50-£70 🚗", link:"https://affiliate.link/fluids" },
+  { text:"Full Vehicle Check today — Call us now!", link:"https://bit.ly/3LSGcQ4" },
+  { text:"Next call-out in 15 mins ⏱️", link:"" },
+  { text:"Weather: Changa, Kent 🌡️ 12°C ☀️", link:"" }
+];
+
+let tickerIndex = 0;
+let tickerPos = window.innerWidth;
+function animateTicker(){
+  const msgObj = tickerMessages[tickerIndex];
+  tickerEl.innerHTML = msgObj.link ? `<a href="${msgObj.link}" target="_blank">${msgObj.text}</a>` : msgObj.text;
+  tickerPos -= 1.2;
+  tickerEl.style.transform = `translateX(${tickerPos}px)`;
+  if(tickerPos < -tickerEl.offsetWidth){
+    tickerIndex = (tickerIndex + 1) % tickerMessages.length;
+    tickerPos = window.innerWidth;
+  }
+  requestAnimationFrame(animateTicker);
+}
+animateTicker();
 </script>
 </body>
 </html>

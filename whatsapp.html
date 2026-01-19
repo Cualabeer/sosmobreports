@@ -33,6 +33,14 @@ button{background:var(--accent);color:#111;font-weight:700;border:none;cursor:po
 #overlay button{padding:12px 20px;font-size:1rem;border:none;border-radius:8px;cursor:pointer;}
 #overlay button:first-child{background:var(--accent);color:#111;margin-right:10px;}
 #overlay button:last-child{background:#fff;color:#111;}
+
+/* WhatsApp Popup */
+#waModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);color:#fff;z-index:3000;align-items:center;justify-content:center;flex-direction:column;padding:20px;}
+#waModal h2{color:var(--accent);}
+#waPreview{background:#111;padding:12px;border:1px solid var(--accent);border-radius:6px;white-space:pre-wrap;margin-top:10px;}
+#waModal button{padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:700;}
+#sendWa{background:var(--accent);color:#111;margin-right:10px;}
+#editWa{background:#fff;color:#111;}
 </style>
 </head>
 <body>
@@ -59,7 +67,6 @@ button{background:var(--accent);color:#111;font-weight:700;border:none;cursor:po
 <div id="countdown">Preparing your service form...</div>
 
 <form id="detailsForm" style="display:none;opacity:0;transform:translateY(30px);transition:all 0.7s ease;">
-  <!-- Urgency first -->
   <select id="urgency" required>
     <option value="" disabled selected>Select Urgency: Urgent or Prebook</option>
     <option value="Urgent – ASAP call-out">Urgent – ASAP call-out</option>
@@ -83,13 +90,23 @@ button{background:var(--accent);color:#111;font-weight:700;border:none;cursor:po
   <div id="priceEstimate" style="margin-bottom:12px;color:var(--accent);font-weight:700;">Estimated Call-out: £50-£100</div>
   <div id="upgradePrompt">Consider upgrading for maximum coverage!</div>
 
-  <div id="scheduleFields" style="display:none;">
+  <div id="scheduleFields">
     <input type="date" id="scheduleDate" placeholder="Date">
     <input type="time" id="scheduleTime" placeholder="Time">
   </div>
 
   <button id="waLink">Chat with a Mechanic</button>
 </form>
+</div>
+
+<!-- WhatsApp Preview Modal -->
+<div id="waModal">
+  <h2>Confirm Your Message</h2>
+  <pre id="waPreview"></pre>
+  <div style="display:flex;gap:12px;margin-top:20px;">
+    <button id="sendWa">Send to WhatsApp</button>
+    <button id="editWa">Edit</button>
+  </div>
 </div>
 
 <script>
@@ -134,11 +151,8 @@ btnPrebook.addEventListener("click", ()=>{
 
 // Show/hide schedule fields based on urgency
 urgencySelect.addEventListener("change", ()=>{
-  if(urgencySelect.value.includes("Prebook")){
-    scheduleFields.style.display="block";
-  } else {
-    scheduleFields.style.display="none";
-  }
+  if(urgencySelect.value.includes("Prebook")){scheduleFields.style.display="block";}
+  else{scheduleFields.style.display="none";}
 });
 
 // Service selection
@@ -159,8 +173,13 @@ serviceSelect.addEventListener("change", ()=>{
   waLink.classList.add("show");
 });
 
-// WhatsApp Button
-waLink.addEventListener("click", (e)=>{
+// WhatsApp Button Popup
+const waModal = document.getElementById("waModal");
+const waPreview = document.getElementById("waPreview");
+const sendWa = document.getElementById("sendWa");
+const editWa = document.getElementById("editWa");
+
+waLink.addEventListener("click",(e)=>{
   e.preventDefault();
   const name=document.getElementById("name").value.trim();
   const vehicle=document.getElementById("vehicle").value.trim();
@@ -188,8 +207,11 @@ Source: QR`;
     message+=`\nScheduled Date: ${date}\nScheduled Time: ${time}`;
   }
 
-  const shortLink="https://bit.ly/3LSGcQ4"; // your burly link
-  window.open(`${shortLink}?text=${encodeURIComponent(message)}`,"_blank");
+  waPreview.textContent = message;
+  waModal.style.display="flex";
+
+  sendWa.onclick = ()=>{window.open(`https://bit.ly/3LSGcQ4?text=${encodeURIComponent(message)}`,"_blank"); waModal.style.display="none";}
+  editWa.onclick = ()=>{waModal.style.display="none";}
 });
 
 // Status Bar
@@ -215,7 +237,6 @@ let tickerMessages = [
   { text:"Next call-out in 15 mins ⏱️", link:"" },
   { text:"Weather: Changa, Kent 🌡️ 12°C ☀️", link:"" }
 ];
-
 let tickerIndex = 0;
 let tickerPos = window.innerWidth;
 function animateTicker(){
@@ -223,10 +244,7 @@ function animateTicker(){
   tickerEl.innerHTML = msgObj.link ? `<a href="${msgObj.link}" target="_blank">${msgObj.text}</a>` : msgObj.text;
   tickerPos -= 1.2;
   tickerEl.style.transform = `translateX(${tickerPos}px)`;
-  if(tickerPos < -tickerEl.offsetWidth){
-    tickerIndex = (tickerIndex + 1) % tickerMessages.length;
-    tickerPos = window.innerWidth;
-  }
+  if(tickerPos < -tickerEl.offsetWidth){tickerIndex = (tickerIndex + 1) % tickerMessages.length; tickerPos = window.innerWidth;}
   requestAnimationFrame(animateTicker);
 }
 animateTicker();

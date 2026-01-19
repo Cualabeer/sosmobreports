@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instant Vehicle Help | SOS Mechanics</title>
+
+<style>
+:root {
+  --neon:#39ff14;
+  --light:#f2f2f2;
+  --dark:#111;
+  --border:#dcdcdc;
+}
+
+* {
+  box-sizing:border-box;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+}
+
+body {
+  margin:0;
+  background:#fff;
+  color:var(--dark);
+}
+
+/* HERO */
+.hero {
+  background:var(--light);
+  padding:36px 20px;
+}
+
+.hero h1 {
+  margin:0 0 8px;
+  font-size:28px;
+}
+
+.hero p {
+  margin:0;
+  font-size:16px;
+}
+
+/* FORM */
+.section {
+  padding:20px;
+}
+
+form {
+  max-width:720px;
+  margin:auto;
+}
+
+.field {
+  margin-bottom:18px;
+}
+
+label {
+  display:block;
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+input {
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  border-radius:8px;
+  border:1px solid var(--border);
+}
+
+/* LOCATION */
+.location-row {
+  display:flex;
+  gap:8px;
+}
+
+.location-row input {
+  flex:1;
+}
+
+.loc-btn {
+  width:52px;
+  border-radius:8px;
+  border:none;
+  background:#eaeaea;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* CTA */
+button.submit {
+  width:100%;
+  padding:18px;
+  font-size:18px;
+  font-weight:700;
+  background:var(--neon);
+  border:none;
+  border-radius:10px;
+  color:#000;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="hero">
+  <h1>Instant Vehicle Help</h1>
+  <p>Fill once. We receive everything instantly.</p>
+</div>
+
+<div class="section">
+<form id="jobForm" autocomplete="on">
+
+  <div class="field">
+    <label>Name</label>
+    <input id="name" name="name" autocomplete="name" required>
+  </div>
+
+  <div class="field">
+    <label>Vehicle Number Plate</label>
+    <input id="plate" placeholder="AB12 CDE" required>
+  </div>
+
+  <div class="field">
+    <label>Location</label>
+    <div class="location-row">
+      <input id="location" name="address" autocomplete="street-address" required>
+      <button type="button" class="loc-btn" onclick="getLocation()">📍</button>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Issue</label>
+    <input id="issue" placeholder="Won’t start / flat battery" required>
+  </div>
+
+  <button class="submit" type="submit">
+    WhatsApp SOS Mechanics
+  </button>
+
+</form>
+</div>
+
+<script>
+function getLocation() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude.toFixed(6);
+    const lon = pos.coords.longitude.toFixed(6);
+    location.value = `GPS: ${lat}, ${lon}`;
+  });
+}
+
+jobForm.addEventListener("submit", e => {
+  e.preventDefault();
+
+  const wa = ["44","7","9","1","2","3","4","5","6","7","8"].join("");
+
+  const msg =
+`🚗 SOS MECHANICS – INSTANT VEHICLE HELP
+Name: ${name.value}
+Reg: ${plate.value.toUpperCase()}
+Location: ${location.value}
+Issue: ${issue.value}
+Time: ${new Date().toLocaleString()}`;
+
+  window.open(
+    "https://wa.me/" + wa + "?text=" + encodeURIComponent(msg),
+    "_blank"
+  );
+});
+</script>
+
+</body>
+</html>

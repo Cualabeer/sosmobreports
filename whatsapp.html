@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOS Mechanics | QR Scan</title>
+
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    font-family: system-ui, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: url("assets/header-image.jpg") center / cover no-repeat;
+    overflow: hidden;
+  }
+
+  /* Dark overlay for readability */
+  body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    padding: 24px;
+    max-width: 360px;
+  }
+
+  h1 {
+    color: #39ff14;
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+    animation: fadeDown 0.8s ease forwards;
+    opacity: 0;
+  }
+
+  p {
+    color: #fff;
+    font-size: 1.05rem;
+    margin-bottom: 24px;
+    animation: fadeUp 0.8s 0.4s ease forwards;
+    opacity: 0;
+  }
+
+  a.button {
+    display: inline-block;
+    background: #39ff14;
+    color: #111;
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 1.05rem;
+    animation: fadeIn 0.8s 0.9s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeDown {
+    to { opacity: 1; transform: translateY(0); }
+    from { transform: translateY(-20px); }
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+    from { transform: translateY(20px); }
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+  <h1>👋 Welcome</h1>
+  <p>You scanned the SOS Mechanics QR code.<br>Chat directly with a mechanic now.</p>
+
+  <a id="waLink" class="button" target="_blank">
+    Chat with a Mechanic
+  </a>
+</div>
+
+<script>
+  // --- SOURCE CONTROL ---
+  const source = "QR";
+  const phone = "447405937104";
+
+  const message = encodeURIComponent(
+    `Hi, I scanned your SOS Mechanics ${source} code and need assistance.`
+  );
+
+  document.getElementById("waLink").href =
+    `https://wa.me/${phone}?text=${message}`;
+</script>
+
+</body>
+</html>

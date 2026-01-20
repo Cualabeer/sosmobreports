@@ -3,227 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mechanics – Job Request</title>
-
+<title>SOS Mechanics Callout</title>
 <style>
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #000;
-    color: #fff;
-  }
-
-  .container {
-    width: 100%;
-    max-width: 100%;
-    padding: 16px;
-  }
-
+  body{margin:0;font-family:system-ui,sans-serif;background:#111;color:#fff;overflow-x:hidden;}
   /* Ticker */
-  .ticker {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: #111;
-    color: #39ff14;
-    padding: 10px 16px;
-    font-size: 14px;
-    z-index: 1000;
+  #ticker{position:fixed;top:0;width:100%;background:#111;color:#39ff14;padding:8px;font-weight:600;white-space:nowrap;overflow:hidden;z-index:1000;}
+  
+  /* Intro */
+  #intro{position:relative;width:100%;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;}
+  #intro h1{font-size:28px;font-weight:700;}
+  #intro h2{font-size:18px;margin:8px;}
+  #intro .charge{font-size:32px;font-weight:700;color:#39ff14;margin:12px;}
+  .carousel-container{width:80%;margin-top:20px;overflow:hidden;}
+  .carousel-track{display:flex;transition:transform 0.5s ease-in-out;}
+  .carousel-card{min-width:100%;padding:20px;background:#111;border-radius:12px;text-align:center;box-shadow:0 0 8px #39ff14;}
+  
+  /* Form */
+  #mainForm{display:none;opacity:0;transform:translateY(50px);transition:all 0.5s ease;max-width:600px;margin:0 auto;padding:20px;}
+  #mainForm input,#mainForm select,#mainForm textarea{width:100%;padding:12px;margin-bottom:12px;border-radius:6px;border:none;font-size:16px;}
+  #mainForm button{width:48%;padding:16px;font-weight:700;color:#fff;border:none;border-radius:8px;margin:1%;cursor:pointer;}
+  
+  /* Neon buttons */
+  .emer{background:#39ff14;animation:neonPulse 1.5s infinite alternate;}
+  .prebook{background:#9b30ff;animation:neonPulse 1.5s infinite alternate;}
+  @keyframes neonPulse{
+    from{box-shadow:0 0 8px #fff;}
+    to{box-shadow:0 0 16px #39ff14;}
   }
-
-  .spacer {
-    height: 60px;
-  }
-
-  h1 {
-    font-size: 20px;
-    margin: 16px 0;
-  }
-
-  label {
-    display: block;
-    margin-top: 16px;
-    margin-bottom: 6px;
-    font-size: 14px;
-  }
-
-  input, select {
-    width: 100%;
-    padding: 14px;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
-  }
-
-  .mode-buttons {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
-  }
-
-  button {
-    width: 100%;
-    padding: 14px;
-    font-size: 16px;
-    font-weight: 700;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-  }
-
-  .urgent {
-    background: #39ff14;
-    color: #000;
-    animation: pulseGreen 1.5s infinite;
-  }
-
-  .prebook {
-    background: #9b59b6;
-    color: #fff;
-    animation: pulsePurple 1.5s infinite;
-  }
-
-  @keyframes pulseGreen {
-    0% { box-shadow: 0 0 4px #39ff14; }
-    50% { box-shadow: 0 0 14px #39ff14; }
-    100% { box-shadow: 0 0 4px #39ff14; }
-  }
-
-  @keyframes pulsePurple {
-    0% { box-shadow: 0 0 4px #9b59b6; }
-    50% { box-shadow: 0 0 14px #9b59b6; }
-    100% { box-shadow: 0 0 4px #9b59b6; }
-  }
-
-  #chatBtn {
-    margin-top: 24px;
-    background: #25D366;
-    color: #000;
-    display: none;
-    animation: flash 1s infinite;
-  }
-
-  @keyframes flash {
-    0% { opacity: 1; }
-    50% { opacity: 0.6; }
-    100% { opacity: 1; }
+  .prebookPulse{animation: neonPulsePurple 1.5s infinite alternate;}
+  @keyframes neonPulsePurple{
+    from{box-shadow:0 0 8px #fff;}
+    to{box-shadow:0 0 16px #9b30ff;}
   }
 </style>
 </head>
-
 <body>
 
-<div class="ticker">
-  SOS Mechanics • Mobile diagnostics & repairs • Open now
+<!-- Ticker -->
+<div id="ticker">SOS Mechanics • Mobile diagnostics & repairs • Open now</div>
+
+<!-- Intro -->
+<div id="intro">
+  <h1>Welcome to SOS Mechanics!</h1>
+  <h2>You scanned our QR code.</h2>
+  <div class="charge">Call-out charge: £45</div>
+  
+  <!-- Carousel -->
+  <div class="carousel-container">
+    <div class="carousel-track" id="carouselTrack">
+      <div class="carousel-card"><h3>Diagnostics</h3><p>Full vehicle check including engine & ECU codes</p></div>
+      <div class="carousel-card"><h3>Battery / Starting</h3><p>Battery health, jump start & alternator check</p></div>
+      <div class="carousel-card"><h3>Brakes & Pads</h3><p>Check brake pads, fluid levels & performance</p></div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;font-size:16px;">Preparing your form...</div>
 </div>
 
-<div class="spacer"></div>
-
-<div class="container">
-  <h1>Request a Mechanic</h1>
-
-  <div class="mode-buttons">
-    <button class="urgent" onclick="setMode('Urgent')">🚨 Emergency</button>
-    <button class="prebook" onclick="setMode('Prebook')">📅 Book Service</button>
-  </div>
-
-  <label>Your name</label>
-  <input id="name" placeholder="Full name">
-
-  <label>Mobile number</label>
-  <input id="phone" placeholder="07xxxxxxxxx">
-
-  <label>Vehicle registration</label>
-  <input id="reg" placeholder="AB12 CDE">
-
-  <label>Service required</label>
+<!-- Form -->
+<div id="mainForm">
+  <input id="name" placeholder="Your Name">
+  <input id="phone" placeholder="Phone Number">
+  <input id="reg" placeholder="Vehicle Reg">
   <select id="service">
-    <option value="">Select service</option>
-    <option>Diagnostics</option>
-    <option>Battery / Starting</option>
-    <option>Brakes</option>
-    <option>Engine issue</option>
+    <option value="">Select Service</option>
+    <option value="Diagnostics">Diagnostics</option>
+    <option value="Battery / Starting">Battery / Starting</option>
+    <option value="Brakes & Pads">Brakes & Pads</option>
   </select>
-
-  <div id="dateWrap" style="display:none;">
-    <label>Date & time</label>
-    <input id="datetime" type="datetime-local">
+  <select id="urgent">
+    <option value="Urgent">Urgent</option>
+    <option value="Prebook">Prebook</option>
+  </select>
+  <input id="datetime" type="datetime-local" placeholder="Date & Time">
+  
+  <div style="display:flex;justify-content:space-between;">
+    <button class="emer" id="urgentBtn">Emergency</button>
+    <button class="prebookPulse" id="prebookBtn">Book Service</button>
   </div>
-
-  <button id="chatBtn">Chat to a mechanic</button>
+  
+  <button id="chatBtn" style="margin-top:12px;background:#fff;color:#111;">Chat to Mechanic</button>
 </div>
 
 <script>
-  const nameInput = document.getElementById("name");
-  const phoneInput = document.getElementById("phone");
-  const regInput = document.getElementById("reg");
-  const serviceInput = document.getElementById("service");
-  const datetimeInput = document.getElementById("datetime");
-  const chatBtn = document.getElementById("chatBtn");
-  const dateWrap = document.getElementById("dateWrap");
+  // Carousel
+  const track = document.getElementById("carouselTrack");
+  const totalCards = track.children.length;
+  let index = 0;
+  setInterval(() => {
+    index = (index + 1) % totalCards;
+    track.style.transform = `translateX(${-index * 100}%)`;
+  }, 3000); // 3s per card → 3 cards in 9s
 
-  let jobMode = "Urgent";
+  // Show form after 10s
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      document.getElementById("intro").style.display = "none";
+      const form = document.getElementById("mainForm");
+      form.style.display = "block";
+      setTimeout(() => {
+        form.style.opacity = "1";
+        form.style.transform = "translateY(0)";
+        document.getElementById("name").focus();
+      },50);
+    },10000);
+  });
 
-  function setMode(mode) {
-    jobMode = mode;
-    dateWrap.style.display = mode === "Prebook" ? "block" : "none";
-    checkComplete();
-  }
-
-  function generateJobNumber() {
-    const raw = nameInput.value + phoneInput.value + regInput.value;
-    let hash = 0;
-    for (let i = 0; i < raw.length; i++) {
-      hash = (hash << 5) - hash + raw.charCodeAt(i);
-      hash |= 0;
-    }
-    const code = Math.abs(hash).toString(16).toUpperCase().slice(0, 4);
-    const d = new Date();
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    return `SOS-${day}${month}-${code}`;
-  }
-
-  function checkComplete() {
-    if (
-      nameInput.value &&
-      phoneInput.value &&
-      regInput.value &&
-      (jobMode === "Urgent" || datetimeInput.value)
-    ) {
-      chatBtn.style.display = "block";
-    }
-  }
-
-  document.querySelectorAll("input, select").forEach(el =>
-    el.addEventListener("input", checkComplete)
-  );
-
-  chatBtn.onclick = () => {
-    const jobNo = generateJobNumber();
-    const when = jobMode === "Prebook" ? datetimeInput.value : "ASAP";
-
-    const message =
-`🚗 SOS MECHANICS – JOB REQUEST
+  // WhatsApp message
+  function sendWhatsApp(){
+    const jobNo = "SOS-" + Math.floor(Math.random()*9000+1000) + "-" + Math.random().toString(36).substring(2,5).toUpperCase();
+    const urgentType = document.getElementById("urgent").value;
+    const when = urgentType === "Prebook" ? document.getElementById("datetime").value : "ASAP";
+    const msg = `🚗 SOS MECHANICS – JOB REQUEST
 Job No: ${jobNo}
-
-Type: ${jobMode}
-Name: ${nameInput.value}
-Phone: ${phoneInput.value}
-Vehicle Reg: ${regInput.value}
-Service: ${serviceInput.value || "Urgent / Not specified"}
+Type: ${urgentType}
+Name: ${document.getElementById("name").value}
+Phone: ${document.getElementById("phone").value}
+Vehicle Reg: ${document.getElementById("reg").value}
+Service: ${document.getElementById("service").value || "Not specified"}
 Date & Time: ${when}
 Source: QR`;
 
-    const url =
-      "https://bit.ly/3LSGcQ4?text=" +
-      encodeURIComponent(message);
+    const wa = "https://wa.me/447405937104?text=" + encodeURIComponent(msg);
+    window.open(wa,"_blank");
+  }
 
-    window.open(url, "_blank");
-  };
+  document.getElementById("chatBtn").onclick = sendWhatsApp;
+  document.getElementById("urgentBtn").onclick = () => {document.getElementById("urgent").value="Urgent"; sendWhatsApp();}
+  document.getElementById("prebookBtn").onclick = () => {document.getElementById("urgent").value="Prebook"; sendWhatsApp();}
 </script>
 
 </body>

@@ -3,282 +3,227 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mechanics – Mobile Mechanic Report & Call-Out</title>
+<title>SOS Mechanics – Job Request</title>
 
 <style>
-:root {
-  --green: #39ff14;
-  --purple: #9b59b6;
-  --bg: #0e0e0e;
-  --card: #161616;
-  --text: #ffffff;
-  --muted: #aaaaaa;
-}
+  * { box-sizing: border-box; }
 
-* {
-  box-sizing: border-box;
-}
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #000;
+    color: #fff;
+  }
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  overflow-x: hidden;
-}
+  .container {
+    width: 100%;
+    max-width: 100%;
+    padding: 16px;
+  }
 
-/* ===== FIXED HEADER + TICKER ===== */
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: #000;
-  z-index: 1000;
-}
+  /* Ticker */
+  .ticker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    color: #39ff14;
+    padding: 10px 16px;
+    font-size: 14px;
+    z-index: 1000;
+  }
 
-.header-inner {
-  padding: 14px;
-  text-align: center;
-  font-weight: 700;
-}
+  .spacer {
+    height: 60px;
+  }
 
-.ticker {
-  background: #111;
-  font-size: 0.85rem;
-  white-space: nowrap;
-  overflow: hidden;
-}
+  h1 {
+    font-size: 20px;
+    margin: 16px 0;
+  }
 
-.ticker span {
-  display: inline-block;
-  padding-left: 100%;
-  animation: ticker 18s linear infinite;
-}
+  label {
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
 
-@keyframes ticker {
-  from { transform: translateX(0); }
-  to { transform: translateX(-100%); }
-}
+  input, select {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+  }
 
-/* ===== MAIN CONTAINER ===== */
-.container {
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 170px 16px 40px;
-}
+  .mode-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
 
-/* ===== INTRO OVERLAY ===== */
-#intro {
-  text-align: center;
-  margin-bottom: 24px;
-}
+  button {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+  }
 
-#intro h1 {
-  margin-bottom: 8px;
-}
+  .urgent {
+    background: #39ff14;
+    color: #000;
+    animation: pulseGreen 1.5s infinite;
+  }
 
-#countdown {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
+  .prebook {
+    background: #9b59b6;
+    color: #fff;
+    animation: pulsePurple 1.5s infinite;
+  }
 
-/* ===== CHOICE BUTTONS ===== */
-.choice-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 24px 0;
-}
+  @keyframes pulseGreen {
+    0% { box-shadow: 0 0 4px #39ff14; }
+    50% { box-shadow: 0 0 14px #39ff14; }
+    100% { box-shadow: 0 0 4px #39ff14; }
+  }
 
-button {
-  width: 100%;
-  padding: 14px;
-  font-size: 1rem;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-}
+  @keyframes pulsePurple {
+    0% { box-shadow: 0 0 4px #9b59b6; }
+    50% { box-shadow: 0 0 14px #9b59b6; }
+    100% { box-shadow: 0 0 4px #9b59b6; }
+  }
 
-/* Emergency – green neon */
-#urgentBtn {
-  background: var(--green);
-  color: #000;
-  animation: pulseGreen 1.5s infinite;
-}
+  #chatBtn {
+    margin-top: 24px;
+    background: #25D366;
+    color: #000;
+    display: none;
+    animation: flash 1s infinite;
+  }
 
-@keyframes pulseGreen {
-  0% { box-shadow: 0 0 6px var(--green); }
-  50% { box-shadow: 0 0 18px var(--green); }
-  100% { box-shadow: 0 0 6px var(--green); }
-}
-
-/* Prebook – purple neon */
-#prebookBtn {
-  background: var(--purple);
-  color: #fff;
-  animation: pulsePurple 1.5s infinite;
-}
-
-@keyframes pulsePurple {
-  0% { box-shadow: 0 0 6px var(--purple); }
-  50% { box-shadow: 0 0 18px var(--purple); }
-  100% { box-shadow: 0 0 6px var(--purple); }
-}
-
-/* ===== FORM ===== */
-form {
-  display: none;
-  background: var(--card);
-  padding: 16px;
-  border-radius: 14px;
-  margin-top: 16px;
-}
-
-form input,
-form select {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  border: none;
-  font-size: 1rem;
-}
-
-.helper {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 12px;
-}
-
-/* ===== CHAT BUTTON ===== */
-#chatBtn {
-  display: none;
-  margin-top: 16px;
-  background: var(--green);
-  color: #000;
-  animation: flash 1.2s infinite;
-}
-
-@keyframes flash {
-  0%,100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
+  @keyframes flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="header-inner">SOS Mechanics</div>
-  <div class="ticker">
-    <span>Live mobile mechanic • On-job reports • Same-day call-outs • Kent & surrounding areas •</span>
-  </div>
-</header>
+<div class="ticker">
+  SOS Mechanics • Mobile diagnostics & repairs • Open now
+</div>
+
+<div class="spacer"></div>
 
 <div class="container">
+  <h1>Request a Mechanic</h1>
 
-  <!-- INTRO -->
-  <div id="intro">
-    <h1>Welcome to SOS Mechanics</h1>
-    <div id="countdown">Preparing secure service intake… 10</div>
+  <div class="mode-buttons">
+    <button class="urgent" onclick="setMode('Urgent')">🚨 Emergency</button>
+    <button class="prebook" onclick="setMode('Prebook')">📅 Book Service</button>
   </div>
 
-  <!-- CHOICE -->
-  <div class="choice-buttons">
-    <button id="urgentBtn">🚨 Emergency / Urgent</button>
-    <button id="prebookBtn">📅 Book a Service</button>
+  <label>Your name</label>
+  <input id="name" placeholder="Full name">
+
+  <label>Mobile number</label>
+  <input id="phone" placeholder="07xxxxxxxxx">
+
+  <label>Vehicle registration</label>
+  <input id="reg" placeholder="AB12 CDE">
+
+  <label>Service required</label>
+  <select id="service">
+    <option value="">Select service</option>
+    <option>Diagnostics</option>
+    <option>Battery / Starting</option>
+    <option>Brakes</option>
+    <option>Engine issue</option>
+  </select>
+
+  <div id="dateWrap" style="display:none;">
+    <label>Date & time</label>
+    <input id="datetime" type="datetime-local">
   </div>
 
-  <!-- FORM -->
-  <form id="serviceForm">
-    <input type="text" id="name" placeholder="Full name" required>
-    <input type="tel" id="phone" placeholder="Phone number" required>
-    <input type="text" id="reg" placeholder="Vehicle registration" required>
-
-    <select id="service">
-      <option value="">Select service required</option>
-      <option>Diagnostics</option>
-      <option>Breakdown recovery</option>
-      <option>Oil / fluid check</option>
-      <option>Inspection report</option>
-    </select>
-
-    <div id="prebookFields" style="display:none;">
-      <div class="helper">Preferred booking date & time</div>
-      <input type="datetime-local" id="datetime">
-    </div>
-
-    <div class="helper">
-      We aim to call you within 15 minutes to confirm the call-out.
-    </div>
-  </form>
-
-  <button id="chatBtn">💬 Chat to a Mechanic</button>
-
+  <button id="chatBtn">Chat to a mechanic</button>
 </div>
 
 <script>
-let countdown = 10;
-const cdEl = document.getElementById("countdown");
-const form = document.getElementById("serviceForm");
-const chatBtn = document.getElementById("chatBtn");
-const prebookFields = document.getElementById("prebookFields");
-let mode = "";
-const source = "QR";
+  const nameInput = document.getElementById("name");
+  const phoneInput = document.getElementById("phone");
+  const regInput = document.getElementById("reg");
+  const serviceInput = document.getElementById("service");
+  const datetimeInput = document.getElementById("datetime");
+  const chatBtn = document.getElementById("chatBtn");
+  const dateWrap = document.getElementById("dateWrap");
 
-const timer = setInterval(() => {
-  countdown--;
-  cdEl.textContent = "Preparing secure service intake… " + countdown;
-  if (countdown <= 0) {
-    clearInterval(timer);
-    cdEl.textContent = "Please choose how you’d like to continue";
+  let jobMode = "Urgent";
+
+  function setMode(mode) {
+    jobMode = mode;
+    dateWrap.style.display = mode === "Prebook" ? "block" : "none";
+    checkComplete();
   }
-}, 1000);
 
-document.getElementById("urgentBtn").onclick = () => {
-  mode = "Urgent";
-  form.style.display = "block";
-  prebookFields.style.display = "none";
-  focusForm();
-};
-
-document.getElementById("prebookBtn").onclick = () => {
-  mode = "Prebook";
-  form.style.display = "block";
-  prebookFields.style.display = "block";
-  focusForm();
-};
-
-function focusForm() {
-  setTimeout(() => {
-    document.getElementById("name").focus();
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-  }, 300);
-}
-
-form.addEventListener("input", () => {
-  if (form.checkValidity()) {
-    chatBtn.style.display = "block";
+  function generateJobNumber() {
+    const raw = nameInput.value + phoneInput.value + regInput.value;
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+      hash = (hash << 5) - hash + raw.charCodeAt(i);
+      hash |= 0;
+    }
+    const code = Math.abs(hash).toString(16).toUpperCase().slice(0, 4);
+    const d = new Date();
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    return `SOS-${day}${month}-${code}`;
   }
-});
 
-chatBtn.onclick = () => {
-  const msg =
-`SOS Mechanics enquiry
-Type: ${mode}
-Name: ${name.value}
-Phone: ${phone.value}
-Reg: ${reg.value}
-Service: ${service.value || "N/A"}
-Date/Time: ${datetime?.value || "ASAP"}
-Source: ${source}`;
+  function checkComplete() {
+    if (
+      nameInput.value &&
+      phoneInput.value &&
+      regInput.value &&
+      (jobMode === "Urgent" || datetimeInput.value)
+    ) {
+      chatBtn.style.display = "block";
+    }
+  }
 
-  const url = "https://bit.ly/3LSGcQ4" + "?text=" + encodeURIComponent(msg);
-  window.open(url, "_blank");
-};
+  document.querySelectorAll("input, select").forEach(el =>
+    el.addEventListener("input", checkComplete)
+  );
+
+  chatBtn.onclick = () => {
+    const jobNo = generateJobNumber();
+    const when = jobMode === "Prebook" ? datetimeInput.value : "ASAP";
+
+    const message =
+`🚗 SOS MECHANICS – JOB REQUEST
+Job No: ${jobNo}
+
+Type: ${jobMode}
+Name: ${nameInput.value}
+Phone: ${phoneInput.value}
+Vehicle Reg: ${regInput.value}
+Service: ${serviceInput.value || "Urgent / Not specified"}
+Date & Time: ${when}
+Source: QR`;
+
+    const url =
+      "https://bit.ly/3LSGcQ4?text=" +
+      encodeURIComponent(message);
+
+    window.open(url, "_blank");
+  };
 </script>
 
 </body>

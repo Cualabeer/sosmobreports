@@ -3,198 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mechanic Dashboard</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+<title>Mechanic Dashboard SPA</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-body, html {margin:0;padding:0;font-family:sans-serif;background:#121212;color:#fff;}
-header {position:fixed;top:0;left:0;width:100%;background:#1a1a1a;padding:10px;z-index:100;}
-#ticker {white-space:nowrap;overflow:hidden;}
-#ticker span {display:inline-block;padding-right:50px;animation:scroll 20s linear infinite;}
-@keyframes scroll {0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
-footer {position:fixed;bottom:0;left:0;width:100%;background:#1a1a1a;padding:10px;display:flex;justify-content:space-around;z-index:100;}
-.job-container {margin-top:60px;margin-bottom:60px;display:flex;overflow-x:auto;padding:10px;gap:10px;}
-.job-card {min-width:250px;background:#222;padding:15px;border-radius:10px;flex-shrink:0;position:relative;}
-.start-job-btn, .pdf-btn {margin-top:10px;padding:10px;width:100%;border:none;border-radius:5px;color:#fff;background:#4caf50;cursor:pointer;}
-.start-job-btn:hover, .pdf-btn:hover {background:#45a049;}
-#map {height:200px;width:100%;margin:10px 0;border-radius:10px;}
-#qrScanner {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:300;}
-#qrScanner video {width:100%;height:100%;object-fit:cover;}
-#closeQR {position:absolute;top:10px;right:10px;padding:10px;}
-#checksModal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);overflow-y:auto;z-index:400;padding:20px;}
-.check-item {padding:10px;border-bottom:1px solid #444;}
-button.close-modal {position:absolute;top:10px;right:10px;padding:10px;background:#f44336;border:none;color:#fff;border-radius:5px;}
+body {margin:0;font-family:sans-serif;background:#111;color:#fff;display:flex;flex-direction:column;height:100vh;}
+header {background:#222;padding:10px;text-align:center;font-weight:bold;position:sticky;top:0;z-index:100;}
+#ticker {background:#333;padding:5px;font-size:14px;margin-top:5px;}
+#jobContainer {flex:0 0 auto;display:flex;overflow-x:auto;padding:10px;gap:10px;}
+.job-card {background:#222;border-radius:10px;padding:10px;min-width:250px;flex:0 0 auto;position:relative;}
+.job-card .priority {position:absolute;top:5px;right:5px;padding:2px 6px;border-radius:5px;font-size:12px;color:#fff;}
+.priority.emergency{background:red;}
+.priority.high{background:orange;}
+.priority.normal{background:green;}
+.job-card button {margin-top:10px;width:100%;padding:8px;border:none;border-radius:5px;background:#4caf50;color:#fff;cursor:pointer;}
+#map {flex:1 1 auto;}
+/* Modal */
+#checksModal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:1000;overflow-y:auto;padding:20px;}
+#checksModal h2 {text-align:center;margin-bottom:10px;}
+.close-modal {position:absolute;top:10px;right:10px;font-size:24px;cursor:pointer;}
+#checksModal label, #checksModal textarea, #checksModal input[type="checkbox"] {display:block;width:100%;margin-bottom:10px;}
+#completeChecks {padding:10px;width:100%;background:#4caf50;color:#fff;border:none;border-radius:5px;cursor:pointer;margin-top:10px;}
+#footerToolbar {background:#222;padding:10px;display:flex;justify-content:space-around;position:sticky;bottom:0;}
+#footerToolbar button {padding:8px;border:none;border-radius:5px;background:#444;color:#fff;cursor:pointer;}
+.timer {font-weight:bold;margin-top:5px;}
 </style>
 </head>
 <body>
 
 <header>
-<div id="ticker"><span>🚨 New Jobs Coming In - Emergency: AB12CDE - Standard: XY34ZK - Same Day: MN56OP</span></div>
+  Mechanic Dashboard
+  <div id="ticker">Live Jobs: 0 pending | 0 emergencies</div>
 </header>
 
-<div class="job-container" id="jobContainer">
-<!-- Job cards will appear here -->
+<div id="jobContainer">
+  <!-- Jobs appended here -->
 </div>
 
 <div id="map"></div>
 
-<footer>
-<button id="openQR">Scan QR</button>
-<button id="refreshJobs">Refresh</button>
-</footer>
-
-<!-- QR Scanner Overlay -->
-<div id="qrScanner">
-  <video id="qrVideo"></video>
-  <button id="closeQR">Close</button>
-</div>
-
 <!-- Essential Checks Modal -->
 <div id="checksModal">
-  <button class="close-modal">Close</button>
+  <span class="close-modal">&times;</span>
   <h2>Essential Checks</h2>
-  <div class="check-item"><input type="checkbox"> Engine Oil Level</div>
-  <div class="check-item"><input type="checkbox"> Coolant Level</div>
-  <div class="check-item"><input type="checkbox"> Battery Condition</div>
-  <div class="check-item"><input type="checkbox"> Brake Fluid</div>
-  <div class="check-item"><input type="checkbox"> Tire Pressure</div>
-  <div class="check-item"><input type="checkbox"> Lights & Indicators</div>
-  <div class="check-item"><input type="checkbox"> Wipers</div>
-  <div class="check-item"><input type="checkbox"> Belts & Hoses</div>
-  <div class="check-item"><input type="checkbox"> Fuel Level</div>
+  <div id="checklist">
+    <label><input type="checkbox"> Engine Oil Level</label>
+    <label><input type="checkbox"> Coolant Level</label>
+    <label><input type="checkbox"> Brake Fluid</label>
+    <label><input type="checkbox"> Tyre Pressure</label>
+    <label><input type="checkbox"> Battery Condition</label>
+    <label><input type="checkbox"> Lights & Indicators</label>
+  </div>
+  <label for="additionalInfo">Additional Notes / Observations</label>
+  <textarea id="additionalInfo" rows="4" style="width:100%;padding:10px;border-radius:5px;"></textarea>
+  <button id="completeChecks">Continue / Complete Checks</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<div id="footerToolbar">
+  <button id="toggleMap">Toggle Map</button>
+  <button id="refreshJobs">Refresh Jobs</button>
+  <button id="scanQR">Scan QR</button>
+</div>
+
 <script>
-// --- Map Setup ---
-const map = L.map('map').setView([51.332593, 0.549980], 14);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'&copy; OpenStreetMap contributors'
-}).addTo(map);
-let jobMarker;
-
-// --- Job Container ---
-const jobContainer = document.getElementById('jobContainer');
-
-// --- Sample Jobs ---
-const sampleJobs = [
-  {"reg":"AB12CDE","location":"51.332593,0.549980","priority":"Emergency","customer":"John Smith","issue":"Won't start"},
-  {"reg":"XY34ZK","location":"51.335000,0.550500","priority":"Same Day","customer":"Alice Jones","issue":"Flat Tire"},
-  {"reg":"MN56OP","location":"51.330000,0.548000","priority":"Standard","customer":"Bob Lee","issue":"Battery low"},
-  {"reg":"CD78FG","location":"51.336000,0.552000","priority":"Standard","customer":"Carol","issue":"Brake squeak"},
-  {"reg":"HI90JK","location":"51.338000,0.553000","priority":"Emergency","customer":"Dan","issue":"Overheating"},
-  {"reg":"LM12NO","location":"51.340000,0.554000","priority":"Same Day","customer":"Eva","issue":"Engine light"},
-  {"reg":"PQ34RS","location":"51.342000,0.555000","priority":"Standard","customer":"Frank","issue":"Stalling"}
+// Job data
+let jobsData = [
+  {reg:'AB12 CDE',issue:'Car won’t start',location:'51.332593,0.549980',phone:'07405937104',priority:'emergency'},
+  {reg:'AJ62 KSV',issue:'Flat tyre',location:'51.340100,0.545000',phone:'07403626985',priority:'high'},
+  {reg:'CD34 FGH',issue:'Battery problem',location:'51.330500,0.550000',phone:'07401234567',priority:'normal'},
+  {reg:'EF56 XYZ',issue:'Engine noise',location:'51.335000,0.552000',phone:'07407891234',priority:'normal'},
+  {reg:'GH78 ABC',issue:'Brake issue',location:'51.337500,0.548000',phone:'07409876543',priority:'high'},
+  {reg:'IJ90 LMN',issue:'AC not working',location:'51.331000,0.547000',phone:'07401122334',priority:'normal'},
+  {reg:'KL12 PQR',issue:'Oil leak',location:'51.338000,0.546500',phone:'07402233445',priority:'normal'}
 ];
 
-// --- Display Jobs ---
-function renderJobs(jobs){
-  jobContainer.innerHTML='';
-  // Sort Emergency first
-  jobs.sort((a,b)=>{
-    const prio = {"Emergency":1,"Same Day":2,"Standard":3};
-    return prio[a.priority]-prio[b.priority];
+// Sorting emergencies first
+function sortJobs(){ 
+  return jobsData.sort((a,b)=>{
+    const order={'emergency':1,'high':2,'normal':3};
+    return order[a.priority]-order[b.priority];
   });
-  jobs.forEach(job=>{
+}
+
+// Append jobs
+function renderJobs(){
+  const jobContainer = document.getElementById('jobContainer');
+  jobContainer.innerHTML='';
+  const sorted = sortJobs();
+  sorted.forEach(job=>{
     const card = document.createElement('div');
     card.className='job-card';
     card.dataset.reg=job.reg;
     card.dataset.location=job.location;
+    card.dataset.phone=job.phone;
     card.dataset.priority=job.priority;
-    card.innerHTML=`<h3>${job.reg} - ${job.priority}</h3>
-                    <p>Customer: ${job.customer}</p>
-                    <p>Issue: ${job.issue}</p>
-                    <button class="start-job-btn">Start Job</button>
-                    <button class="pdf-btn">Generate PDF</button>`;
+    card.innerHTML=`
+      <span class="priority ${job.priority}">${job.priority}</span>
+      <p><strong>${job.reg}</strong></p>
+      <p>${job.issue}</p>
+      <p>${job.phone}</p>
+      <div class="timer" id="timer-${job.reg}">00:00</div>
+      <button class="start-job-btn">Start Job</button>
+    `;
     jobContainer.appendChild(card);
 
-    // Start job button
-    card.querySelector('.start-job-btn').onclick = ()=>{
-      document.getElementById('checksModal').style.display='block';
-      const [lat,lng]=job.location.split(',');
-      if(jobMarker) map.removeLayer(jobMarker);
-      jobMarker=L.marker([lat,lng]).addTo(map);
-      map.setView([lat,lng],14);
-    };
-
-    // PDF button
-    card.querySelector('.pdf-btn').onclick = ()=>generatePDF(card);
+    // Start Job
+    card.querySelector('.start-job-btn').onclick = ()=> openChecksModal(card);
   });
+
+  // Update ticker
+  const emergencies = jobsData.filter(j=>j.priority==='emergency').length;
+  document.getElementById('ticker').textContent=`Live Jobs: ${jobsData.length} pending | ${emergencies} emergencies`;
 }
 
-// --- Generate PDF ---
+// Map
+let map = L.map('map').setView([51.332593,0.549980], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(map);
+let jobMarker=null;
+
+// Modal
+const modal=document.getElementById('checksModal');
+const closeModal=document.querySelector('.close-modal');
+closeModal.onclick = ()=> {
+  modal.style.display='none';
+  document.getElementById('map').style.display='block';
+};
+
+function openChecksModal(card){
+  modal.style.display='block';
+  document.getElementById('map').style.display='none';
+  const [lat,lng]=card.dataset.location.split(',');
+  if(jobMarker) map.removeLayer(jobMarker);
+  jobMarker=L.marker([lat,lng]).addTo(map);
+  map.setView([lat,lng],14);
+
+  // Start timer
+  startJobTimer(card);
+}
+
+// Timer
+let timers={};
+function startJobTimer(card){
+  const timerId = card.dataset.reg;
+  if(timers[timerId]) clearInterval(timers[timerId]);
+  let seconds=0;
+  const display=document.getElementById(`timer-${timerId}`);
+  timers[timerId]=setInterval(()=>{
+    seconds++;
+    let min=Math.floor(seconds/60).toString().padStart(2,'0');
+    let sec=(seconds%60).toString().padStart(2,'0');
+    display.textContent=`${min}:${sec}`;
+    if(seconds>1800) display.style.color='red'; // over 30 min
+    else display.style.color='lime';
+  },1000);
+}
+
+// Complete Checks & Generate PDF
+document.getElementById('completeChecks').onclick = ()=>{
+  const checkedItems = Array.from(document.querySelectorAll('#checklist input[type="checkbox"]'))
+        .filter(chk => chk.checked)
+        .map(chk => chk.parentNode.textContent.trim());
+
+  const notes = document.getElementById('additionalInfo').value.trim();
+  const openCard=document.querySelector('.job-card'); 
+  openCard.dataset.checked=JSON.stringify(checkedItems);
+  openCard.dataset.notes=notes;
+
+  modal.style.display='none';
+  document.getElementById('map').style.display='block';
+
+  generatePDF(openCard);
+}
+
+// PDF
 function generatePDF(jobCard){
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const now = new Date();
-    const timestamp = now.toISOString().replace(/[:.]/g,'-');
-    doc.setFontSize(16);
-    doc.text(`Job Report - ${jobCard.dataset.reg}`,10,10);
-    doc.setFontSize(12);
-    doc.text(jobCard.querySelector('p:nth-child(2)').textContent,10,20);
-    doc.text(jobCard.querySelector('p:nth-child(3)').textContent,10,30);
-    doc.text(`Location: ${jobCard.dataset.location}`,10,40);
-    doc.save(`${jobCard.dataset.reg}_${timestamp}.pdf`);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const now = new Date();
+  const timestamp = now.toISOString().replace(/[:.]/g,'-');
+
+  doc.setFontSize(16);
+  doc.text(`Job Report - ${jobCard.dataset.reg}`,10,10);
+  doc.setFontSize(12);
+  doc.text(`Issue: ${jobCard.querySelector('p:nth-child(2)').textContent}`,10,20);
+  doc.text(`Phone: ${jobCard.dataset.phone}`,10,30);
+  doc.text(`Location: ${jobCard.dataset.location}`,10,40);
+
+  const checks = jobCard.dataset.checked ? JSON.parse(jobCard.dataset.checked) : [];
+  if(checks.length){
+    doc.text("Essential Checks Completed:",10,50);
+    checks.forEach((chk,i)=>doc.text(`- ${chk}`,10,60 + (i*10)));
+  }
+
+  const notes = jobCard.dataset.notes || '';
+  if(notes){
+    const startY = 60 + (checks.length*10) + 10;
+    doc.text("Additional Info:",10,startY);
+    doc.text(notes,10,startY+10);
+  }
+
+  doc.save(`${jobCard.dataset.reg}_${timestamp}.pdf`);
 }
 
-// --- Initial Render ---
-renderJobs(sampleJobs);
-
-// --- QR Scanner ---
-const qrScanner = document.getElementById('qrScanner');
-const qrVideo = document.getElementById('qrVideo');
-let qrStream;
-
-document.getElementById('openQR').onclick=async()=>{
-  qrScanner.style.display='block';
-  qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }});
-  qrVideo.srcObject = qrStream;
-  qrVideo.play();
-  scanQRCode();
+// Footer buttons
+document.getElementById('toggleMap').onclick=()=>{
+  const mapDiv=document.getElementById('map');
+  mapDiv.style.display=mapDiv.style.display==='none'?'block':'none';
 };
+document.getElementById('refreshJobs').onclick=()=> renderJobs();
+document.getElementById('scanQR').onclick=()=> alert("QR scanning to be implemented with camera API");
 
-document.getElementById('closeQR').onclick=()=>{
-  qrScanner.style.display='none';
-  qrVideo.pause();
-  if(qrStream) qrStream.getTracks().forEach(track=>track.stop());
-};
-
-async function scanQRCode(){
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const code = async ()=>{
-        if(qrVideo.readyState===qrVideo.HAVE_ENOUGH_DATA){
-            canvas.width=qrVideo.videoWidth;
-            canvas.height=qrVideo.videoHeight;
-            ctx.drawImage(qrVideo,0,0);
-            const imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-            const qr = jsQR(imageData.data,canvas.width,canvas.height);
-            if(qr){
-                handleJobQR(qr.data);
-                qrScanner.style.display='none';
-                qrVideo.pause();
-                if(qrStream) qrStream.getTracks().forEach(track=>track.stop());
-                return;
-            }
-        }
-        requestAnimationFrame(code);
-    };
-    requestAnimationFrame(code);
-}
-
-function handleJobQR(qrData){
-    try{
-        const job=JSON.parse(qrData);
-        sampleJobs.unshift(job);
-        renderJobs(sampleJobs);
-        alert(`New job loaded: ${job.reg}`);
-    }catch(e){alert('Invalid QR code');}
-}
-
-// --- Close Modal ---
-document.querySelector('#checksModal .close-modal').onclick=()=>document.getElementById('checksModal').style.display='none';
-
+// Initial render
+renderJobs();
 </script>
 </body>
 </html>

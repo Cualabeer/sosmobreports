@@ -6,21 +6,19 @@
 <title>Mechanic PWA Dashboard</title>
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
-<script src="https://unpkg.com/leaflet@1.9.5/dist/leaflet.js"></script>
-<script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body>
+
 <div id="app">
-  <!-- Split-screen layout -->
   <div id="main">
-    <div id="taskPane"></div>
+    <div id="taskPane">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
     <div id="mapPane"><div id="map"></div></div>
   </div>
 
-  <!-- Bottom Nav -->
   <div class="navbar">
     <button onclick="showJobs()">Jobs</button>
     <button onclick="showMap()">Map</button>
@@ -28,8 +26,67 @@
   </div>
 </div>
 
-<script src="jobs.js"></script>
-<script src="qr.js"></script>
-<script src="sw.js"></script>
+<!-- QR scanning fallback -->
+<input type="file" id="qrUpload" accept="image/*" />
+
+<script src="https://unpkg.com/leaflet@1.9.5/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
+<script>
+// Basic IndexedDB setup
+let db;
+const req = indexedDB.open("mechanicDB",1);
+req.onupgradeneeded = ()=> req.result.createObjectStore("jobs",{keyPath:"id",autoIncrement:true});
+req.onsuccess = ()=>{ db = req.result; loadJobs(); };
+
+// SPA navigation
+function showJobs(){ document.getElementById('taskPane').style.display='block'; }
+function showMap(){ document.getElementById('taskPane').style.display='none'; }
+function showCompleted(){ document.getElementById('taskPane').style.display='block'; loadCompleted(); }
+
+// Placeholder job handling
+let jobs = [];
+function loadJobs(){ 
+  const pane = document.getElementById('taskPane');
+  pane.innerHTML = '';
+  let tx = db.transaction("jobs","readonly"), store=tx.objectStore("jobs");
+  store.openCursor().onsuccess=e=>{
+    let cursor=e.target.result;
+    if(!cursor){
+      if(pane.innerHTML==='') pane.innerHTML='<p>No jobs yet</p>';
+      return;
+    }
+    let job = cursor.value;
+    let div=document.createElement('div');
+    div.textContent = `${job.customer} – ${job.vehicle}`;
+    pane.appendChild(div);
+    cursor.continue();
+  }
+}
+
+// Map
+let map = L.map('map').setView([51.378,0.523],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(map);
+
+// QR upload fallback
+document.getElementById('qrUpload').onchange = function(e){
+  let file = e.target.files[0];
+  let reader=new FileReader();
+  reader.onload=function(){
+    let img=new Image();
+    img.onload=function(){
+      let canvas=document.createElement('canvas');
+      canvas.width=img.width;
+      canvas.height=img.height;
+      let ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      let code=jsQR(ctx.getImageData(0,0,canvas.width,canvas.height).data,canvas.width,canvas.height);
+      if(code) alert("Decoded QR: "+code.data);
+    };
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+};
+</script>
 </body>
 </html>

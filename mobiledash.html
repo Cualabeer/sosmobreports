@@ -5,25 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mechanic Dashboard</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <style>
 body { margin:0; font-family:sans-serif; background:#111; color:#eee; }
-header { position:fixed; top:0; width:100%; background:#222; padding:10px; z-index:1000; }
-#ticker { font-weight:bold; }
-#job-list { margin-top:60px; max-height:50vh; overflow-y:auto; padding:10px; }
-.job-card { position:relative; background:#1a1a1a; margin:10px 0; padding:15px 15px 15px 25px; border-radius:12px; box-shadow:0 0 5px #555; transition: transform 0.2s, box-shadow 0.2s; }
-.job-card:hover { transform:scale(1.02); box-shadow:0 0 8px #888; }
+header { position:fixed; top:0; width:100%; background:#222; padding:10px; z-index:1000; display:flex; flex-direction:column; }
+#ticker { font-weight:bold; overflow:hidden; white-space:nowrap; }
+#job-timer { font-size:1.2rem; font-weight:bold; margin-top:5px; text-align:center; }
+
+#job-list { margin-top:80px; max-height:50vh; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:10px; }
+.job-card { position:relative; background:#1a1a1a; padding:15px 15px 15px 25px; border-radius:12px; box-shadow:0 0 5px #555; transition: transform 0.2s; }
 .job-type-indicator { width:8px; height:100%; position:absolute; left:0; top:0; border-radius:6px 0 0 6px; }
 .job-card[data-priority="emergency"] .job-type-indicator { background:#ff4d4d; }
 .job-card[data-priority="same-day"] .job-type-indicator { background:#ffa500; }
 .job-card[data-priority="normal"] .job-type-indicator { background:#0f0; }
-.start-job-btn { margin-top:10px; width:100%; padding:10px; font-weight:bold; border:none; border-radius:8px; background:#8e2eff; color:white; cursor:pointer; transition: background 0.2s; }
+
+.start-job-btn { margin-top:10px; width:100%; padding:10px; font-weight:bold; border:none; border-radius:8px; background:#8e2eff; color:white; cursor:pointer; }
 .start-job-btn:hover { background:#6a1bd9; }
 
 #checks-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; flex-direction:column; overflow-y:auto; padding:20px; }
 #checks-modal h2 { text-align:center; margin-bottom:10px; }
 #close-checks { background:#ff4d4d; color:white; border:none; border-radius:8px; padding:10px; width:100%; font-weight:bold; cursor:pointer; margin-top:10px; }
-#job-timer { font-size:1.2rem; font-weight:bold; text-align:center; margin:10px 0; }
-#map { width:100%; height:200px; margin-top:10px; border-radius:12px; background:#222; }
+#map { width:100%; height:200px; margin-top:10px; border-radius:12px; }
 
 footer { position:fixed; bottom:0; width:100%; background:#222; padding:10px; display:flex; justify-content:space-around; z-index:1000; }
 footer button { padding:10px; border:none; border-radius:8px; background:#444; color:white; font-weight:bold; cursor:pointer; }
@@ -37,39 +39,37 @@ footer button { padding:10px; border:none; border-radius:8px; background:#444; c
 </header>
 
 <div id="job-list">
-  <!-- Example jobs -->
-  <div class="job-card" data-priority="emergency" data-name="John Doe" data-reg="AB12 CDE" data-location="Tesco Extra, Snodland" data-issue="Car won't start" data-emergency="Yes">
+  <!-- 7 Example jobs -->
+  <div class="job-card" data-priority="emergency" data-name="John Doe" data-reg="AB12 CDE" data-lat="51.332593" data-lng="0.549980" data-location="Tesco Extra, Snodland" data-issue="Car won't start">
     <div class="job-type-indicator"></div>
     <div class="job-title">AB12 CDE</div>
     <div class="job-location">Tesco Extra, Snodland</div>
     <button class="start-job-btn">Start Job</button>
   </div>
-  <div class="job-card" data-priority="same-day" data-name="Alice Smith" data-reg="AJ62 KSV" data-location="Morrisons, Rochester" data-issue="Flat tire" data-emergency="No">
+  <div class="job-card" data-priority="same-day" data-name="Alice Smith" data-reg="AJ62 KSV" data-lat="51.389" data-lng="0.501" data-location="Morrisons, Rochester" data-issue="Flat tire">
     <div class="job-type-indicator"></div>
     <div class="job-title">AJ62 KSV</div>
     <div class="job-location">Morrisons, Rochester</div>
     <button class="start-job-btn">Start Job</button>
   </div>
-  <div class="job-card" data-priority="normal" data-name="Bob Brown" data-reg="AC34 XYZ" data-location="High Street, Chatham" data-issue="Oil change" data-emergency="No">
-    <div class="job-type-indicator"></div>
-    <div class="job-title">AC34 XYZ</div>
-    <div class="job-location">High Street, Chatham</div>
-    <button class="start-job-btn">Start Job</button>
-  </div>
-  <!-- Add 4 more jobs as needed -->
+  <!-- Add 5 more jobs -->
 </div>
 
-<div id="map">Map Placeholder</div>
+<div id="map"></div>
 
-<!-- Essential Checks Modal -->
-<div id="checks-modal" class="modal">
+<div id="checks-modal">
   <h2>Essential Checks</h2>
   <div><strong>Name:</strong> <span id="cust-name"></span></div>
   <div><strong>Reg:</strong> <span id="cust-reg"></span></div>
   <div><strong>Location:</strong> <span id="cust-location"></span></div>
   <div><strong>Issue:</strong> <span id="cust-issue"></span></div>
-  <div><strong>Emergency:</strong> <span id="cust-emergency"></span></div>
-  <!-- Add your checklist items here -->
+  <div id="checklist">
+    <p>Battery ✅</p>
+    <p>Lights ✅</p>
+    <p>Tyres ✅</p>
+    <p>Fluids ✅</p>
+    <!-- Add all RAC/AA essential checks -->
+  </div>
   <button id="close-checks">Close</button>
 </div>
 
@@ -79,6 +79,7 @@ footer button { padding:10px; border:none; border-radius:8px; background:#444; c
   <button>Settings</button>
 </footer>
 
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 // --- Job Sorting ---
 function sortJobs() {
@@ -92,7 +93,7 @@ function sortJobs() {
 }
 sortJobs();
 
-// --- Start Job Button ---
+// --- Job Timer ---
 const checksModal = document.getElementById("checks-modal");
 const jobTimerDisplay = document.getElementById("job-timer");
 
@@ -110,6 +111,7 @@ function startJobTimer() {
     return interval;
 }
 
+// --- Start Job Button ---
 document.querySelectorAll(".start-job-btn").forEach(btn=>{
     btn.addEventListener("click", ()=>{
         const card = btn.closest(".job-card");
@@ -117,7 +119,6 @@ document.querySelectorAll(".start-job-btn").forEach(btn=>{
         document.getElementById("cust-reg").textContent = card.dataset.reg;
         document.getElementById("cust-location").textContent = card.dataset.location;
         document.getElementById("cust-issue").textContent = card.dataset.issue;
-        document.getElementById("cust-emergency").textContent = card.dataset.emergency;
 
         checksModal.style.display = "flex";
 
@@ -129,6 +130,24 @@ document.querySelectorAll(".start-job-btn").forEach(btn=>{
 document.getElementById("close-checks").onclick = ()=>{
     checksModal.style.display = "none";
 };
+
+// --- Leaflet Map ---
+const map = L.map('map').setView([51.332593, 0.54998], 12);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19,
+    attribution:'© OpenStreetMap'
+}).addTo(map);
+
+// Add markers for jobs
+document.querySelectorAll('.job-card').forEach(card=>{
+    const lat = parseFloat(card.dataset.lat);
+    const lng = parseFloat(card.dataset.lng);
+    const priority = card.dataset.priority;
+    let color = (priority==="emergency")?"red":(priority==="same-day")?"orange":"green";
+    const marker = L.circleMarker([lat,lng],{radius:8,color:color,fillColor:color,fillOpacity:0.8}).addTo(map);
+    marker.bindPopup(`<strong>${card.dataset.reg}</strong><br>${card.dataset.name}<br>${card.dataset.location}<br>${card.dataset.issue}`);
+});
 </script>
+
 </body>
 </html>

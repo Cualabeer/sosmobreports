@@ -3,164 +3,230 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mobile Mechanics Dashboard</title>
+<title>On-Demand Mechanic Dashboard</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
-body, html{height:100%;background:#f5f5f5;}
-header{position:fixed;top:0;width:100%;background:#222;color:#fff;padding:10px;z-index:1000;}
-header h1{font-size:1.2rem;}
-#ticker{margin-top:5px;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-main{padding-top:70px;padding-bottom:60px;}
-#job-list{display:flex;flex-direction:column;gap:10px;padding:10px;}
-.job-card{background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.2);cursor:pointer;}
-.job-card.emergency{border-left:5px solid red;}
-.job-card h3{font-size:1rem;margin-bottom:5px;}
-.job-card p{font-size:0.85rem;}
-.map{height:200px;margin:10px;border-radius:8px;}
-.bottom-nav{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:#222;color:#fff;padding:10px 0;}
-.bottom-nav button{background:none;border:none;color:#fff;font-size:1rem;}
-.modal{display:none;position:fixed;z-index:2000;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;}
-.modal-content{background:#fff;padding:20px;border-radius:10px;width:90%;max-height:90%;overflow-y:auto;position:relative;}
-#close-modal{position:absolute;top:10px;right:15px;font-size:1.5rem;cursor:pointer;}
-button.action-btn{margin-top:10px;padding:10px 15px;font-size:1rem;border:none;border-radius:5px;background:#222;color:#fff;cursor:pointer;}
-button.action-btn.red{background:red;}
-#qr-scanner{margin:10px;}
+  body {
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:0;
+    background:#111;
+    color:#fff;
+  }
+  /* Neon QR Section */
+  #qr-section {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    border: 3px solid #8e2eff;
+    box-shadow: 0 0 20px #8e2eff, 0 0 40px #00ff66;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 400px;
+    text-align:center;
+    transition: transform 0.2s ease;
+    cursor:pointer;
+  }
+  #qr-section h2 { color:#8e2eff; text-shadow:0 0 10px #8e2eff; }
+  #qr-section p { color:#00ff66; text-shadow:0 0 8px #00ff66; }
+  #qr-section button {
+    background:#8e2eff;
+    color:white;
+    padding:12px 20px;
+    border:none;
+    border-radius:10px;
+    font-weight:bold;
+    font-size:1rem;
+    box-shadow:0 0 15px #00ff66;
+  }
+
+  /* Full-screen modals */
+  .modal {
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.95);
+    justify-content:center;
+    align-items:flex-start;
+    overflow-y:auto;
+    z-index:1000;
+    padding-top:30px;
+  }
+  .modal-content {
+    background:#222;
+    color:#fff;
+    border-radius:12px;
+    padding:20px;
+    width:95%;
+    max-width:500px;
+    margin:0 auto 30px auto;
+    box-shadow:0 0 15px #00ff66;
+  }
+  .modal-content h2,h3 { color:#00ff66; margin-top:15px; }
+  .modal-content label { display:block; margin:8px 0; }
+  .modal-content input[type="checkbox"] { margin-right:10px; }
+  .action-btn {
+    margin-top:20px;
+    width:100%;
+    padding:12px;
+    font-size:1rem;
+    font-weight:bold;
+    color:#fff;
+    background:#8e2eff;
+    border:none;
+    border-radius:10px;
+    box-shadow:0 0 10px #00ff66;
+    cursor:pointer;
+  }
+  .close-btn {
+    position:absolute;
+    top:10px; right:15px;
+    font-size:1.5rem;
+    cursor:pointer;
+  }
+
+  /* Timer display */
+  #job-timer {
+    font-size:1.5rem;
+    text-align:center;
+    margin:15px;
+    color:#00ff66;
+    text-shadow:0 0 10px #00ff66;
+  }
 </style>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 </head>
 <body>
 
-<header>
-  <h1>SOS Mobile Mechanics</h1>
-  <div id="ticker">Live Jobs: 3 New – 1 Emergency – 2 Normal</div>
-</header>
+<!-- QR Scan Section -->
+<div id="qr-section">
+  <h2>Scan QR to Start Job</h2>
+  <p>Tap here to activate camera or upload QR image</p>
+  <button id="start-qr-scan">Activate QR Scanner</button>
+</div>
 
-<main>
-  <div id="job-list"></div>
-  <div id="map" class="map"></div>
-  <div id="qr-scanner">
-    <input type="file" id="qr-file" accept="image/*"/>
-    <button id="scan-qr">Scan QR</button>
-  </div>
-</main>
-
-<nav class="bottom-nav">
-  <button>Home</button>
-  <button>Jobs</button>
-  <button>Notifications</button>
-  <button>Settings</button>
-</nav>
-
-<!-- Job Detail Modal -->
+<!-- Job Card Modal -->
 <div id="job-modal" class="modal">
   <div class="modal-content">
-    <span id="close-modal">&times;</span>
-    <div id="job-detail"></div>
+    <span class="close-btn" id="close-job">&times;</span>
+    <h2>Job Card</h2>
+    <div id="customer-info">
+      <p><strong>Name:</strong> <span id="cust-name"></span></p>
+      <p><strong>Car Reg:</strong> <span id="cust-reg"></span></p>
+      <p><strong>Location:</strong> <span id="cust-location"></span></p>
+      <p><strong>Issue:</strong> <span id="cust-issue"></span></p>
+      <p><strong>Emergency:</strong> <span id="cust-emergency"></span></p>
+    </div>
+    <div id="job-timer">00:00:00</div>
+    <button class="action-btn" id="open-checks">Start Essential Checks</button>
   </div>
 </div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+<!-- Essential Checks Modal -->
+<div id="checks-modal" class="modal">
+  <div class="modal-content">
+    <span id="close-checks" class="close-btn">&times;</span>
+    <h2>Essential Checks (AA/RAC Style)</h2>
+
+    <h3>Visual & Safety</h3>
+    <label><input type="checkbox" class="check-item"> Check for leaks (oil, coolant, fuel)</label>
+    <label><input type="checkbox" class="check-item"> Check tires: pressure & condition</label>
+    <label><input type="checkbox" class="check-item"> Check exterior lights & signals</label>
+
+    <h3>Battery & Electrical</h3>
+    <label><input type="checkbox" class="check-item"> Battery voltage</label>
+    <label><input type="checkbox" class="check-item"> Starter motor function</label>
+    <label><input type="checkbox" class="check-item"> Check fuses & warning lights</label>
+
+    <h3>Fluids</h3>
+    <label><input type="checkbox" class="check-item"> Engine oil level</label>
+    <label><input type="checkbox" class="check-item"> Coolant level & condition</label>
+    <label><input type="checkbox" class="check-item"> Brake fluid</label>
+
+    <h3>Engine & Driveability</h3>
+    <label><input type="checkbox" class="check-item"> Engine starts / runs smoothly</label>
+    <label><input type="checkbox" class="check-item"> Listen for unusual noises</label>
+    <label><input type="checkbox" class="check-item"> Transmission / clutch operation</label>
+
+    <h3>Quick Fix / Advice</h3>
+    <label><input type="checkbox" class="check-item"> Recommend tow / repair / parts replacement</label>
+    <label><input type="checkbox" class="check-item"> Take photos if needed</label>
+    <label><input type="checkbox" class="check-item"> Capture mechanic notes</label>
+
+    <button id="save-checks" class="action-btn">Save & Close Checks</button>
+  </div>
+</div>
+
 <script>
-// Sample Jobs (serverless)
-let jobs = [
-  { reg:"AB12 CDE", type:"Normal", emergency:false, location:"Outside Tesco Extra, Snodland", lat:51.332593, lng:0.549980, time:"21/01/2026 14:36" },
-  { reg:"AJ62 KSV", type:"Emergency", emergency:true, location:"Garage Lane, Snodland", lat:51.333500, lng:0.548000, time:"21/01/2026 15:00" },
-  { reg:"XY34 ZAB", type:"Normal", emergency:false, location:"High Street, Snodland", lat:51.331200, lng:0.550500, time:"21/01/2026 16:15" }
-];
-
-const jobList = document.getElementById("job-list");
-jobs.forEach((job,index)=>{
-  const card = document.createElement("div");
-  card.className = "job-card";
-  if(job.emergency) card.classList.add("emergency");
-  card.innerHTML = `<h3>${job.reg} - ${job.type}</h3>
-                    <p>Location: ${job.location}</p>
-                    <p>Time: ${job.time}</p>`;
-  card.addEventListener("click",()=>openJobModal(index));
-  jobList.appendChild(card);
-});
-
-// Modal logic
-const modal = document.getElementById("job-modal");
-const jobDetail = document.getElementById("job-detail");
-document.getElementById("close-modal").onclick = ()=>{modal.style.display="none";};
-
-let timers = {};
-function openJobModal(index){
-  const job = jobs[index];
-  jobDetail.innerHTML = `
-    <h2>${job.reg} - ${job.type}</h2>
-    <p><strong>Emergency:</strong> ${job.emergency ? "Yes":"No"}</p>
-    <p><strong>Location:</strong> ${job.location}</p>
-    <p><strong>Lat/Lng:</strong> ${job.lat}, ${job.lng}</p>
-    <p><strong>Time:</strong> ${job.time}</p>
-    <p><strong>AI Suggested Checks:</strong></p>
-    <ul>
-      <li>Check brake pads</li>
-      <li>Inspect coolant levels</li>
-      <li>Serpentine belt tension</li>
-      <li>Oil level</li>
-      <li>Battery condition</li>
-    </ul>
-    <button class="action-btn" onclick="startTimer(${index})">Start Timer</button>
-  `;
-  modal.style.display="flex";
-}
-
-function startTimer(index){
-  const job = jobs[index];
-  if(!timers[job.reg]){
-    let seconds=0;
-    const btn = jobDetail.querySelector("button");
-    timers[job.reg] = setInterval(()=>{
-      seconds++;
-      btn.innerText = `Timer: ${Math.floor(seconds/60)}m ${seconds%60}s`;
-      if(seconds>=3600) btn.classList.add("red"); // overdue after 1 hour
-    },1000);
-  }
-}
-
-// Map
-const map = L.map('map').setView([51.332593,0.549980], 15);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
-jobs.forEach(job=>{
-  L.marker([job.lat,job.lng]).addTo(map).bindPopup(`${job.reg} - ${job.type}`);
-});
-
-// QR Scanner
-document.getElementById("scan-qr").onclick = () => {
-  const fileInput = document.getElementById("qr-file");
-  if(fileInput.files.length===0){ alert("Select QR image"); return; }
-  const file = fileInput.files[0];
-  const reader = new FileReader();
-  reader.onload = function(){
-    const img = new Image();
-    img.onload = function(){
-      const canvas=document.createElement("canvas");
-      canvas.width=img.width; canvas.height=img.height;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img,0,0);
-      const imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-      const code = jsQR(imageData.data, canvas.width, canvas.height);
-      if(code){
-        handleQR(code.data);
-      }else{
-        alert("No QR code detected");
-      }
-    }
-    img.src = reader.result;
-  }
-  reader.readAsDataURL(file);
+/* QR Scan placeholder */
+const startScan = document.getElementById("start-qr-scan");
+startScan.onclick = ()=>{
+  // For demo, fake QR data
+  const customerData = {
+    name:"John Doe",
+    reg:"AB12 CDE",
+    location:"Tesco Extra, A229, Snodland",
+    issue:"Car won't start, clicking noise",
+    emergency:"Yes"
+  };
+  openJobCard(customerData);
 };
 
-function handleQR(data){
-  // QR contains job reg (serverless)
-  const jobIndex = jobs.findIndex(j=>j.reg===data);
-  if(jobIndex!==-1){
-    openJobModal(jobIndex);
-  } else alert("Job not found");
+/* Job Modal */
+const jobModal = document.getElementById("job-modal");
+const closeJob = document.getElementById("close-job");
+const custName = document.getElementById("cust-name");
+const custReg = document.getElementById("cust-reg");
+const custLocation = document.getElementById("cust-location");
+const custIssue = document.getElementById("cust-issue");
+const custEmergency = document.getElementById("cust-emergency");
+let jobTimerInterval;
+
+function openJobCard(data){
+  custName.textContent = data.name;
+  custReg.textContent = data.reg;
+  custLocation.textContent = data.location;
+  custIssue.textContent = data.issue;
+  custEmergency.textContent = data.emergency;
+  jobModal.style.display="flex";
+  startJobTimer();
 }
+closeJob.onclick = ()=>{ jobModal.style.display="none"; clearInterval(jobTimerInterval); }
+
+/* Timer */
+function startJobTimer(){
+  let seconds = 0;
+  const display = document.getElementById("job-timer");
+  jobTimerInterval = setInterval(()=>{
+    seconds++;
+    const h = String(Math.floor(seconds/3600)).padStart(2,'0');
+    const m = String(Math.floor((seconds%3600)/60)).padStart(2,'0');
+    const s = String(seconds%60).padStart(2,'0');
+    display.textContent = `${h}:${m}:${s}`;
+    if(seconds > 3600){ display.style.color="red"; } // warning if >1hr
+  },1000);
+}
+
+/* Essential Checks Modal */
+const checksModal = document.getElementById("checks-modal");
+const openChecks = document.getElementById("open-checks");
+const closeChecks = document.getElementById("close-checks");
+const saveChecks = document.getElementById("save-checks");
+
+openChecks.onclick = ()=>{ checksModal.style.display="flex"; };
+closeChecks.onclick = ()=>{ checksModal.style.display="none"; };
+saveChecks.onclick = ()=>{
+  const completed = [];
+  document.querySelectorAll(".check-item").forEach((chk)=>{
+    if(chk.checked) completed.push(chk.parentNode.textContent.trim());
+  });
+  console.log("Completed checks:", completed);
+  checksModal.style.display="none";
+};
 </script>
+
 </body>
 </html>

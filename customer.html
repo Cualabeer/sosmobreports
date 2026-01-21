@@ -36,7 +36,7 @@ button{width:100%;padding:12px;margin-top:15px;font-weight:bold;background:#4CAF
 
 <label>Location:</label>
 <div id="map"></div>
-<input type="text" id="addressInput" placeholder="Type your address">
+<input type="text" id="addressInput" placeholder="Type your address manually">
 
 <button id="locBtn">Use My Location</button>
 <button id="generateQR">Generate QR Code</button>
@@ -59,18 +59,18 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   attribution:'&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Update lat/lng when marker is dragged
-marker.on('dragend', function(e){
-  let pos = marker.getLatLng();
-  document.getElementById('lat').value = pos.lat;
-  document.getElementById('lng').value = pos.lng;
-});
-
 // Hidden fields for lat/lng
 let latInput = document.createElement('input'); latInput.type='hidden'; latInput.id='lat';
 let lngInput = document.createElement('input'); lngInput.type='hidden'; lngInput.id='lng';
 document.querySelector('.container').appendChild(latInput);
 document.querySelector('.container').appendChild(lngInput);
+
+// Update lat/lng when marker is dragged
+marker.on('dragend', function(e){
+  let pos = marker.getLatLng();
+  latInput.value = pos.lat;
+  lngInput.value = pos.lng;
+});
 
 // Use GPS Location
 document.getElementById('locBtn').addEventListener('click', ()=>{
@@ -82,32 +82,11 @@ document.getElementById('locBtn').addEventListener('click', ()=>{
       map.setView([lat,lng],16);
       latInput.value = lat;
       lngInput.value = lng;
-      document.getElementById('addressInput').value = "Detected location"; // placeholder, optional reverse geocode
+      document.getElementById('addressInput').value = "Detected location"; // optional text placeholder
     }, ()=>{
       alert("Unable to get GPS location. Please enter manually.");
     });
   } else alert("Geolocation not supported");
-});
-
-// Address autocomplete using Photon API (free OSM service)
-let addressInput = document.getElementById('addressInput');
-addressInput.addEventListener('input', async ()=>{
-  let val = addressInput.value;
-  if(val.length < 3) return;
-  let res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=5`);
-  let data = await res.json();
-  // Show suggestions (simple, console log for now)
-  console.log("Suggestions:", data.features.map(f=>f.properties.name + ", " + f.properties.city));
-  if(data.features.length>0){
-    let f = data.features[0];
-    let lat = f.geometry.coordinates[1];
-    let lng = f.geometry.coordinates[0];
-    marker.setLatLng([lat,lng]);
-    map.setView([lat,lng],16);
-    latInput.value = lat;
-    lngInput.value = lng;
-    addressInput.value = f.properties.name + (f.properties.city ? ", " + f.properties.city : "");
-  }
 });
 
 // Generate QR Code
@@ -124,12 +103,12 @@ document.getElementById('generateQR').addEventListener('click', ()=>{
     },
     pin: Math.floor(1000 + Math.random()*9000) // 4-digit PIN
   };
-  QRCode.toCanvas(payload.pin ? payload.pin : "0000", {width:200}, function(err,canvas){
+  QRCode.toCanvas(JSON.stringify(payload), {width:200}, function(err,canvas){
     if(err)console.error(err);
     let container = document.getElementById('qrContainer');
     container.innerHTML="";
     container.appendChild(canvas);
-    // Add JSON hidden text for scanning
+    // Optional: show JSON for debug
     let pre = document.createElement('pre'); pre.textContent = JSON.stringify(payload, null, 2);
     container.appendChild(pre);
   });

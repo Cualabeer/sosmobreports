@@ -1,5 +1,5 @@
-const CACHE_NAME='mechanic-pwa-v1';
-const urlsToCache=[
+const CACHE_NAME = 'mechanic-pwa-cache-v1';
+const urlsToCache = [
   '/',
   '/index.html',
   '/style.css',
@@ -8,16 +8,20 @@ const urlsToCache=[
   '/qr.js'
 ];
 
-self.addEventListener('install', e=>{
-  e.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(urlsToCache)));
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+      .then(() => self.skipWaiting())
+  );
 });
 
-self.addEventListener('fetch', e=>{
-  e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
+self.addEventListener('activate', event => {
+  event.waitUntil(self.clients.claim());
 });
 
-// Background sync placeholder
-self.addEventListener('sync', e=>{
-  if(e.tag==='sync-jobs'){ e.waitUntil(syncJobs()); }
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(response => response || fetch(event.request))
+  );
 });
-async function syncJobs(){ console.log('Sync jobs when online'); }

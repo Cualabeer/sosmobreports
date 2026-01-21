@@ -3,117 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Customer Job Entry</title>
-
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<title>SOS Mechanics - Tesla Style</title>
 <style>
-body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f5f5f5;}
-.container{max-width:600px;margin:20px auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-label{display:block;margin-top:10px;font-weight:bold;}
-input, select{width:100%;padding:10px;margin-top:5px;border-radius:6px;border:1px solid #ccc;font-size:1em;}
-button{width:100%;padding:12px;margin-top:15px;font-weight:bold;background:#4CAF50;color:white;border:none;border-radius:8px;cursor:pointer;font-size:1em;}
-#map{height:250px;width:100%;margin-top:10px;border-radius:6px;}
-#qrContainer{text-align:center;margin-top:20px;}
+  /* Tesla-inspired dark theme */
+  body { font-family: 'Roboto', sans-serif; margin:0; padding:0; background:#121212; color:#fff; }
+  header { position:fixed; top:0; width:100%; text-align:center; padding:15px 0; z-index:1000; background:#000; font-size:20px; font-weight:500; }
+  main { padding:80px 20px 100px; max-width:480px; margin:auto; }
+  .card { background:#1c1c1c; padding:20px; margin-bottom:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.5); transition:0.3s; }
+  .card:hover { box-shadow:0 6px 18px rgba(255,0,0,0.3); }
+  input { width:100%; padding:12px; margin:10px 0; border:none; border-radius:10px; background:#2a2a2a; color:#fff; font-size:16px; }
+  button { width:100%; padding:15px; border:none; border-radius:10px; font-size:18px; font-weight:500; background:#e60000; color:#fff; cursor:pointer; margin-top:10px; transition:0.2s; }
+  button:disabled { background:#444; cursor:not-allowed; }
+  .service-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .service-card { background:#2a2a2a; padding:12px; border-radius:10px; text-align:center; cursor:pointer; transition:0.3s; }
+  .service-card.selected { background:#e60000; color:#fff; }
+  #qrModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center; flex-direction:column; color:#fff; }
+  #pinDisplay { font-size:30px; font-weight:bold; background:#000; padding:15px 25px; margin-top:15px; border-radius:10px; filter:blur(6px); transition:filter 0.5s; }
 </style>
 </head>
 <body>
 
-<div class="container">
-<h2>SOS Job Entry</h2>
+<header>SOS Mechanics</header>
 
-<label>Customer Name:</label>
-<input type="text" id="customerName" placeholder="Full Name">
+<main>
+  <div class="card" id="contactCard">
+    <h2>Contact & Vehicle Info</h2>
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="tel" id="phone" placeholder="Phone Number" required>
+    <input type="text" id="make" placeholder="Vehicle Make" required>
+    <input type="text" id="model" placeholder="Vehicle Model" required>
+    <input type="number" id="year" placeholder="Year" required>
+    <input type="text" id="reg" placeholder="Registration / Plate" required>
+    <input type="text" id="location" placeholder="Address / GPS" required>
+  </div>
 
-<label>Vehicle Registration:</label>
-<input type="text" id="vehicleReg" placeholder="ABC123">
+  <div class="card">
+    <h2>Select Services</h2>
+    <div class="service-grid">
+      <div class="service-card" data-price="55">Oil Change<br>£55</div>
+      <div class="service-card" data-price="45">Spark Plugs<br>£45</div>
+      <div class="service-card" data-price="35">Coolant Check<br>£35</div>
+      <div class="service-card" data-price="70">Engine Diagnostics<br>£70</div>
+      <div class="service-card" data-price="60">Brake Pads<br>£60</div>
+      <div class="service-card" data-price="30">Brake Fluid<br>£30</div>
+    </div>
+  </div>
 
-<label>Vehicle Make/Model:</label>
-<input type="text" id="vehicleModel" placeholder="BMW 118i Sport">
+  <div class="card">
+    <label><input type="checkbox" id="agree"> I agree to the total price</label>
+  </div>
 
-<label>Job Description:</label>
-<input type="text" id="jobDetails" placeholder="Oil leak, brake issue etc.">
+  <div class="card">
+    <p>Total Price: £<span id="totalPrice">0</span></p>
+    <button id="generateQR" disabled>Generate QR + PIN</button>
+  </div>
+</main>
 
-<label>Location:</label>
-<div id="map"></div>
-<input type="text" id="addressInput" placeholder="Type your address manually">
-
-<button id="locBtn">Use My Location</button>
-<button id="generateQR">Generate QR Code</button>
-
-<div id="qrContainer"></div>
+<!-- QR Modal -->
+<div id="qrModal" class="flex-center">
+  <canvas id="qrCanvas"></canvas>
+  <div id="pinDisplay"></div>
+  <button onclick="closeModal()">Done</button>
 </div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- QR Code JS -->
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 <script>
-let map = L.map('map').setView([51.3782, 0.5075], 13);
-let marker = L.marker([51.3782, 0.5075], {draggable:true}).addTo(map);
+  const serviceCards = document.querySelectorAll('.service-card');
+  const totalEl = document.getElementById('totalPrice');
+  const agree = document.getElementById('agree');
+  const generateBtn = document.getElementById('generateQR');
+  let selectedServices = [];
 
-// OSM Tile Layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  maxZoom:19,
-  attribution:'&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-// Hidden fields for lat/lng
-let latInput = document.createElement('input'); latInput.type='hidden'; latInput.id='lat';
-let lngInput = document.createElement('input'); lngInput.type='hidden'; lngInput.id='lng';
-document.querySelector('.container').appendChild(latInput);
-document.querySelector('.container').appendChild(lngInput);
-
-// Update lat/lng when marker is dragged
-marker.on('dragend', function(e){
-  let pos = marker.getLatLng();
-  latInput.value = pos.lat;
-  lngInput.value = pos.lng;
-});
-
-// Use GPS Location
-document.getElementById('locBtn').addEventListener('click', ()=>{
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition((pos)=>{
-      let lat = pos.coords.latitude;
-      let lng = pos.coords.longitude;
-      marker.setLatLng([lat,lng]);
-      map.setView([lat,lng],16);
-      latInput.value = lat;
-      lngInput.value = lng;
-      document.getElementById('addressInput').value = "Detected location"; // optional text placeholder
-    }, ()=>{
-      alert("Unable to get GPS location. Please enter manually.");
+  serviceCards.forEach(card=>{
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('selected');
+      const name = card.innerText.split('\n')[0];
+      if(card.classList.contains('selected')) selectedServices.push(name);
+      else selectedServices = selectedServices.filter(s=>s!==name);
+      updateTotal();
     });
-  } else alert("Geolocation not supported");
-});
-
-// Generate QR Code
-document.getElementById('generateQR').addEventListener('click', ()=>{
-  let payload = {
-    customerName: document.getElementById('customerName').value,
-    vehicleReg: document.getElementById('vehicleReg').value,
-    vehicleModel: document.getElementById('vehicleModel').value,
-    jobDetails: document.getElementById('jobDetails').value,
-    location: {
-      latitude: latInput.value,
-      longitude: lngInput.value,
-      address: document.getElementById('addressInput').value
-    },
-    pin: Math.floor(1000 + Math.random()*9000) // 4-digit PIN
-  };
-  QRCode.toCanvas(JSON.stringify(payload), {width:200}, function(err,canvas){
-    if(err)console.error(err);
-    let container = document.getElementById('qrContainer');
-    container.innerHTML="";
-    container.appendChild(canvas);
-    // Optional: show JSON for debug
-    let pre = document.createElement('pre'); pre.textContent = JSON.stringify(payload, null, 2);
-    container.appendChild(pre);
   });
-});
-</script>
 
+  function updateTotal(){
+    let total = 0;
+    selectedServices.forEach(s=>{
+      const card = Array.from(serviceCards).find(c=>c.innerText.startsWith(s));
+      total += parseInt(card.dataset.price);
+    });
+    totalEl.innerText = total;
+    generateBtn.disabled = !agree.checked || total===0;
+  }
+
+  agree.addEventListener('change', updateTotal);
+
+  function generatePIN() { return Math.floor(1000 + Math.random()*9000); }
+
+  generateBtn.addEventListener('click', ()=>{
+    const data = {
+      name: document.getElementById('name').value,
+      phone: document.getElementById('phone').value,
+      vehicle: document.getElementById('make').value + ' ' + document.getElementById('model').value,
+      year: document.getElementById('year').value,
+      reg: document.getElementById('reg').value,
+      location: document.getElementById('location').value,
+      services: selectedServices,
+      total: totalEl.innerText
+    };
+    const pin = generatePIN();
+    const qr = new QRious({
+      element: document.getElementById('qrCanvas'),
+      value: JSON.stringify({...data,pin}),
+      size: 250
+    });
+    const pinDisplay = document.getElementById('pinDisplay');
+    pinDisplay.innerText = pin;
+    document.getElementById('qrModal').style.display = 'flex';
+    setTimeout(()=>{ pinDisplay.style.filter='blur(0)'; },2000);
+  });
+
+  function closeModal(){
+    document.getElementById('qrModal').style.display='none';
+    serviceCards.forEach(c=>c.classList.remove('selected'));
+    selectedServices=[];
+    totalEl.innerText=0;
+    agree.checked=false;
+    generateBtn.disabled=true;
+    document.querySelectorAll('input').forEach(i=>i.value='');
+  }
+</script>
 </body>
 </html>

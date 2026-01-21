@@ -1,1 +1,14 @@
-files.json
+[
+  "customer.html",
+  "dashboard.html",
+  "diagnose-my-car.html",
+  "diagnosisconsent.html",
+  "index.html",
+  "instant-vehicle-help.html",
+  "quote.html",
+  "sos-report.html",
+  "sosmobilereport.html",
+  "sosmobilereports.html",
+  "welcome.html",
+  "whatsapp.html"
+]

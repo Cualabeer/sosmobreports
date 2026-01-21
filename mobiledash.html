@@ -4,150 +4,197 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mechanic Dashboard</title>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
 <style>
-body { margin:0; font-family:sans-serif; background:#111; color:#eee; }
-header { position:fixed; top:0; width:100%; background:#222; padding:10px; z-index:1000; display:flex; flex-direction:column; }
-#ticker { font-weight:bold; overflow:hidden; white-space:nowrap; }
-#job-timer { font-size:1.2rem; font-weight:bold; margin-top:5px; text-align:center; }
-
-#job-list { margin-top:80px; max-height:50vh; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:10px; }
-.job-card { position:relative; background:#1a1a1a; padding:15px 15px 15px 25px; border-radius:12px; box-shadow:0 0 5px #555; transition: transform 0.2s; }
-.job-type-indicator { width:8px; height:100%; position:absolute; left:0; top:0; border-radius:6px 0 0 6px; }
-.job-card[data-priority="emergency"] .job-type-indicator { background:#ff4d4d; }
-.job-card[data-priority="same-day"] .job-type-indicator { background:#ffa500; }
-.job-card[data-priority="normal"] .job-type-indicator { background:#0f0; }
-
-.start-job-btn { margin-top:10px; width:100%; padding:10px; font-weight:bold; border:none; border-radius:8px; background:#8e2eff; color:white; cursor:pointer; }
-.start-job-btn:hover { background:#6a1bd9; }
-
-#checks-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; flex-direction:column; overflow-y:auto; padding:20px; }
-#checks-modal h2 { text-align:center; margin-bottom:10px; }
-#close-checks { background:#ff4d4d; color:white; border:none; border-radius:8px; padding:10px; width:100%; font-weight:bold; cursor:pointer; margin-top:10px; }
-#map { width:100%; height:200px; margin-top:10px; border-radius:12px; }
-
-footer { position:fixed; bottom:0; width:100%; background:#222; padding:10px; display:flex; justify-content:space-around; z-index:1000; }
-footer button { padding:10px; border:none; border-radius:8px; background:#444; color:white; font-weight:bold; cursor:pointer; }
+body, html {margin:0;padding:0;font-family:sans-serif;background:#121212;color:#fff;}
+header {position:fixed;top:0;left:0;width:100%;background:#1a1a1a;padding:10px;z-index:100;}
+#ticker {white-space:nowrap;overflow:hidden;}
+#ticker span {display:inline-block;padding-right:50px;animation:scroll 20s linear infinite;}
+@keyframes scroll {0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
+footer {position:fixed;bottom:0;left:0;width:100%;background:#1a1a1a;padding:10px;display:flex;justify-content:space-around;z-index:100;}
+.job-container {margin-top:60px;margin-bottom:60px;display:flex;overflow-x:auto;padding:10px;gap:10px;}
+.job-card {min-width:250px;background:#222;padding:15px;border-radius:10px;flex-shrink:0;position:relative;}
+.start-job-btn, .pdf-btn {margin-top:10px;padding:10px;width:100%;border:none;border-radius:5px;color:#fff;background:#4caf50;cursor:pointer;}
+.start-job-btn:hover, .pdf-btn:hover {background:#45a049;}
+#map {height:200px;width:100%;margin:10px 0;border-radius:10px;}
+#qrScanner {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:300;}
+#qrScanner video {width:100%;height:100%;object-fit:cover;}
+#closeQR {position:absolute;top:10px;right:10px;padding:10px;}
+#checksModal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);overflow-y:auto;z-index:400;padding:20px;}
+.check-item {padding:10px;border-bottom:1px solid #444;}
+button.close-modal {position:absolute;top:10px;right:10px;padding:10px;background:#f44336;border:none;color:#fff;border-radius:5px;}
 </style>
 </head>
 <body>
 
 <header>
-  <div id="ticker">Live Jobs Ticker: Emergency at Tesco Extra, AB12 CDE | Same-day AJ62 KSV</div>
-  <div id="job-timer">00:00:00</div>
+<div id="ticker"><span>🚨 New Jobs Coming In - Emergency: AB12CDE - Standard: XY34ZK - Same Day: MN56OP</span></div>
 </header>
 
-<div id="job-list">
-  <!-- 7 Example jobs -->
-  <div class="job-card" data-priority="emergency" data-name="John Doe" data-reg="AB12 CDE" data-lat="51.332593" data-lng="0.549980" data-location="Tesco Extra, Snodland" data-issue="Car won't start">
-    <div class="job-type-indicator"></div>
-    <div class="job-title">AB12 CDE</div>
-    <div class="job-location">Tesco Extra, Snodland</div>
-    <button class="start-job-btn">Start Job</button>
-  </div>
-  <div class="job-card" data-priority="same-day" data-name="Alice Smith" data-reg="AJ62 KSV" data-lat="51.389" data-lng="0.501" data-location="Morrisons, Rochester" data-issue="Flat tire">
-    <div class="job-type-indicator"></div>
-    <div class="job-title">AJ62 KSV</div>
-    <div class="job-location">Morrisons, Rochester</div>
-    <button class="start-job-btn">Start Job</button>
-  </div>
-  <!-- Add 5 more jobs -->
+<div class="job-container" id="jobContainer">
+<!-- Job cards will appear here -->
 </div>
 
 <div id="map"></div>
 
-<div id="checks-modal">
-  <h2>Essential Checks</h2>
-  <div><strong>Name:</strong> <span id="cust-name"></span></div>
-  <div><strong>Reg:</strong> <span id="cust-reg"></span></div>
-  <div><strong>Location:</strong> <span id="cust-location"></span></div>
-  <div><strong>Issue:</strong> <span id="cust-issue"></span></div>
-  <div id="checklist">
-    <p>Battery ✅</p>
-    <p>Lights ✅</p>
-    <p>Tyres ✅</p>
-    <p>Fluids ✅</p>
-    <!-- Add all RAC/AA essential checks -->
-  </div>
-  <button id="close-checks">Close</button>
-</div>
-
 <footer>
-  <button>Dashboard</button>
-  <button>QR Scan</button>
-  <button>Settings</button>
+<button id="openQR">Scan QR</button>
+<button id="refreshJobs">Refresh</button>
 </footer>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- QR Scanner Overlay -->
+<div id="qrScanner">
+  <video id="qrVideo"></video>
+  <button id="closeQR">Close</button>
+</div>
+
+<!-- Essential Checks Modal -->
+<div id="checksModal">
+  <button class="close-modal">Close</button>
+  <h2>Essential Checks</h2>
+  <div class="check-item"><input type="checkbox"> Engine Oil Level</div>
+  <div class="check-item"><input type="checkbox"> Coolant Level</div>
+  <div class="check-item"><input type="checkbox"> Battery Condition</div>
+  <div class="check-item"><input type="checkbox"> Brake Fluid</div>
+  <div class="check-item"><input type="checkbox"> Tire Pressure</div>
+  <div class="check-item"><input type="checkbox"> Lights & Indicators</div>
+  <div class="check-item"><input type="checkbox"> Wipers</div>
+  <div class="check-item"><input type="checkbox"> Belts & Hoses</div>
+  <div class="check-item"><input type="checkbox"> Fuel Level</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 <script>
-// --- Job Sorting ---
-function sortJobs() {
-    const jobList = document.getElementById("job-list");
-    const jobs = Array.from(jobList.children);
-    jobs.sort((a,b)=>{
-        const priorityOrder = { "emergency":0, "same-day":1, "normal":2 };
-        return priorityOrder[a.dataset.priority] - priorityOrder[b.dataset.priority];
-    });
-    jobs.forEach(job => jobList.appendChild(job));
+// --- Map Setup ---
+const map = L.map('map').setView([51.332593, 0.549980], 14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'&copy; OpenStreetMap contributors'
+}).addTo(map);
+let jobMarker;
+
+// --- Job Container ---
+const jobContainer = document.getElementById('jobContainer');
+
+// --- Sample Jobs ---
+const sampleJobs = [
+  {"reg":"AB12CDE","location":"51.332593,0.549980","priority":"Emergency","customer":"John Smith","issue":"Won't start"},
+  {"reg":"XY34ZK","location":"51.335000,0.550500","priority":"Same Day","customer":"Alice Jones","issue":"Flat Tire"},
+  {"reg":"MN56OP","location":"51.330000,0.548000","priority":"Standard","customer":"Bob Lee","issue":"Battery low"},
+  {"reg":"CD78FG","location":"51.336000,0.552000","priority":"Standard","customer":"Carol","issue":"Brake squeak"},
+  {"reg":"HI90JK","location":"51.338000,0.553000","priority":"Emergency","customer":"Dan","issue":"Overheating"},
+  {"reg":"LM12NO","location":"51.340000,0.554000","priority":"Same Day","customer":"Eva","issue":"Engine light"},
+  {"reg":"PQ34RS","location":"51.342000,0.555000","priority":"Standard","customer":"Frank","issue":"Stalling"}
+];
+
+// --- Display Jobs ---
+function renderJobs(jobs){
+  jobContainer.innerHTML='';
+  // Sort Emergency first
+  jobs.sort((a,b)=>{
+    const prio = {"Emergency":1,"Same Day":2,"Standard":3};
+    return prio[a.priority]-prio[b.priority];
+  });
+  jobs.forEach(job=>{
+    const card = document.createElement('div');
+    card.className='job-card';
+    card.dataset.reg=job.reg;
+    card.dataset.location=job.location;
+    card.dataset.priority=job.priority;
+    card.innerHTML=`<h3>${job.reg} - ${job.priority}</h3>
+                    <p>Customer: ${job.customer}</p>
+                    <p>Issue: ${job.issue}</p>
+                    <button class="start-job-btn">Start Job</button>
+                    <button class="pdf-btn">Generate PDF</button>`;
+    jobContainer.appendChild(card);
+
+    // Start job button
+    card.querySelector('.start-job-btn').onclick = ()=>{
+      document.getElementById('checksModal').style.display='block';
+      const [lat,lng]=job.location.split(',');
+      if(jobMarker) map.removeLayer(jobMarker);
+      jobMarker=L.marker([lat,lng]).addTo(map);
+      map.setView([lat,lng],14);
+    };
+
+    // PDF button
+    card.querySelector('.pdf-btn').onclick = ()=>generatePDF(card);
+  });
 }
-sortJobs();
 
-// --- Job Timer ---
-const checksModal = document.getElementById("checks-modal");
-const jobTimerDisplay = document.getElementById("job-timer");
-
-function startJobTimer() {
-    let seconds = 0;
-    jobTimerDisplay.style.color = "#0f0";
-    const interval = setInterval(() => {
-        seconds++;
-        const h = String(Math.floor(seconds/3600)).padStart(2,'0');
-        const m = String(Math.floor((seconds%3600)/60)).padStart(2,'0');
-        const s = String(seconds%60).padStart(2,'0');
-        jobTimerDisplay.textContent = `${h}:${m}:${s}`;
-        if(seconds >= 3600) jobTimerDisplay.style.color = "red";
-    }, 1000);
-    return interval;
+// --- Generate PDF ---
+function generatePDF(jobCard){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[:.]/g,'-');
+    doc.setFontSize(16);
+    doc.text(`Job Report - ${jobCard.dataset.reg}`,10,10);
+    doc.setFontSize(12);
+    doc.text(jobCard.querySelector('p:nth-child(2)').textContent,10,20);
+    doc.text(jobCard.querySelector('p:nth-child(3)').textContent,10,30);
+    doc.text(`Location: ${jobCard.dataset.location}`,10,40);
+    doc.save(`${jobCard.dataset.reg}_${timestamp}.pdf`);
 }
 
-// --- Start Job Button ---
-document.querySelectorAll(".start-job-btn").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-        const card = btn.closest(".job-card");
-        document.getElementById("cust-name").textContent = card.dataset.name;
-        document.getElementById("cust-reg").textContent = card.dataset.reg;
-        document.getElementById("cust-location").textContent = card.dataset.location;
-        document.getElementById("cust-issue").textContent = card.dataset.issue;
+// --- Initial Render ---
+renderJobs(sampleJobs);
 
-        checksModal.style.display = "flex";
+// --- QR Scanner ---
+const qrScanner = document.getElementById('qrScanner');
+const qrVideo = document.getElementById('qrVideo');
+let qrStream;
 
-        if(window.jobTimerInterval) clearInterval(window.jobTimerInterval);
-        window.jobTimerInterval = startJobTimer();
-    });
-});
-
-document.getElementById("close-checks").onclick = ()=>{
-    checksModal.style.display = "none";
+document.getElementById('openQR').onclick=async()=>{
+  qrScanner.style.display='block';
+  qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }});
+  qrVideo.srcObject = qrStream;
+  qrVideo.play();
+  scanQRCode();
 };
 
-// --- Leaflet Map ---
-const map = L.map('map').setView([51.332593, 0.54998], 12);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:19,
-    attribution:'© OpenStreetMap'
-}).addTo(map);
+document.getElementById('closeQR').onclick=()=>{
+  qrScanner.style.display='none';
+  qrVideo.pause();
+  if(qrStream) qrStream.getTracks().forEach(track=>track.stop());
+};
 
-// Add markers for jobs
-document.querySelectorAll('.job-card').forEach(card=>{
-    const lat = parseFloat(card.dataset.lat);
-    const lng = parseFloat(card.dataset.lng);
-    const priority = card.dataset.priority;
-    let color = (priority==="emergency")?"red":(priority==="same-day")?"orange":"green";
-    const marker = L.circleMarker([lat,lng],{radius:8,color:color,fillColor:color,fillOpacity:0.8}).addTo(map);
-    marker.bindPopup(`<strong>${card.dataset.reg}</strong><br>${card.dataset.name}<br>${card.dataset.location}<br>${card.dataset.issue}`);
-});
+async function scanQRCode(){
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const code = async ()=>{
+        if(qrVideo.readyState===qrVideo.HAVE_ENOUGH_DATA){
+            canvas.width=qrVideo.videoWidth;
+            canvas.height=qrVideo.videoHeight;
+            ctx.drawImage(qrVideo,0,0);
+            const imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+            const qr = jsQR(imageData.data,canvas.width,canvas.height);
+            if(qr){
+                handleJobQR(qr.data);
+                qrScanner.style.display='none';
+                qrVideo.pause();
+                if(qrStream) qrStream.getTracks().forEach(track=>track.stop());
+                return;
+            }
+        }
+        requestAnimationFrame(code);
+    };
+    requestAnimationFrame(code);
+}
+
+function handleJobQR(qrData){
+    try{
+        const job=JSON.parse(qrData);
+        sampleJobs.unshift(job);
+        renderJobs(sampleJobs);
+        alert(`New job loaded: ${job.reg}`);
+    }catch(e){alert('Invalid QR code');}
+}
+
+// --- Close Modal ---
+document.querySelector('#checksModal .close-modal').onclick=()=>document.getElementById('checksModal').style.display='none';
+
 </script>
-
 </body>
 </html>

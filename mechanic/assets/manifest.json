@@ -1,10 +1,11 @@
 {
-  "name": "Mechanic Dashboard",
+  "name": "SOS Mechanic Dashboard",
   "short_name": "MechanicPWA",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#f5f5f5",
   "theme_color": "#333333",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "assets/icon-192.png",

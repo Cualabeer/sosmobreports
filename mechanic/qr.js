@@ -1,23 +1,26 @@
-document.getElementById('qrUpload').onchange = function(e){
-  let file = e.target.files[0];
-  let reader = new FileReader();
+function scanQR(){
+  document.getElementById('qrUpload').click();
+}
+
+document.getElementById('qrUpload').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
   reader.onload = function(){
-    let img = new Image();
+    const img = new Image();
     img.onload = function(){
-      let canvas = document.createElement('canvas');
-      canvas.width = img.width; canvas.height = img.height;
-      let ctx = canvas.getContext('2d');
-      ctx.drawImage(img,0,0);
-      let code = jsQR(ctx.getImageData(0,0,canvas.width,canvas.height).data,canvas.width,canvas.height);
+      const canvas = document.createElement('canvas');
+      canvas.width=img.width; canvas.height=img.height;
+      const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0);
+      const code = jsQR(ctx.getImageData(0,0,canvas.width,canvas.height).data, canvas.width, canvas.height);
       if(code){
-        alert("Decoded QR: "+code.data);
-        try{
-          let job = JSON.parse(code.data);
-          jobs.push(job); loadJobs();
-        }catch(err){alert("Invalid QR content");}
-      }else alert("No QR code detected");
+        alert('QR detected: '+code.data);
+        const job = jobs.find(j=>j.vehicle.replace(/\s+/g,'_')===code.data);
+        if(job) startJob(job);
+        else alert('Job not found!');
+      } else alert('No QR detected');
     };
     img.src = reader.result;
   };
   reader.readAsDataURL(file);
-};
+});

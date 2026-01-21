@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOS Mobile Mechanics Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
+body, html{height:100%;background:#f5f5f5;}
+header{position:fixed;top:0;width:100%;background:#222;color:#fff;padding:10px;z-index:1000;}
+header h1{font-size:1.2rem;}
+#ticker{margin-top:5px;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+main{padding-top:70px;padding-bottom:60px;}
+#job-list{display:flex;flex-direction:column;gap:10px;padding:10px;}
+.job-card{background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.2);cursor:pointer;}
+.job-card.emergency{border-left:5px solid red;}
+.job-card h3{font-size:1rem;margin-bottom:5px;}
+.job-card p{font-size:0.85rem;}
+.map{height:200px;margin:10px;border-radius:8px;}
+.bottom-nav{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:#222;color:#fff;padding:10px 0;}
+.bottom-nav button{background:none;border:none;color:#fff;font-size:1rem;}
+.modal{display:none;position:fixed;z-index:2000;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;}
+.modal-content{background:#fff;padding:20px;border-radius:10px;width:90%;max-height:90%;overflow-y:auto;position:relative;}
+#close-modal{position:absolute;top:10px;right:15px;font-size:1.5rem;cursor:pointer;}
+button.action-btn{margin-top:10px;padding:10px 15px;font-size:1rem;border:none;border-radius:5px;background:#222;color:#fff;cursor:pointer;}
+button.action-btn.red{background:red;}
+#qr-scanner{margin:10px;}
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+</head>
+<body>
+
+<header>
+  <h1>SOS Mobile Mechanics</h1>
+  <div id="ticker">Live Jobs: 3 New – 1 Emergency – 2 Normal</div>
+</header>
+
+<main>
+  <div id="job-list"></div>
+  <div id="map" class="map"></div>
+  <div id="qr-scanner">
+    <input type="file" id="qr-file" accept="image/*"/>
+    <button id="scan-qr">Scan QR</button>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <button>Home</button>
+  <button>Jobs</button>
+  <button>Notifications</button>
+  <button>Settings</button>
+</nav>
+
+<!-- Job Detail Modal -->
+<div id="job-modal" class="modal">
+  <div class="modal-content">
+    <span id="close-modal">&times;</span>
+    <div id="job-detail"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+<script>
+// Sample Jobs (serverless)
+let jobs = [
+  { reg:"AB12 CDE", type:"Normal", emergency:false, location:"Outside Tesco Extra, Snodland", lat:51.332593, lng:0.549980, time:"21/01/2026 14:36" },
+  { reg:"AJ62 KSV", type:"Emergency", emergency:true, location:"Garage Lane, Snodland", lat:51.333500, lng:0.548000, time:"21/01/2026 15:00" },
+  { reg:"XY34 ZAB", type:"Normal", emergency:false, location:"High Street, Snodland", lat:51.331200, lng:0.550500, time:"21/01/2026 16:15" }
+];
+
+const jobList = document.getElementById("job-list");
+jobs.forEach((job,index)=>{
+  const card = document.createElement("div");
+  card.className = "job-card";
+  if(job.emergency) card.classList.add("emergency");
+  card.innerHTML = `<h3>${job.reg} - ${job.type}</h3>
+                    <p>Location: ${job.location}</p>
+                    <p>Time: ${job.time}</p>`;
+  card.addEventListener("click",()=>openJobModal(index));
+  jobList.appendChild(card);
+});
+
+// Modal logic
+const modal = document.getElementById("job-modal");
+const jobDetail = document.getElementById("job-detail");
+document.getElementById("close-modal").onclick = ()=>{modal.style.display="none";};
+
+let timers = {};
+function openJobModal(index){
+  const job = jobs[index];
+  jobDetail.innerHTML = `
+    <h2>${job.reg} - ${job.type}</h2>
+    <p><strong>Emergency:</strong> ${job.emergency ? "Yes":"No"}</p>
+    <p><strong>Location:</strong> ${job.location}</p>
+    <p><strong>Lat/Lng:</strong> ${job.lat}, ${job.lng}</p>
+    <p><strong>Time:</strong> ${job.time}</p>
+    <p><strong>AI Suggested Checks:</strong></p>
+    <ul>
+      <li>Check brake pads</li>
+      <li>Inspect coolant levels</li>
+      <li>Serpentine belt tension</li>
+      <li>Oil level</li>
+      <li>Battery condition</li>
+    </ul>
+    <button class="action-btn" onclick="startTimer(${index})">Start Timer</button>
+  `;
+  modal.style.display="flex";
+}
+
+function startTimer(index){
+  const job = jobs[index];
+  if(!timers[job.reg]){
+    let seconds=0;
+    const btn = jobDetail.querySelector("button");
+    timers[job.reg] = setInterval(()=>{
+      seconds++;
+      btn.innerText = `Timer: ${Math.floor(seconds/60)}m ${seconds%60}s`;
+      if(seconds>=3600) btn.classList.add("red"); // overdue after 1 hour
+    },1000);
+  }
+}
+
+// Map
+const map = L.map('map').setView([51.332593,0.549980], 15);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+jobs.forEach(job=>{
+  L.marker([job.lat,job.lng]).addTo(map).bindPopup(`${job.reg} - ${job.type}`);
+});
+
+// QR Scanner
+document.getElementById("scan-qr").onclick = () => {
+  const fileInput = document.getElementById("qr-file");
+  if(fileInput.files.length===0){ alert("Select QR image"); return; }
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  reader.onload = function(){
+    const img = new Image();
+    img.onload = function(){
+      const canvas=document.createElement("canvas");
+      canvas.width=img.width; canvas.height=img.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img,0,0);
+      const imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+      const code = jsQR(imageData.data, canvas.width, canvas.height);
+      if(code){
+        handleQR(code.data);
+      }else{
+        alert("No QR code detected");
+      }
+    }
+    img.src = reader.result;
+  }
+  reader.readAsDataURL(file);
+};
+
+function handleQR(data){
+  // QR contains job reg (serverless)
+  const jobIndex = jobs.findIndex(j=>j.reg===data);
+  if(jobIndex!==-1){
+    openJobModal(jobIndex);
+  } else alert("Job not found");
+}
+</script>
+</body>
+</html>

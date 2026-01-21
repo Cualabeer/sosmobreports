@@ -3,107 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mechanics Customer Job Entry</title>
+<title>SOS Customer Job Entry</title>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:0;}
-header{background:#222;color:#fff;padding:15px;text-align:center;position:fixed;top:0;width:100%;z-index:1000;}
-.container{max-width:600px;margin:80px auto 40px;padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-label{display:block;margin-bottom:5px;font-weight:bold;}
-input,textarea{width:100%;padding:12px;margin-bottom:15px;border-radius:6px;border:1px solid #ccc;font-size:1em;}
-textarea{resize:vertical;}
-.btn{display:block;width:100%;padding:15px;margin:10px 0;border:none;border-radius:8px;font-weight:bold;font-size:1.1em;cursor:pointer;}
-.btn-primary{background:#4CAF50;color:white;}
-.btn-primary:hover{background:#45a049;}
-.hidden{display:none;}
-#overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);color:#fff;display:flex;justify-content:center;align-items:center;text-align:center;font-size:1.5em;z-index:2000;flex-direction:column;}
-canvas{display:block;margin:auto;}
+body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f5f5f5;}
+.container{max-width:600px;margin:20px auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+label{display:block;margin-top:10px;font-weight:bold;}
+input, select{width:100%;padding:10px;margin-top:5px;border-radius:6px;border:1px solid #ccc;font-size:1em;}
+button{width:100%;padding:12px;margin-top:15px;font-weight:bold;background:#4CAF50;color:white;border:none;border-radius:8px;cursor:pointer;font-size:1em;}
+#map{height:250px;width:100%;margin-top:10px;border-radius:6px;}
+#qrContainer{text-align:center;margin-top:20px;}
 </style>
 </head>
 <body>
 
-<header>
-<h1>SOS Mechanics - Job Request</h1>
-</header>
-
 <div class="container">
-<h2>Enter Your Vehicle Details</h2>
+<h2>SOS Job Entry</h2>
 
-<label>Name</label>
-<input type="text" id="custName" placeholder="Full Name">
+<label>Customer Name:</label>
+<input type="text" id="customerName" placeholder="Full Name">
 
-<label>Phone</label>
-<input type="text" id="custPhone" placeholder="Phone Number">
+<label>Vehicle Registration:</label>
+<input type="text" id="vehicleReg" placeholder="ABC123">
 
-<label>Vehicle Make / Model / Year</label>
-<input type="text" id="custVehicle" placeholder="e.g., BMW 118i Sport 2015">
+<label>Vehicle Make/Model:</label>
+<input type="text" id="vehicleModel" placeholder="BMW 118i Sport">
 
-<label>Registration Number</label>
-<input type="text" id="custReg" placeholder="e.g., KX68ABC">
+<label>Job Description:</label>
+<input type="text" id="jobDetails" placeholder="Oil leak, brake issue etc.">
 
-<label>Mileage</label>
-<input type="text" id="custMileage" placeholder="e.g., 45,000">
+<label>Location:</label>
+<div id="map"></div>
+<input type="text" id="addressInput" placeholder="Type your address">
 
-<label>Reported Issue / Symptom</label>
-<textarea id="custSymptom" rows="3"></textarea>
+<button id="locBtn">Use My Location</button>
+<button id="generateQR">Generate QR Code</button>
 
-<h3>Set Your PIN</h3>
-<label>2–4 Digit PIN (used by mechanic to unlock job)</label>
-<input type="text" id="custPin" maxlength="4" placeholder="Enter PIN">
-
-<button class="btn btn-primary" onclick="generateQR()">Generate QR & Download</button>
-
-<canvas id="qrCanvas" class="hidden"></canvas>
+<div id="qrContainer"></div>
 </div>
 
-<div id="overlay" class="hidden">
-<p id="overlayMessage">Please wait...</p>
-</div>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- QR Code JS -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script>
-function generateQR(){
-  const name=document.getElementById('custName').value.trim();
-  const phone=document.getElementById('custPhone').value.trim();
-  const vehicle=document.getElementById('custVehicle').value.trim();
-  const reg=document.getElementById('custReg').value.trim();
-  const mileage=document.getElementById('custMileage').value.trim();
-  const symptom=document.getElementById('custSymptom').value.trim();
-  const pin=document.getElementById('custPin').value.trim();
+let map = L.map('map').setView([51.3782, 0.5075], 13);
+let marker = L.marker([51.3782, 0.5075], {draggable:true}).addTo(map);
 
-  if(!name || !phone || !vehicle || !reg || !mileage || !symptom || !pin){
-    alert("Please fill all fields and set your PIN");
-    return;
-  }
+// OSM Tile Layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  maxZoom:19,
+  attribution:'&copy; OpenStreetMap contributors'
+}).addTo(map);
 
-  const qrData=JSON.stringify({name,phone,vehicle,reg,mileage,symptom,pin});
-  const qrCanvas=document.getElementById('qrCanvas');
+// Update lat/lng when marker is dragged
+marker.on('dragend', function(e){
+  let pos = marker.getLatLng();
+  document.getElementById('lat').value = pos.lat;
+  document.getElementById('lng').value = pos.lng;
+});
 
-  showOverlay("Generating QR… please wait up to 10 seconds");
+// Hidden fields for lat/lng
+let latInput = document.createElement('input'); latInput.type='hidden'; latInput.id='lat';
+let lngInput = document.createElement('input'); lngInput.type='hidden'; lngInput.id='lng';
+document.querySelector('.container').appendChild(latInput);
+document.querySelector('.container').appendChild(lngInput);
 
-  setTimeout(()=>{
-    QRCode.toCanvas(qrCanvas, qrData, {width:200}, function(err){
-      if(err){alert("Error generating QR"); console.error(err); hideOverlay(); return;}
-      // Download QR image automatically
-      const link=document.createElement('a');
-      const ts=new Date(); 
-      const tsStr=ts.toISOString().slice(0,19).replace(/[: ]/g,'');
-      link.download=`JOB_${reg}_${tsStr}.png`;
-      link.href=qrCanvas.toDataURL();
-      link.click();
-      showOverlay("QR downloaded! Please show this to your mechanic",5000);
+// Use GPS Location
+document.getElementById('locBtn').addEventListener('click', ()=>{
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition((pos)=>{
+      let lat = pos.coords.latitude;
+      let lng = pos.coords.longitude;
+      marker.setLatLng([lat,lng]);
+      map.setView([lat,lng],16);
+      latInput.value = lat;
+      lngInput.value = lng;
+      document.getElementById('addressInput').value = "Detected location"; // placeholder, optional reverse geocode
+    }, ()=>{
+      alert("Unable to get GPS location. Please enter manually.");
     });
-  },2000);
-}
+  } else alert("Geolocation not supported");
+});
 
-function showOverlay(msg, hideAfter=0){
-  const overlay=document.getElementById('overlay');
-  const msgEl=document.getElementById('overlayMessage');
-  overlay.classList.remove('hidden');
-  msgEl.innerText=msg;
-  if(hideAfter>0) setTimeout(()=>overlay.classList.add('hidden'),hideAfter);
-}
+// Address autocomplete using Photon API (free OSM service)
+let addressInput = document.getElementById('addressInput');
+addressInput.addEventListener('input', async ()=>{
+  let val = addressInput.value;
+  if(val.length < 3) return;
+  let res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=5`);
+  let data = await res.json();
+  // Show suggestions (simple, console log for now)
+  console.log("Suggestions:", data.features.map(f=>f.properties.name + ", " + f.properties.city));
+  if(data.features.length>0){
+    let f = data.features[0];
+    let lat = f.geometry.coordinates[1];
+    let lng = f.geometry.coordinates[0];
+    marker.setLatLng([lat,lng]);
+    map.setView([lat,lng],16);
+    latInput.value = lat;
+    lngInput.value = lng;
+    addressInput.value = f.properties.name + (f.properties.city ? ", " + f.properties.city : "");
+  }
+});
 
-function hideOverlay(){document.getElementById('overlay').classList.add('hidden');}
+// Generate QR Code
+document.getElementById('generateQR').addEventListener('click', ()=>{
+  let payload = {
+    customerName: document.getElementById('customerName').value,
+    vehicleReg: document.getElementById('vehicleReg').value,
+    vehicleModel: document.getElementById('vehicleModel').value,
+    jobDetails: document.getElementById('jobDetails').value,
+    location: {
+      latitude: latInput.value,
+      longitude: lngInput.value,
+      address: document.getElementById('addressInput').value
+    },
+    pin: Math.floor(1000 + Math.random()*9000) // 4-digit PIN
+  };
+  QRCode.toCanvas(payload.pin ? payload.pin : "0000", {width:200}, function(err,canvas){
+    if(err)console.error(err);
+    let container = document.getElementById('qrContainer');
+    container.innerHTML="";
+    container.appendChild(canvas);
+    // Add JSON hidden text for scanning
+    let pre = document.createElement('pre'); pre.textContent = JSON.stringify(payload, null, 2);
+    container.appendChild(pre);
+  });
+});
 </script>
+
 </body>
 </html>

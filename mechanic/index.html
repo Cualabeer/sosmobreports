@@ -30,11 +30,19 @@
   </div>
 </div>
 
-<!-- QR upload fallback -->
 <input type="file" id="qrUpload" accept="image/*" style="display:none;" />
 
 <script src="jobs.js"></script>
 <script src="qr.js"></script>
 <script src="sw.js"></script>
+
+<script>
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registered', reg))
+    .catch(err => console.log('SW failed', err));
+}
+</script>
 </body>
 </html>

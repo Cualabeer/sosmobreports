@@ -3,133 +3,160 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mechanics - Tesla Style</title>
+<title>Car Service Booking</title>
 <style>
-  /* Tesla-inspired dark theme */
-  body { font-family: 'Roboto', sans-serif; margin:0; padding:0; background:#121212; color:#fff; }
-  header { position:fixed; top:0; width:100%; text-align:center; padding:15px 0; z-index:1000; background:#000; font-size:20px; font-weight:500; }
-  main { padding:80px 20px 100px; max-width:480px; margin:auto; }
-  .card { background:#1c1c1c; padding:20px; margin-bottom:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.5); transition:0.3s; }
-  .card:hover { box-shadow:0 6px 18px rgba(255,0,0,0.3); }
-  input { width:100%; padding:12px; margin:10px 0; border:none; border-radius:10px; background:#2a2a2a; color:#fff; font-size:16px; }
-  button { width:100%; padding:15px; border:none; border-radius:10px; font-size:18px; font-weight:500; background:#e60000; color:#fff; cursor:pointer; margin-top:10px; transition:0.2s; }
-  button:disabled { background:#444; cursor:not-allowed; }
-  .service-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .service-card { background:#2a2a2a; padding:12px; border-radius:10px; text-align:center; cursor:pointer; transition:0.3s; }
-  .service-card.selected { background:#e60000; color:#fff; }
-  #qrModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center; flex-direction:column; color:#fff; }
-  #pinDisplay { font-size:30px; font-weight:bold; background:#000; padding:15px 25px; margin-top:15px; border-radius:10px; filter:blur(6px); transition:filter 0.5s; }
+  body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5; }
+  header { position:fixed; top:0; left:0; width:100%; background:#222; color:#fff; text-align:center; padding:10px 0; z-index:1000; }
+  main { padding:70px 15px 15px; max-width:600px; margin:auto; }
+  h2 { margin:15px 0; }
+  label { display:block; margin:10px 0 5px; font-weight:bold; }
+  input, select, textarea, button { width:100%; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc; box-sizing:border-box; }
+  button { background:#222; color:#fff; font-weight:bold; cursor:pointer; }
+  .accordion { background:#eee; cursor:pointer; padding:10px; border-radius:5px; margin-bottom:5px; }
+  .panel { display:none; padding:0 10px; background:white; border-radius:5px; margin-bottom:5px; }
+  #qrContainer { text-align:center; margin:20px 0; }
+  #emergencyPopup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); padding:20px; box-sizing:border-box; z-index:2000; }
+  #emergencyPopup .popupContent { background:white; padding:20px; border-radius:10px; max-width:500px; margin:50px auto; }
 </style>
 </head>
 <body>
 
-<header>SOS Mechanics</header>
+<header>
+  Car Service Booking
+</header>
 
 <main>
-  <div class="card" id="contactCard">
-    <h2>Contact & Vehicle Info</h2>
-    <input type="text" id="name" placeholder="Full Name" required>
-    <input type="tel" id="phone" placeholder="Phone Number" required>
-    <input type="text" id="make" placeholder="Vehicle Make" required>
-    <input type="text" id="model" placeholder="Vehicle Model" required>
-    <input type="number" id="year" placeholder="Year" required>
-    <input type="text" id="reg" placeholder="Registration / Plate" required>
-    <input type="text" id="location" placeholder="Address / GPS" required>
-  </div>
+  <h2>Build Your Service Package</h2>
+  
+  <label for="reg">Car Registration</label>
+  <input type="text" id="reg" placeholder="Enter registration">
 
-  <div class="card">
-    <h2>Select Services</h2>
-    <div class="service-grid">
-      <div class="service-card" data-price="55">Oil Change<br>£55</div>
-      <div class="service-card" data-price="45">Spark Plugs<br>£45</div>
-      <div class="service-card" data-price="35">Coolant Check<br>£35</div>
-      <div class="service-card" data-price="70">Engine Diagnostics<br>£70</div>
-      <div class="service-card" data-price="60">Brake Pads<br>£60</div>
-      <div class="service-card" data-price="30">Brake Fluid<br>£30</div>
+  <label for="carModel">Car Model</label>
+  <input type="text" id="carModel" placeholder="Enter car model">
+
+  <label>Choose Service Type</label>
+  <select id="serviceType">
+    <option value="normal">Normal</option>
+    <option value="emergency">Emergency</option>
+  </select>
+
+  <div id="servicesAccordion">
+    <div class="accordion">Engine Services</div>
+    <div class="panel">
+      <input type="checkbox" value="Oil Change"> Oil Change<br>
+      <input type="checkbox" value="Spark Plugs Replacement"> Spark Plugs Replacement<br>
+      <input type="checkbox" value="Air Filter Replacement"> Air Filter Replacement<br>
+      <input type="checkbox" value="Coolant Flush"> Coolant Flush<br>
+      <input type="checkbox" value="Timing Belt Check"> Timing Belt Check
     </div>
+    <div class="accordion">Brakes</div>
+    <div class="panel">
+      <input type="checkbox" value="Brake Pads Replacement"> Brake Pads Replacement<br>
+      <input type="checkbox" value="Brake Fluid Change"> Brake Fluid Change<br>
+      <input type="checkbox" value="Disc Check"> Disc Check<br>
+      <input type="checkbox" value="Brake Caliper Service"> Brake Caliper Service<br>
+      <input type="checkbox" value="Handbrake Adjustment"> Handbrake Adjustment
+    </div>
+    <!-- Add more sections as needed -->
   </div>
 
-  <div class="card">
-    <label><input type="checkbox" id="agree"> I agree to the total price</label>
-  </div>
+  <button id="generateBtn">Generate QR</button>
 
-  <div class="card">
-    <p>Total Price: £<span id="totalPrice">0</span></p>
-    <button id="generateQR" disabled>Generate QR + PIN</button>
-  </div>
+  <div id="qrContainer"></div>
 </main>
 
-<!-- QR Modal -->
-<div id="qrModal" class="flex-center">
-  <canvas id="qrCanvas"></canvas>
-  <div id="pinDisplay"></div>
-  <button onclick="closeModal()">Done</button>
+<!-- Emergency Popup -->
+<div id="emergencyPopup">
+  <div class="popupContent">
+    <h2>Emergency Breakdown</h2>
+    <label for="emergencyIssue">Issue</label>
+    <input type="text" id="emergencyIssue" placeholder="Short issue description">
+    <label for="emergencyPhone">Phone Number</label>
+    <input type="text" id="emergencyPhone" placeholder="Your phone number">
+    <label for="emergencyLocation">Location</label>
+    <input type="text" id="emergencyLocation" placeholder="Type or use GPS">
+    <button onclick="sendEmergency()">Send Emergency</button>
+    <button onclick="closeEmergency()">Cancel</button>
+  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 <script>
-  const serviceCards = document.querySelectorAll('.service-card');
-  const totalEl = document.getElementById('totalPrice');
-  const agree = document.getElementById('agree');
-  const generateBtn = document.getElementById('generateQR');
-  let selectedServices = [];
-
-  serviceCards.forEach(card=>{
-    card.addEventListener('click', ()=>{
-      card.classList.toggle('selected');
-      const name = card.innerText.split('\n')[0];
-      if(card.classList.contains('selected')) selectedServices.push(name);
-      else selectedServices = selectedServices.filter(s=>s!==name);
-      updateTotal();
+  // Accordion toggle
+  const acc = document.getElementsByClassName("accordion");
+  for (let i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      const panel = this.nextElementSibling;
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
     });
-  });
-
-  function updateTotal(){
-    let total = 0;
-    selectedServices.forEach(s=>{
-      const card = Array.from(serviceCards).find(c=>c.innerText.startsWith(s));
-      total += parseInt(card.dataset.price);
-    });
-    totalEl.innerText = total;
-    generateBtn.disabled = !agree.checked || total===0;
   }
 
-  agree.addEventListener('change', updateTotal);
+  // Show emergency popup if selected
+  const serviceType = document.getElementById("serviceType");
+  const emergencyPopup = document.getElementById("emergencyPopup");
 
-  function generatePIN() { return Math.floor(1000 + Math.random()*9000); }
-
-  generateBtn.addEventListener('click', ()=>{
-    const data = {
-      name: document.getElementById('name').value,
-      phone: document.getElementById('phone').value,
-      vehicle: document.getElementById('make').value + ' ' + document.getElementById('model').value,
-      year: document.getElementById('year').value,
-      reg: document.getElementById('reg').value,
-      location: document.getElementById('location').value,
-      services: selectedServices,
-      total: totalEl.innerText
-    };
-    const pin = generatePIN();
-    const qr = new QRious({
-      element: document.getElementById('qrCanvas'),
-      value: JSON.stringify({...data,pin}),
-      size: 250
-    });
-    const pinDisplay = document.getElementById('pinDisplay');
-    pinDisplay.innerText = pin;
-    document.getElementById('qrModal').style.display = 'flex';
-    setTimeout(()=>{ pinDisplay.style.filter='blur(0)'; },2000);
+  serviceType.addEventListener("change", () => {
+    if(serviceType.value === "emergency") {
+      emergencyPopup.style.display = "block";
+    }
   });
 
-  function closeModal(){
-    document.getElementById('qrModal').style.display='none';
-    serviceCards.forEach(c=>c.classList.remove('selected'));
-    selectedServices=[];
-    totalEl.innerText=0;
-    agree.checked=false;
-    generateBtn.disabled=true;
-    document.querySelectorAll('input').forEach(i=>i.value='');
+  function closeEmergency() {
+    emergencyPopup.style.display = "none";
+    serviceType.value = "normal";
+  }
+
+  // Generate QR for normal service
+  const generateBtn = document.getElementById("generateBtn");
+  generateBtn.addEventListener("click", () => {
+    if(serviceType.value === "normal") {
+      const reg = document.getElementById("reg").value;
+      const carModel = document.getElementById("carModel").value;
+      const services = [];
+      document.querySelectorAll('#servicesAccordion input[type=checkbox]:checked').forEach(cb => services.push(cb.value));
+      const jobData = {
+        jobType: "normal",
+        reg, carModel, services,
+        timestamp: new Date().toISOString()
+      };
+      QRCode.toCanvas(document.getElementById("qrContainer"), JSON.stringify(jobData), {width:200});
+    }
+  });
+
+  // Send Emergency via WhatsApp + generate QR
+  function sendEmergency() {
+    const reg = document.getElementById("reg").value;
+    const carModel = document.getElementById("carModel").value;
+    const issue = document.getElementById("emergencyIssue").value;
+    const phone = document.getElementById("emergencyPhone").value;
+    const location = document.getElementById("emergencyLocation").value;
+    const timestamp = new Date().toLocaleString();
+
+    const jobData = {
+      jobType: "emergency",
+      reg, carModel, issue, location, contact: phone,
+      timestamp
+    };
+
+    // Generate QR
+    QRCode.toCanvas(document.getElementById("qrContainer"), JSON.stringify(jobData), {width:200});
+
+    // Create WhatsApp link
+    const waMsg = `🚨 Emergency Breakdown
+Reg: ${reg}
+Car: ${carModel}
+Location: ${location}
+Issue: ${issue}
+Phone: ${phone}
+Time: ${timestamp}`;
+    const waLink = `https://wa.me/07405937104?text=${encodeURIComponent(waMsg)}`;
+    window.open(waLink, "_blank");
+
+    emergencyPopup.style.display = "none";
+    serviceType.value = "normal"; // reset
   }
 </script>
+
 </body>
 </html>

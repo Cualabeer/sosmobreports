@@ -3,122 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Emergency Call-Out</title>
+<title>SOS Mechanics - Emergency</title>
 <style>
-  /* Full-screen emergency modal */
   body {
     margin: 0;
-    font-family: sans-serif;
+    font-family: 'Roboto', sans-serif;
     background: #111;
     color: #fff;
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  body.emergency-active > *:not(#emergency-modal) {
-    filter: blur(8px);
-    pointer-events: none;
+    min-height: 100vh;
   }
 
   #emergency-modal {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(8px);
-    z-index: 9999;
-  }
-
-  .emergency-card {
     width: 100%;
     max-width: 420px;
-    background: #222;
-    padding: 24px;
+    padding: 32px 24px;
+    background: #1a1a1a;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
+    text-align: center;
+    margin: 0 16px;
   }
 
-  .emergency-card h2 {
-    margin: 0 0 8px;
-    font-size: 1.5em;
-    text-align: center;
+  h2 {
+    font-size: 1.8em;
+    font-weight: 500;
+    margin: 0 0 12px;
   }
 
   input, textarea {
     width: 100%;
-    padding: 12px;
-    border-radius: 8px;
+    padding: 16px;
+    border-radius: 12px;
     border: none;
-    font-size: 1em;
+    font-size: 1.05em;
+    outline: none;
   }
 
-  textarea {
-    resize: none;
-    height: 80px;
-  }
+  textarea { resize: none; height: 80px; }
 
   button {
     width: 100%;
-    padding: 14px;
-    font-size: 1.1em;
-    border-radius: 8px;
+    padding: 16px;
+    font-size: 1.15em;
+    border-radius: 12px;
     border: none;
-    background: #ff3b30;
-    color: #fff;
     cursor: pointer;
+    transition: 0.2s;
   }
 
-  button.secondary {
-    background: #444;
-    margin-top: 8px;
+  button.primary { background: #ff3b30; color: #fff; font-weight: 500; }
+  button.primary:hover { background: #ff6254; }
+  button.secondary { background: #333; color: #ccc; margin-top: 8px; }
+  button.secondary:hover { background: #555; }
+
+  #qr {
+    width: 180px;
+    height: 180px;
+    margin: 12px auto 0;
   }
+
 </style>
 </head>
 <body>
 
-<!-- Background page content -->
-<div id="content">
-  <h1>SOS Mechanics</h1>
-  <p>Tap Emergency if you need immediate assistance.</p>
-  <button onclick="openEmergency()">🚨 Emergency Breakdown</button>
-</div>
+<div id="emergency-modal">
+  <h2>🚨 Emergency Breakdown</h2>
+  <input type="text" id="vehicleReg" placeholder="Vehicle Registration (AB12 CDE)" required>
+  <input type="text" id="locationText" placeholder="Your Location (e.g., Tesco Extra, Snodland)">
+  <button type="button" onclick="useMyLocation()">Use my location</button>
+  <textarea id="issue" placeholder="What’s wrong? (e.g., Car won’t start)"></textarea>
+  <input type="tel" id="phone" placeholder="Mobile Number" required>
 
-<!-- Emergency Modal -->
-<div id="emergency-modal" class="hidden">
-  <div class="emergency-card">
-    <h2>🚨 Emergency Breakdown</h2>
-    <p style="font-size:0.9em; text-align:center;">Fast help. Only essential details required.</p>
+  <button class="primary" onclick="generateEmergencyQR()">Generate QR & WhatsApp</button>
+  <button class="secondary" onclick="resetForm()">Cancel</button>
 
-    <input type="text" id="vehicleReg" placeholder="Vehicle Registration (AB12 CDE)" required>
-    <input type="text" id="locationText" placeholder="Your Location (e.g., Tesco Extra, Snodland)">
-    <button type="button" onclick="useMyLocation()">Use my location</button>
-    <textarea id="issue" placeholder="What’s wrong? (e.g., Car won’t start)"></textarea>
-    <input type="tel" id="phone" placeholder="Mobile Number" required>
-
-    <button onclick="generateEmergencyQR()">Generate QR & Open WhatsApp</button>
-    <button class="secondary" onclick="closeEmergency()">Cancel</button>
-  </div>
+  <img id="qr" alt="Emergency QR" style="display:none;">
+  <button id="downloadQR" style="display:none;" class="primary" onclick="downloadQR()">Download QR</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script>
-function openEmergency() {
-  document.body.classList.add('emergency-active');
-  document.getElementById('emergency-modal').classList.remove('hidden');
-}
+let qrDataUrl = '';
 
-function closeEmergency() {
-  document.body.classList.remove('emergency-active');
-  document.getElementById('emergency-modal').classList.add('hidden');
-}
-
-// Attempt browser GPS
 function useMyLocation() {
   if (!navigator.geolocation) {
     alert('Geolocation not supported.');
@@ -133,7 +104,6 @@ function useMyLocation() {
   });
 }
 
-// Generate QR and open WhatsApp
 function generateEmergencyQR() {
   const reg = document.getElementById('vehicleReg').value.trim().toUpperCase();
   const loc = document.getElementById('locationText').value.trim();
@@ -148,38 +118,48 @@ function generateEmergencyQR() {
   const timestamp = Date.now();
   const jobId = `SOS-EMG-${reg.replace(/\s+/g,'')}-${timestamp}`;
 
-  // Job object (can be saved serverless in JSON)
   const job = {
     job_id: jobId,
     type: 'emergency',
-    status: 'awaiting_mechanic',
     vehicle: { reg },
     customer: { phone },
-    location: { text: loc },
-    issue: issue,
+    location: loc,
+    issue,
     timestamps: { created: timestamp }
   };
 
-  // Generate QR
-  const qrData = JSON.stringify({ job_id: jobId, type: 'emergency', v: 1 });
-  QRCode.toDataURL(qrData).then(url => {
-    // Auto-download QR
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${jobId}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    // Open WhatsApp
-    const msg = encodeURIComponent(
-      `🚨 Emergency Breakdown\nReg: ${reg}\nLocation: ${loc}\nIssue: ${issue}\nTime: ${new Date(timestamp).toLocaleString()}\n\nQR attached.`
-    );
-    window.open(`https://wa.me/${phone.replace(/\D/g,'')}?text=${msg}`, '_blank');
-
-    alert('QR generated and WhatsApp opened.');
-    closeEmergency();
+  // Create QR with Bitly link or WhatsApp link
+  const waBitlyLink = `https://bit.ly/3YPTkIO?text=🚨 Emergency Breakdown%0AReg: ${reg}%0ALocation: ${loc}%0AIssue: ${issue}%0APhone: ${phone}%0ATime: ${new Date(timestamp).toLocaleString()}`;
+  
+  QRCode.toDataURL(waBitlyLink).then(url => {
+    qrDataUrl = url;
+    const qrImg = document.getElementById('qr');
+    qrImg.src = url;
+    qrImg.style.display = 'block';
+    document.getElementById('downloadQR').style.display = 'block';
+    
+    // Optionally open WhatsApp automatically
+    window.open(waBitlyLink, '_blank');
   });
+}
+
+function downloadQR() {
+  if (!qrDataUrl) return;
+  const a = document.createElement('a');
+  a.href = qrDataUrl;
+  a.download = `SOS-EMG-${document.getElementById('vehicleReg').value.replace(/\s+/g,'')}.png`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function resetForm() {
+  document.getElementById('vehicleReg').value = '';
+  document.getElementById('locationText').value = '';
+  document.getElementById('issue').value = '';
+  document.getElementById('phone').value = '';
+  document.getElementById('qr').style.display = 'none';
+  document.getElementById('downloadQR').style.display = 'none';
 }
 </script>
 </body>

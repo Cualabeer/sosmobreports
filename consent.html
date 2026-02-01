@@ -52,6 +52,11 @@ header h1 {
   color: #00b85c;
 }
 
+.card p {
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
 label {
   display: block;
   margin-top: 14px;
@@ -88,6 +93,7 @@ button {
 
 button.enabled {
   opacity: 1;
+  cursor: pointer;
 }
 
 .footer {
@@ -108,42 +114,59 @@ button.enabled {
 
 <div class="container">
 
+  <!-- CUSTOMER INITIATED REQUEST -->
   <div class="card">
     <h2>Customer-Initiated Request</h2>
     <p>
-      The diagnostic or repair work on this vehicle has been <strong>requested by the customer</strong>.  
-      No actions or recommendations are taken without the customer’s explicit instruction.
+      All diagnostic or repair work on this vehicle is <strong>requested by the customer</strong>.  
+      SOS Mechanics does not recommend or perform any work without explicit customer instruction.
     </p>
   </div>
 
+  <!-- LIABILITY & POLICE -->
   <div class="card">
     <h2>Liability & Authority</h2>
     <p>
-      The customer confirms they have the legal authority to authorise work on this vehicle.  
-      All information provided is accurate.  
-      SOS Mechanics is not liable for misinformation or undisclosed facts.  
-      Police may be contacted immediately if safety or conduct issues arise.
+      The customer confirms they have full legal authority to authorise work on this vehicle.  
+      SOS Mechanics is not liable for undisclosed information or misinformation.  
+      Police may be contacted immediately if any safety or legal issues arise.  
+      The customer acknowledges that all information provided is truthful to the best of their knowledge.
     </p>
   </div>
 
+  <!-- CUSTOMER DETAILS -->
   <div class="card">
     <h2>Customer Details</h2>
     <label>Full Name (type to consent)</label>
     <input type="text" id="custName" placeholder="Your full name">
   </div>
 
+  <!-- AUTOMATIC DATE/TIME/LOCATION -->
+  <div class="card">
+    <h2>Consent Record</h2>
+    <p id="timestamp">Date & Time: --</p>
+    <p id="location">Location: --</p>
+    <p id="jobRef">Job Reference: --</p>
+  </div>
+
+  <!-- AGREE BUTTON -->
   <button id="agreeBtn" disabled>AGREE & AUTHORISE WORK</button>
 
 </div>
 
 <div class="footer">
-  SOS Mechanics · Mobile Mechanic Consent Record · Date, Time & Location captured
+  SOS Mechanics · Mobile Mechanic Consent Record · Must be agreed before work starts
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const nameInput = document.getElementById("custName");
 const agreeBtn = document.getElementById("agreeBtn");
+const timestampEl = document.getElementById("timestamp");
+const locationEl = document.getElementById("location");
+const jobRefEl = document.getElementById("jobRef");
 
+// Enable button only when name is typed
 nameInput.addEventListener("input", () => {
   if(nameInput.value.trim().length > 0){
     agreeBtn.disabled = false;
@@ -154,50 +177,62 @@ nameInput.addEventListener("input", () => {
   }
 });
 
+// On click: generate job ref, timestamp, location, PDF
 agreeBtn.addEventListener("click", () => {
   const name = nameInput.value.trim();
-  const now = new Date().toLocaleString();
-  let location = "Unavailable";
+  const now = new Date();
+  const nowString = now.toLocaleString();
+  let locationText = "Unavailable";
+
+  // generate Job Ref: SOSCONSENT-<name><timestamp>
+  const jobRef = `SOSCONSENT-${name.replace(/\s+/g,'').toUpperCase()}-${now.getTime().toString().slice(-6)}`;
+
+  timestampEl.textContent = `Date & Time: ${nowString}`;
+  jobRefEl.textContent = `Job Reference: ${jobRef}`;
 
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(
       pos => {
-        location = `Lat ${pos.coords.latitude.toFixed(6)}, Lon ${pos.coords.longitude.toFixed(6)}`;
-        savePDF(name, now, location);
+        locationText = `Lat ${pos.coords.latitude.toFixed(6)}, Lon ${pos.coords.longitude.toFixed(6)}`;
+        locationEl.textContent = `Location: ${locationText}`;
+        savePDF(name, nowString, locationText, jobRef);
       },
-      () => savePDF(name, now, location)
+      () => {
+        locationEl.textContent = `Location: ${locationText}`;
+        savePDF(name, nowString, locationText, jobRef);
+      }
     );
   } else {
-    savePDF(name, now, location);
+    locationEl.textContent = `Location: ${locationText}`;
+    savePDF(name, nowString, locationText, jobRef);
   }
 });
 
-function savePDF(name, now, location){
-  const { jsPDF } = window.jspdf || {};
-  if(!jsPDF){
-    alert("jsPDF library required to save PDF");
-    return;
-  }
+function savePDF(name, dateTime, location, jobRef){
+  const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
-  const jobRef = `SOSCONSENT-${name.replace(/\s+/g,'').toUpperCase()}-${Date.now().toString().slice(-6)}`;
 
-  pdf.text(`
+  const content = `
 SOS MECHANICS – CUSTOMER CONSENT & AUTHORISATION
 
 Job Reference: ${jobRef}
 Customer Name: ${name}
-Date & Time: ${now}
+Date & Time: ${dateTime}
 Location: ${location}
 
-The customer has requested diagnostic/repair work and authorises SOS Mechanics to proceed.
-All liability excluded for misinformation. Police may be contacted for conduct issues.
-`, 10, 10);
+1. Customer has requested all work. No work performed without instruction.
+2. SOS Mechanics is not liable for misinformation or undisclosed facts.
+3. Police may be contacted for safety or legal issues.
+4. Customer confirms authority to authorise this vehicle.
+`;
 
+  pdf.setFontSize(11);
+  pdf.text(content, 10, 10);
   pdf.save(`${jobRef}.pdf`);
+
   alert(`Consent recorded.\nJob Ref: ${jobRef}\nPDF downloaded.`);
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
 </html>

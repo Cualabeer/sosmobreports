@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Diagnostic & Repair Authorisation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #0e0e0e;
+    color: #fff;
+    margin: 0;
+}
+header {
+    background: linear-gradient(135deg, #00ff66, #00cc55);
+    color: #000;
+    text-align: center;
+    padding: 15px;
+    font-weight: bold;
+}
+.container {
+    padding: 15px;
+    max-width: 650px;
+    margin: auto;
+}
+.section {
+    background: #1b1b1b;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+}
+h2 {
+    color: #00ff66;
+    margin-top: 0;
+}
+label {
+    margin-top: 10px;
+    display: block;
+    font-weight: bold;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    background: #000;
+    color: #fff;
+    border: 2px solid #444;
+    border-radius: 4px;
+}
+input.invalid {
+    border-color: red;
+    box-shadow: 0 0 6px red;
+}
+.note {
+    font-size: 0.85em;
+    color: #aaa;
+}
+button {
+    width: 90%;
+    margin: 20px auto;
+    display: block;
+    padding: 18px;
+    font-size: 17px;
+    font-weight: bold;
+    border-radius: 30px;
+    border: none;
+    background: linear-gradient(135deg, #00ff66, #00cc55);
+    color: #000;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+button.enabled {
+    cursor: pointer;
+    opacity: 1;
+    box-shadow: 0 0 15px #00ff66;
+}
+footer {
+    text-align: center;
+    font-size: 0.8em;
+    color: #777;
+    padding-bottom: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>Customer-Initiated Vehicle Diagnostic & Repair Agreement</header>
+
+<div class="container">
+
+<div class="section">
+<h2>Customer Initiation</h2>
+<p>This diagnostic or repair process begins <strong>only because the customer has requested it</strong>.  
+No inspection, testing, recommendation, or repair is performed without customer initiation and approval.</p>
+</div>
+
+<div class="section">
+<h2>Vehicle & Authority Declaration</h2>
+<label>Vehicle Registration</label>
+<input id="reg" required>
+
+<label>VIN</label>
+<input id="vin" required>
+
+<p class="note">Customer confirms legal authority to authorise work. Vehicles subject to finance, third-party ownership, or dispute require prior written permission.</p>
+</div>
+
+<div class="section">
+<h2>Accuracy & Liability</h2>
+<p>The customer confirms all information provided is true and complete.  
+<strong>All liability is excluded</strong> for faults, costs, delays, or damage resulting from incorrect, misleading, or withheld information.</p>
+</div>
+
+<div class="section">
+<h2>Diagnostics Scope</h2>
+<p>Diagnostics include visual, mechanical, electrical, and electronic testing within the agreed scope.  
+Diagnostics do not guarantee fault elimination or absence of future issues.</p>
+</div>
+
+<div class="section">
+<h2>Safety & Conduct</h2>
+<p>Any physical interference, threat, or aggressive behaviour will result in immediate cessation of work.  
+Police may be contacted without further notice.</p>
+</div>
+
+<div class="section">
+<h2>Customer Authorisation</h2>
+<label>Customer Full Name (typed)</label>
+<input id="name" required>
+
+<p class="note">Typing your name and pressing AGREE constitutes legal authorisation.</p>
+</div>
+
+<button id="agreeBtn" onclick="authorise()" disabled>
+AGREE & AUTHORISE WORK
+</button>
+
+</div>
+
+<footer>
+Mobile Mechanic Authorisation • Time, Date & Location Recorded Automatically
+</footer>
+
+<script>
+const fields = ["name","reg","vin"];
+const btn = document.getElementById("agreeBtn");
+
+fields.forEach(id=>{
+    document.getElementById(id).addEventListener("input", validate);
+});
+
+function validate(){
+    let valid = true;
+    fields.forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el.value.trim()){
+            el.classList.add("invalid");
+            valid = false;
+        } else {
+            el.classList.remove("invalid");
+        }
+    });
+
+    if(valid){
+        btn.disabled = false;
+        btn.classList.add("enabled");
+        btn.style.cursor = "pointer";
+    } else {
+        btn.disabled = true;
+        btn.classList.remove("enabled");
+        btn.style.cursor = "not-allowed";
+    }
+}
+
+async function authorise(){
+    const name = document.getElementById("name").value.trim();
+    const reg = document.getElementById("reg").value.trim();
+    const vin = document.getElementById("vin").value.trim();
+
+    const now = new Date().toLocaleString();
+    let location = "Unavailable";
+
+    if(navigator.geolocation){
+        await new Promise(res=>{
+            navigator.geolocation.getCurrentPosition(
+                pos=>{
+                    location = `Lat ${pos.coords.latitude.toFixed(6)}, Lon ${pos.coords.longitude.toFixed(6)}`;
+                    res();
+                },
+                ()=>res()
+            );
+        });
+    }
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+
+    pdf.text(`
+CUSTOMER-INITIATED VEHICLE DIAGNOSTIC & REPAIR AGREEMENT
+
+Customer Name: ${name}
+Vehicle Registration: ${reg}
+VIN: ${vin}
+Date & Time: ${now}
+Location: ${location}
+
+Customer confirms:
+• They initiated this process
+• They have authority to authorise work
+• Information provided is accurate
+• Liability is excluded for misinformation
+• Police may be contacted if safety is compromised
+
+Agreement recorded via typed name and confirmation button.
+`,10,10);
+
+    pdf.save(`Authorisation_${reg}_${Date.now()}.pdf`);
+    alert("Agreement recorded and downloaded. Work may now commence.");
+}
+</script>
+
+</body>
+</html>

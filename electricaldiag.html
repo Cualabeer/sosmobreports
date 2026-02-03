@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Professional Diagnostic Report with RAG</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+* { box-sizing:border-box; }
+body { margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:#f6f8fb; color:#1f2933; }
+.container { max-width:100%; padding:28px 32px 140px; }
+h1{ font-size:28px; margin-bottom:6px; }
+h2{ font-size:20px; margin-bottom:12px; }
+h3{ font-size:15px; margin:16px 0 6px; }
+.section{ background:#fff; border-radius:10px; padding:22px 24px; margin-bottom:24px; box-shadow:0 6px 18px rgba(0,0,0,0.06);}
+label{display:block; margin-top:14px; font-size:14px; font-weight:500;}
+input,textarea,select{width:100%; margin-top:6px; padding:10px 12px; border-radius:6px; border:1px solid #d1d9e6; background:#fff; font-size:14px;}
+textarea{resize:vertical; min-height:70px;}
+.row{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px;}
+.note{font-size:13px; color:#6b7280; margin-top:4px;}
+.mandatory{color:#dc2626; font-weight:600; font-size:13px;}
+.complete-bar{position:fixed; bottom:0; left:0; width:100%; background:#0f0f1a; padding:18px; display:flex; justify-content:center; border-top:1px solid #1f1f3a;}
+.complete-btn{background:linear-gradient(135deg,#b026ff,#7a00ff); color:#fff; font-size:18px; font-weight:700; padding:14px 40px; border-radius:40px; border:none; cursor:pointer; box-shadow:0 0 18px rgba(176,38,255,0.8),0 0 40px rgba(122,0,255,0.6); transition:transform 0.15s, box-shadow 0.15s;}
+.complete-btn:hover{transform:translateY(-1px); box-shadow:0 0 26px rgba(176,38,255,1),0 0 60px rgba(122,0,255,0.9);}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>Professional Diagnostic Report</h1>
+<p class="note">Complete Step 1 before Step 2. All fields required.</p>
+
+<form id="diagnosticForm">
+
+<!-- VEHICLE INFO -->
+<div class="section">
+<h2>Vehicle & Job Info</h2>
+<div class="row">
+<label>Registration / VIN<input required id="vin"></label>
+<label>Mileage<input required id="mileage"></label>
+</div>
+<label>Make / Model / Engine<input required id="make"></label>
+<label>Customer Complaint<textarea required id="complaint"></textarea></label>
+<label>Technician Name<input required id="techName"></label>
+<label>Date/Time<input readonly id="timestamp"></label>
+</div>
+
+<!-- STEP 1 – ELECTRICAL -->
+<div class="section">
+<h2>STEP 1 – Electrical Foundation <span class="mandatory">(MANDATORY)</span></h2>
+<h3>Battery Health</h3>
+<div class="row">
+<label>Battery Voltage<input type="number" step="0.1" required id="batVolt"></label>
+<label>Cranking Voltage<input type="number" step="0.1" required id="crankVolt"></label>
+<label>Charging Voltage<input type="number" step="0.1" required id="chargeVolt"></label>
+</div>
+
+<h3>Ground Voltage Drop</h3>
+<div class="row">
+<label>Battery → Engine Block<input type="number" step="0.01" required id="gEngine"></label>
+<label>Battery → Chassis<input type="number" step="0.01" required id="gChassis"></label>
+<label>Battery → ECU Ground<input type="number" step="0.01" required id="gECU"></label>
+<label>Battery → Sensor Ground<input type="number" step="0.01" required id="gSensor"></label>
+</div>
+
+<label>Electrical Verdict<select required id="elecVerdict"><option value="">Select</option><option>PASS</option><option>FAIL</option></select></label>
+<label>Notes<textarea required id="elecNotes"></textarea></label>
+</div>
+
+<!-- STEP 2 – Full System Scan -->
+<div class="section">
+<h2>STEP 2 – Full System Scan</h2>
+<label>Modules Scanned<textarea required id="modules"></textarea></label>
+<label>Stored Fault Codes<textarea required id="storedCodes"></textarea></label>
+<label>Live Fault Codes<textarea required id="liveCodes"></textarea></label>
+</div>
+
+<!-- STEP 3 – Live Data -->
+<div class="section">
+<h2>STEP 3 – Live Data</h2>
+<div class="row">
+<label>Coolant Temp<input required id="coolant"></label>
+<label>Intake Air Temp<input required id="airTemp"></label>
+<label>Fuel Trims<input required id="fuelTrims"></label>
+<label>RPM Stability<input required id="rpm"></label>
+</div>
+</div>
+
+<!-- STEP 4 – Mechanical -->
+<div class="section">
+<h2>STEP 4 – Mechanical Baseline</h2>
+<div class="row">
+<label>Air / Vacuum Leaks<select required id="vacuum"><option value="">Select</option><option>OK</option><option>Fault</option></select></label>
+<label>Fuel Pressure<input required id="fuelPress"></label>
+<label>Compression Test<input required id="compression"></label>
+</div>
+</div>
+
+<!-- STEP 5 – Sensor & Actuator -->
+<div class="section">
+<h2>STEP 5 – Sensor & Actuator</h2>
+<label>Component Tested<input required id="component"></label>
+<div class="row">
+<label>Power Present<select required id="power"><option value="">Select</option><option>Yes</option><option>No</option></select></label>
+<label>Ground<select required id="ground"><option value="">Select</option><option>Good</option><option>Faulty</option></select></label>
+</div>
+<label>Signal Behaviour<textarea required id="signal"></textarea></label>
+</div>
+
+<!-- STEP 6 – Road Test -->
+<div class="section">
+<h2>STEP 6 – Road Test & Validation</h2>
+<div class="row">
+<label>Fault Reproduced<select required id="fault"><option value="">Select</option><option>Yes</option><option>No</option></select></label>
+<label>Post Repair Scan<select required id="postRepair"><option value="">Select</option><option>No Faults</option><option>Faults Returned</option></select></label>
+</div>
+<label>Conditions<textarea required id="conditions"></textarea></label>
+</div>
+
+<!-- Optional Misfire -->
+<div class="section">
+<h2>Optional: Misfire Detected</h2>
+<label><input type="checkbox" id="misfireCheck"> Misfire Present</label>
+</div>
+
+<div class="section" id="misfireSection" style="display:none;">
+<h2>Misfire Analysis</h2>
+<div class="row">
+<label>Cylinder(s) Affected<input id="misCylinder"></label>
+<label>Fault Codes<input id="misCodes"></label>
+</div>
+<div class="row">
+<label>Fuel Trim per Cylinder<input id="misFuelTrim"></label>
+<label>Compression/Ignition Data<input id="misCompression"></label>
+</div>
+<label>Suspected Cause<textarea id="misCause"></textarea></label>
+<label>Corrective Action<textarea id="misAction"></textarea></label>
+</div>
+
+<!-- Final Conclusion -->
+<div class="section">
+<h2>Final Diagnostic Conclusion</h2>
+<textarea required id="conclusion"></textarea>
+</div>
+
+<!-- Signature Block -->
+<div class="section">
+<h2>Technician Signature</h2>
+<label>Type Your Name<input type="text" required id="techSignature" placeholder="Technician Name"></label>
+<label>Date<input type="date" required id="sigDate"></label>
+</div>
+
+</form>
+
+<div class="complete-bar">
+<button class="complete-btn" onclick="generatePDF()">COMPLETE DIAGNOSTIC & DOWNLOAD PDF</button>
+</div>
+
+<script>
+const ts = document.getElementById('timestamp');
+ts.value = new Date().toLocaleString();
+
+// Misfire toggle
+const misCheck = document.getElementById('misfireCheck');
+const misSection = document.getElementById('misfireSection');
+misCheck.addEventListener('change', ()=>{misSection.style.display = misCheck.checked ? 'block' : 'none';});
+
+// RAG function
+function getRAG(value,type){
+  value = parseFloat(value);
+  switch(type){
+    case 'battery': return (value<12 || value>13)?'Red':(value<12.4 || value>12.8)?'Amber':'Green';
+    case 'crank': return (value<10)?'Red':(value<10.5)?'Amber':'Green';
+    case 'charge': return (value<13.8 || value>15)?'Red':(value<13.8 || value>14.5)?'Amber':'Green';
+    case 'ground': return (value>0.3)?'Red':(value>0.1)?'Amber':'Green';
+    default: return 'Green';
+  }
+}
+
+// PDF generation
+async function generatePDF(){
+  const form = document.getElementById('diagnosticForm');
+  if(!form.checkValidity()){ alert("Complete all fields first."); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'a4'});
+  let y = 40;
+
+  function addText(label,value,rType){
+      doc.setFont('helvetica','bold'); 
+      doc.text(label,40,y); 
+      doc.setFont('helvetica','normal'); 
+      if(rType){
+          if(rType==='Green') doc.setTextColor(0,128,0);
+          else if(rType==='Amber') doc.setTextColor(255,165,0);
+          else if(rType==='Red') doc.setTextColor(255,0,0);
+          else doc.setTextColor(0,0,0);
+      } else doc.setTextColor(0,0,0);
+      doc.text(value,180,y); 
+      y+=20;
+      doc.setTextColor(0,0,0);
+  }
+
+  function addSection(title,fields){doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.text(title,40,y); y+=18; doc.setFontSize(12); fields.forEach(f=>addText(f.label,f.value,f.rType)); y+=10;}
+
+  // Cover
+  doc.setFontSize(22); doc.setFont('helvetica','bold'); doc.text("Professional Diagnostic Report",40,y); y+=30;
+  addText("Date",ts.value);
+  addText("Technician",document.getElementById('techName').value);
+
+  addSection("Vehicle Info",[
+    {label:"VIN", value:document.getElementById('vin').value},
+    {label:"Make/Model", value:document.getElementById('make').value},
+    {label:"Mileage", value:document.getElementById('mileage').value},
+    {label:"Customer Complaint", value:document.getElementById('complaint').value}
+  ]);
+
+  addSection("Electrical Foundation",[
+    {label:"Battery Voltage", value:document.getElementById('batVolt').value+" V", rType:getRAG(document.getElementById('batVolt').value,'battery')},
+    {label:"Cranking Voltage", value:document.getElementById('crankVolt').value+" V", rType:getRAG(document.getElementById('crankVolt').value,'crank')},
+    {label:"Charging Voltage", value:document.getElementById('chargeVolt').value+" V", rType:getRAG(document.getElementById('chargeVolt').value,'charge')},
+    {label:"Battery→Engine Block", value:document.getElementById('gEngine').value+" V", rType:getRAG(document.getElementById('gEngine').value,'ground')},
+    {label:"Battery→Chassis", value:document.getElementById('gChassis').value+" V", rType:getRAG(document.getElementById('gChassis').value,'ground')},
+    {label:"Battery→ECU", value:document.getElementById('gECU').value+" V", rType:getRAG(document.getElementById('gECU').value,'ground')},
+    {label:"Battery→Sensor", value:document.getElementById('gSensor').value+" V", rType:getRAG(document.getElementById('gSensor').value,'ground')},
+    {label:"Verdict", value:document.getElementById('elecVerdict').value},
+    {label:"Notes", value:document.getElementById('elecNotes').value}
+  ]);
+
+  addSection("Full System Scan",[
+    {label:"Modules Scanned", value:document.getElementById('modules').value},
+    {label:"Stored Fault Codes", value:document.getElementById('storedCodes').value},
+    {label:"Live Fault Codes", value:document.getElementById('liveCodes').value}
+  ]);
+
+  addSection("Live Data",[
+    {label:"Coolant Temp", value:document.getElementById('coolant').value},
+    {label:"Intake Air Temp", value:document.getElementById('airTemp').value},
+    {label:"Fuel Trims", value:document.getElementById('fuelTrims').value},
+    {label:"RPM Stability", value:document.getElementById('rpm').value}
+  ]);
+
+  addSection("Mechanical Baseline",[
+    {label:"Air/Vacuum Leaks", value:document.getElementById('vacuum').value},
+    {label:"Fuel Pressure", value:document.getElementById('fuelPress').value},
+    {label:"Compression Test", value:document.getElementById('compression').value}
+  ]);
+
+  addSection("Sensor & Actuator",[
+    {label:"Component Tested", value:document.getElementById('component').value},
+    {label:"Power Present", value:document.getElementById('power').value},
+    {label:"Ground", value:document.getElementById('ground').value},
+    {label:"Signal Behaviour", value:document.getElementById('signal').value}
+  ]);
+
+  addSection("Road Test",[
+    {label:"Fault Reproduced", value:document.getElementById('fault').value},
+    {label:"Post Repair Scan", value:document.getElementById('postRepair').value},
+    {label:"Conditions", value:document.getElementById('conditions').value}
+  ]);
+
+  if(misCheck.checked){
+    addSection("Misfire Analysis",[
+      {label:"Cylinder(s)", value:document.getElementById('misCylinder').value},
+      {label:"Fault Codes", value:document.getElementById('misCodes').value},
+      {label:"Fuel Trim per Cylinder", value:document.getElementById('misFuelTrim').value},
+      {label:"Compression/Ignition Data", value:document.getElementById('misCompression').value},
+      {label:"Suspected Cause", value:document.getElementById('misCause').value},
+      {label:"Corrective Action", value:document.getElementById('misAction').value}
+    ]);
+  }
+
+  addSection("Final Conclusion",[
+    {label:"Conclusion", value:document.getElementById('conclusion').value}
+  ]);
+
+  // Signature page with typed name + date
+  doc.addPage();
+  doc.setFontSize(16);
+  doc.setFont('helvetica','bold');
+  doc.text("Technician Signature",40,40);
+
+  // Draw signature & date lines
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.line(40,70,300,70); // signature
+  doc.line(320,70,500,70); // date
+
+  // Place typed name centered on line
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(14);
+  const sigName = document.getElementById('techSignature').value;
+  const sigDate = document.getElementById('sigDate').value;
+
+  const line1Width = 300-40;
+  const nameWidth = doc.getTextWidth(sigName);
+  const nameX = 40 + (line1Width-nameWidth)/2;
+  doc.text(sigName,nameX,68);
+
+  const line2Width = 500-320;
+  const dateWidth = doc.getTextWidth(sigDate);
+  const dateX = 320 + (line2Width-dateWidth)/2;
+  doc.text(sigDate,dateX,68);
+
+  doc.setFontSize(10);
+  doc.text("Signature",140,78);
+  doc.text("Date",410,78);
+
+  doc.save(`Diagnostic_Report_${document.getElementById('vin').value}.pdf`);
+}
+</script>
+
+</body>
+</html>

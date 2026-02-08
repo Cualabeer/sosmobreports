@@ -3,170 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOS Mechanics | Mobile Diagnostics & Labour-Only Repairs Medway</title>
     
-    <!-- PRIMARY SEO TAGS -->
-    <title>Mobile Mechanic Medway | Emergency Car Repairs & Service | SOS Mechanics</title>
-    <meta name="description" content="Affordable Mobile Mechanic in Medway. Professional car repairs at home or work. Brake pads, batteries, diagnostics & full servicing from £50/hr. Book online or WhatsApp now!">
-    <meta name="keywords" content="mobile mechanic medway, car repairs medway, mobile car service kent, roadside assistance medway, brake pads replacement medway, mobile diagnostic check">
-    <link rel="canonical" href="https://sosmechanics.co.uk" />
-
-    <!-- LOCAL SEO AGGRESSION -->
-    <meta name="geo.region" content="GB-KEN">
-    <meta name="geo.placename" content="Medway">
-    <meta name="geo.position" content="51.388;-0.539">
-    <meta name="ICBM" content="51.388, -0.539">
-
-    <!-- OPEN GRAPH (Social Media SEO) -->
-    <meta property="og:title" content="SOS Mechanics | Mobile Mechanic Medway">
-    <meta property="og:description" content="Expert car repairs delivered to your door. Transparent pricing: £50/hr + £50 call-out.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://sosmechanics.co.uk">
-    <!-- <meta property="og:image" content="link-to-your-logo.jpg"> -->
-
-    <!-- SCHEMA.ORG (Structured Data for Google Rankings) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "AutoRepair",
-      "name": "SOS Mechanics",
-      "image": "https://sosmechanics.co.uk/logo.png",
-      "@id": "https://sosmechanics.co.uk",
-      "url": "https://sosmechanics.co.uk",
-      "telephone": "07405937104",
-      "priceRange": "££",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Medway",
-        "addressRegion": "Kent",
-        "addressCountry": "GB"
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": 51.388,
-        "longitude": -0.539
-      },
-      "servesCateringEstablishment": "https://en.wikipedia.org/wiki/Medway",
-      "areaServed": ["Medway", "Gillingham", "Chatham", "Rochester", "Rainham", "Maidstone", "Sittingbourne"],
-      "openingHoursSpecification": {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-        "opens": "08:00",
-        "closes": "20:00"
-      }
-    }
-    </script>
-
+    <!-- Aggressive SEO: Two-Stage Model -->
+    <meta name="description" content="Medway's Mobile Diagnostic Specialist. £50 Initial Diag Call-out. Fixed Labour-only prices for repairs. We find the fault, you provide parts, we fit them at your door.">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        :root { --primary: #7a00ff; --whatsapp: #25D366; --bg: #f6f7fb; --white: #ffffff; }
+        :root { --primary: #7a00ff; --whatsapp: #25D366; --bg: #f6f7fb; --white: #ffffff; --warn: #ff9800; }
         * { box-sizing: border-box; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #111; line-height: 1.4; }
-        .container { max-width: 900px; margin: auto; padding: 20px; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #111; }
         
-        /* Heading SEO Hierarchy */
-        h1 { text-align: center; font-size: 28px; margin-bottom: 5px; color: var(--primary); }
-        .subtext { text-align: center; color: #555; margin-bottom: 25px; font-size: 15px; }
+        .top-bar { background: #111; color: white; text-align: center; padding: 10px; font-size: 12px; font-weight: bold; }
+
+        .container { max-width: 900px; margin: auto; padding: 20px; }
+        h1 { text-align: center; font-size: 26px; color: var(--primary); margin: 10px 0; }
+        .subtext { text-align: center; color: #555; margin-bottom: 20px; font-size: 14px; }
+
+        /* The Process Explained (SEO & Trust) */
+        .process {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px;
+        }
+        .step { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-size: 13px; }
+        .step i { color: var(--primary); font-size: 20px; margin-bottom: 5px; }
 
         .cards { display: flex; gap: 16px; overflow-x: auto; padding: 10px 5px 25px; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .cards::-webkit-scrollbar { display: none; }
         .card {
-            min-width: 250px; background: var(--white); border-radius: 18px; padding: 20px;
+            min-width: 260px; background: var(--white); border-radius: 20px; padding: 20px;
             scroll-snap-align: center; box-shadow: 0 4px 15px rgba(0,0,0,.06);
             border: 2px solid transparent; text-align: center; transition: 0.3s;
         }
         .card.selected { border-color: var(--primary); background: #f4eeff; }
-        .price { font-size: 26px; font-weight: 800; color: var(--primary); margin: 8px 0; }
-        .hours { font-size: 11px; color: #888; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        
+        .price { font-size: 30px; font-weight: 800; color: var(--primary); margin: 5px 0; }
+        .tag { font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 10px; background: #eee; display: inline-block; margin-bottom: 5px; }
+
         form { background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,.05); }
         input, select, button { width: 100%; padding: 14px; margin-top: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 16px; }
         button { background: var(--primary); color: var(--white); border: none; font-weight: 700; cursor: pointer; }
-
-        #choiceModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        
+        #choiceModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
         .choice-box { background: white; padding: 30px; width: 100%; max-width: 400px; border-radius: 24px; text-align: center; }
         .wa-btn { background: var(--whatsapp); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        
-        /* SEO Content Section */
-        .seo-content { margin-top: 40px; font-size: 13px; color: #777; line-height: 1.6; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>Mobile Mechanic Medway & Kent</h1>
-        <p class="subtext">Professional Car Service & Emergency Repairs at Your Door. <br><strong>£50/hr Labour + £50 Call-out Fee</strong></p>
-    </header>
+<div class="top-bar">
+    🛠️ MEDWAY'S MOBILE MECHANIC: DIAGNOSTICS & LABOUR ONLY
+</div>
 
-    <section>
-        <h2 style="font-size: 20px; text-align: center;">1. Choose Your Service</h2>
-        <div class="cards" id="services"></div>
-    </section>
+<div class="container">
+    <h1>SOS Mechanics</h1>
+    <p class="subtext">Specializing in on-site Diagnostics & Fixed-Price Repairs.</p>
+
+    <div class="process">
+        <div class="step">
+            <i class="fas fa-search"></i><br>
+            <strong>Phase 1: Diag</strong><br>
+            £50 Call-out to visit and identify the fault.
+        </div>
+        <div class="step">
+            <i class="fas fa-tools"></i><br>
+            <strong>Phase 2: Repair</strong><br>
+            Fixed Labour prices below (Second visit required).
+        </div>
+    </div>
+
+    <h2>Select Service</h2>
+    <div class="cards" id="services"></div>
 
     <form id="bookingForm" action="https://formspree.io/f/xaqdykza" method="POST">
-        <h2 style="font-size: 20px; margin-bottom: 0;">2. Booking Details</h2>
+        <h2 style="font-size: 18px; margin-top: 20px;">Booking Details</h2>
         <div style="display: flex; gap: 10px;">
-            <input id="date" type="date" aria-label="Select Date">
-            <select id="time" aria-label="Select Time"></select>
+            <input id="date" type="date">
+            <select id="time"></select>
         </div>
 
         <input type="hidden" name="Service" id="serviceField">
-        <input type="hidden" name="Price" id="priceField">
+        <input type="hidden" name="Labour_Price" id="priceField">
         
-        <input required id="userName" name="Name" placeholder="Your Full Name">
+        <input required id="userName" name="Name" placeholder="Your Name">
         <input required id="userPhone" name="Phone" type="tel" placeholder="Mobile Number">
-        <input required id="userVehicle" name="Vehicle" placeholder="Vehicle Reg or Make/Model">
-        
+        <input required id="userVehicle" name="Vehicle" placeholder="Vehicle Reg / Model">
         <input id="location" name="Location" placeholder="GPS Link (Optional)" readonly>
-        <button type="button" onclick="getLocation()" style="background:#f0f0f0; color:#333; font-size:13px; border: 1px dashed #ccc;">
-            📍 Use My Current GPS Location
-        </button>
+        <button type="button" onclick="getLocation()" style="background:#eee; color:#333; font-size:12px;">📍 Tap to Share GPS</button>
 
-        <button type="submit" style="margin-top: 25px; font-size: 18px;">Check Availability & Price</button>
+        <button type="submit" style="margin-top: 20px; font-size: 18px;">Request Slot</button>
     </form>
-
-    <!-- Aggressive SEO Text Footer -->
-    <article class="seo-content">
-        <h3>Reliable Roadside & Home Mechanics in Medway</h3>
-        <p>Providing mobile car repairs across <strong>Chatham, Gillingham, Rochester, Rainham, and Maidstone</strong>. 
-        Whether you need a brake pad replacement, a diagnostic check, or a car battery fitted at home, SOS Mechanics 
-        brings the garage to you. Avoid expensive towing fees and garage wait times.</p>
-    </article>
 </div>
 
-<!-- Choice Modal -->
 <div id="choiceModal">
     <div class="choice-box">
-        <h3>Booking Summary</h3>
-        <p id="summaryText" style="font-weight: bold; color: var(--primary); font-size: 18px;"></p>
-        <button class="wa-btn" onclick="handleBooking('whatsapp')"><i class="fab fa-whatsapp"></i> WhatsApp Booking (Preferred)</button>
-        <button style="background: #333;" onclick="handleBooking('form')">Submit Email Request</button>
-        <p style="font-size: 11px; color: #999; margin-top: 15px;">A mechanic will confirm your slot within 30 mins.</p>
+        <h3 id="modalTitle">Initial Diag Visit</h3>
+        <p id="summaryText" style="font-weight: bold; color: var(--primary); font-size: 24px;"></p>
+        <p id="partsNote" style="font-size: 12px; color: #777; margin-top: -10px;"></p>
+        
+        <button class="wa-btn" onclick="handleBooking('whatsapp')"><i class="fab fa-whatsapp"></i> Book via WhatsApp</button>
+        <button style="background: #333;" onclick="handleBooking('form')">Email Request</button>
     </div>
 </div>
 
 <script>
 const myNumber = "447405937104";
-const HOURLY_RATE = 50;
-const CALLOUT_FEE = 50;
 
+// The 'hrs' here represents the fixed labour cost (hrs * 50)
 const services = [
-    { name: "Front Brake Pads", hrs: 1.5 },
-    { name: "Rear Brake Pads", hrs: 1.5 },
-    { name: "Full Service", hrs: 3.0 },
-    { name: "Interim Service", hrs: 1.5 },
-    { name: "Battery Replacement", hrs: 0.8 },
-    { name: "Diagnostic Check", hrs: 1.0 },
-    { name: "Alternator Change", hrs: 2.5 },
-    { name: "Starter Motor", hrs: 2.0 },
-    { name: "Water Pump", hrs: 3.5 },
-    { name: "Brake Discs & Pads", hrs: 2.5 },
-    { name: "Oil & Filter Change", hrs: 1.0 },
-    { name: "Suspension Spring", hrs: 1.5 },
-    { name: "Drive Belt", hrs: 1.0 },
-    { name: "Spark Plugs", hrs: 1.2 },
-    { name: "Pre-MOT Check", hrs: 1.5 },
-    { name: "General Repair", hrs: 1.0 }
+    { name: "Initial Diag & Call-out", hrs: 1, type: "DIAG", note: "Standard Inspection" },
+    { name: "Front Brake Pads", hrs: 1.5, type: "FIX", note: "Repair Labour Only" },
+    { name: "Rear Brake Pads", hrs: 1.5, type: "FIX", note: "Repair Labour Only" },
+    { name: "Alternator Fitment", hrs: 2.5, type: "FIX", note: "Repair Labour Only" },
+    { name: "Starter Motor Fitment", hrs: 2.0, type: "FIX", note: "Repair Labour Only" },
+    { name: "Full Service", hrs: 2.5, type: "FIX", note: "Labour Only" },
+    { name: "Battery Fitting", hrs: 1.0, type: "FIX", note: "Repair Labour Only" },
+    { name: "Brake Discs & Pads", hrs: 3.0, type: "FIX", note: "Repair Labour Only" },
+    { name: "Suspension Spring", hrs: 2.0, type: "FIX", note: "Repair Labour Only" },
+    { name: "Other Repair", hrs: 1.5, type: "FIX", note: "Labour Quote" }
 ];
 
 let selectedService = null;
@@ -182,27 +135,31 @@ for(let h=8; h<=20; h++) {
     timeSelect.appendChild(opt);
 }
 
-function calcTotal(hours) {
-    let total = (hours * HOURLY_RATE) + CALLOUT_FEE;
+function calcPrice(s) {
+    // If it's just a DIAG, it's just the 50 Callout. 
+    // If it's a FIX, it's the Labour price (no callout in this view to avoid confusion, 
+    // you will charge that separately as per your model).
+    let price = s.hrs * 50;
+    
     const d = new Date(dateInput.value);
-    const h = parseInt(timeSelect.value);
-    if(d.getDay() === 0 || d.getDay() === 6) total *= 1.2;
-    else if(h < 9 || h >= 17) total *= 1.35;
-    return total.toFixed(2);
+    if(d.getDay() === 0 || d.getDay() === 6) price *= 1.2;
+    
+    return price.toFixed(2);
 }
 
 function render() {
     const container = document.getElementById("services");
     container.innerHTML = "";
     services.forEach((s, index) => {
-        const price = calcTotal(s.hrs);
+        const price = calcPrice(s);
         const card = document.createElement("div");
         card.className = `card ${selectedService?.name === s.name ? 'selected' : ''}`;
         card.innerHTML = `
-            <div class="hours">${s.hrs} HR Est.</div>
+            <div class="tag">${s.type === 'DIAG' ? 'PHASE 1' : 'PHASE 2: REPAIR'}</div>
             <h3>${s.name}</h3>
             <div class="price">£${price}</div>
-            <button type="button" onclick="select(${index})">Select</button>
+            <div style="font-size:12px; color:#666;">${s.note}</div>
+            <button type="button" onclick="select(${index})" style="margin-top:10px;">Select</button>
         `;
         container.appendChild(card);
         if(selectedService?.name === s.name) {
@@ -222,8 +179,13 @@ function getLocation() {
 
 document.getElementById("bookingForm").onsubmit = function(e) {
     e.preventDefault();
-    if(!selectedService) return alert("Please select a service card first!");
-    document.getElementById("summaryText").innerText = `${selectedService.name} - ${document.getElementById("priceField").value}`;
+    if(!selectedService) return alert("Please select a service card.");
+    
+    const isDiag = selectedService.type === 'DIAG';
+    document.getElementById("modalTitle").innerText = isDiag ? "Diagnostic Visit Request" : "Repair Labour Booking";
+    document.getElementById("summaryText").innerText = `£${calcPrice(selectedService)}`;
+    document.getElementById("partsNote").innerText = isDiag ? "Covers call-out and inspection." : "Labour only. You provide the parts.";
+    
     document.getElementById("choiceModal").style.display = "flex";
 };
 
@@ -234,13 +196,12 @@ function handleBooking(type) {
     const price = document.getElementById("priceField").value;
     const date = dateInput.value;
     const time = timeSelect.value + ":00";
-    const loc = document.getElementById("location").value || "No GPS";
+    const note = (selectedService.type === 'DIAG') ? "Diag/Inspection Visit" : "Repair Visit (Labour Only)";
 
-    const msg = `Hi SOS Mechanics!%0A%0A*New Booking*%0A*Name:* ${name}%0A*Vehicle:* ${vehicle}%0A*Service:* ${svc}%0A*Price:* ${price}%0A*Date:* ${date} at ${time}%0A*Location:* ${loc}`;
+    const msg = `Hi SOS Mechanics!%0A%0A*${note}*%0A*Service:* ${svc}%0A*Labour Quote:* ${price}%0A*Customer:* ${name}%0A*Vehicle:* ${vehicle}%0A*Date:* ${date} at ${time}`;
 
     if(type === 'whatsapp') {
         window.open(`https://wa.me/${myNumber}?text=${msg}`, '_blank');
-        document.getElementById("choiceModal").style.display = "none";
     } else {
         document.getElementById("bookingForm").submit();
     }

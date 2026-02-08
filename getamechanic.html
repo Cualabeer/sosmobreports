@@ -3,74 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mechanics – Mobile Mechanic Medway, Kent | Car Repair at Home</title>
-<meta name="description" content="SOS Mechanics offers fast, pre-booked mobile car repair in Medway, Kent. Brakes, battery, oil, suspension & diagnostics at your location. Book now!">
-<meta name="keywords" content="mobile mechanic Medway, car repair at home, SOS Mechanics, brake replacement Medway, battery replacement Medway, BMW repair Medway">
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "AutoRepair",
-  "name": "SOS Mechanics",
-  "image": "https://yourwebsite.com/logo.png",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Mobile service – location varies",
-    "addressLocality": "Medway",
-    "addressRegion": "Kent",
-    "postalCode": "",
-    "addressCountry": "UK"
-  },
-  "telephone": "+447405937104",
-  "priceRange": "££",
-  "url": "https://yourwebsite.com",
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": 51.38,
-    "longitude": 0.52
-  },
-  "areaServed": {
-    "@type": "Place",
-    "name": "Medway, Kent"
-  }
-}
-</script>
-
+<title>SOS Mechanics - Mobile Mechanic Booking</title>
+<meta name="description" content="Book a mobile mechanic in Medway. Weekday, weekend, and out-of-hours service with transparent pricing. Quick quote & WhatsApp booking.">
 <style>
-body {font-family: Arial, sans-serif; margin:0; background:#f5f5f5; color:#333;}
-a {text-decoration:none;}
-h1,h2,h3 {color:#b400ff;}
-.container {max-width:900px; margin:auto; padding:20px;}
-.card {background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:30px; margin-bottom:30px;}
-label {display:block; margin:10px 0 5px;}
-input, select, textarea {width:100%; padding:10px; border-radius:5px; border:1px solid #ccc; margin-bottom:10px;}
-button {background:#b400ff; color:#fff; font-size:1.1em; padding:15px; border:none; border-radius:8px; cursor:pointer; transition:0.2s;}
-button:hover {background:#8e00cc;}
-.whatsapp-btn {display:block; text-align:center; margin:20px 0; padding:15px; font-weight:bold; background:#b400ff; border-radius:8px; color:#fff;}
-.legal {font-size:0.85em; color:#666; margin-top:10px;}
-#thankYouPopup {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center;}
-#thankYouPopup div {background:#fff; padding:30px; border-radius:12px; max-width:500px; width:90%; text-align:left; position:relative;}
-#thankYouPopup button {margin-top:20px; background:#b400ff; color:#fff; padding:12px 20px; border:none; border-radius:8px; cursor:pointer;}
+body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; padding:0; color:#111; }
+.container { max-width:800px; margin:20px auto; padding:20px; }
+h1, h2 { color:#6f2dff; text-align:center; }
+.card { background:#fff; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:20px; margin:20px 0; }
+label { display:block; margin:10px 0 5px; }
+input, select, textarea { width:100%; padding:10px; border:1px solid #ccc; border-radius:5px; }
+button { background:#6f2dff; color:#fff; border:none; padding:15px; font-size:16px; border-radius:5px; cursor:pointer; margin-top:10px; }
+button:hover { background:#5a24cc; }
+#quickQuote, #hoverPrice { font-weight:bold; margin-top:10px; color:#222; }
+.popup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; }
+.popup-content { background:#fff; padding:30px; border-radius:10px; max-width:400px; text-align:center; }
 </style>
 </head>
 <body>
-
 <div class="container">
+  <h1>SOS Mechanics</h1>
+  <h2>Quick Quote & Book Your Mobile Mechanic</h2>
 
-  <!-- Hero / Info Card -->
+  <!-- Quick Quote Calculator -->
   <div class="card">
-    <h1>SOS Mechanics – Mobile Car Service</h1>
-    <p>Pre-booked appointments only. Weekday & weekend emergency slots available. Fully equipped mobile van arrives at your location in Medway, Kent.</p>
-    <p>📞 Call or WhatsApp: <strong>07405 937104</strong></p>
+    <label for="quickDay">Select Day</label>
+    <input type="date" id="quickDay">
+
+    <label for="quickTime">Select Time</label>
+    <input type="time" id="quickTime" min="09:00" max="17:00" step="3600">
+
+    <label for="quickService">Select Service</label>
+    <select id="quickService" title="Hover to see total price">
+      <option value="">-- Select --</option>
+    </select>
+    <p id="hoverPrice">Hover over a service to see total price</p>
+    <p id="quickQuote">Total Quote: £0</p>
+    <button id="quickBook">Book Now</button>
   </div>
 
-  <!-- Booking Form Card -->
+  <!-- Booking Form -->
   <div class="card">
-    <h2>Book Your Job</h2>
     <form id="bookingForm" action="https://formspree.io/f/xaqdykza" method="POST">
-      <input type="text" name="website" style="display:none">
-      <input type="hidden" name="_subject" value="New SOS Booking">
-      <input type="hidden" name="_cc" value="mobile@sosmechanics.co.uk">
+      <!-- Honeypot for spam protection -->
+      <input type="text" name="website" style="display:none" autocomplete="off">
 
       <label for="name">Full Name *</label>
       <input type="text" id="name" name="name" required>
@@ -78,136 +53,213 @@ button:hover {background:#8e00cc;}
       <label for="phone">Phone Number *</label>
       <input type="tel" id="phone" name="phone" required>
 
-      <label for="email">Email *</label>
-      <input type="email" id="email" name="email" required>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email">
 
-      <label for="vehicle">Vehicle Make/Model/Year *</label>
+      <label for="vehicle">Vehicle Details *</label>
       <input type="text" id="vehicle" name="vehicle" required>
 
-      <label for="service">Service Required *</label>
-      <select id="service" name="service" required>
-        <option value="">Select a service</option>
-        <option value="Brakes">Brakes</option>
-        <option value="Battery">Battery Replacement</option>
-        <option value="Oil">Oil & Filter</option>
-        <option value="Suspension">Suspension Jobs</option>
-        <option value="Diagnostics">Diagnostics</option>
-      </select>
-
-      <label for="address">Address (or GPS coordinates) *</label>
+      <label for="address">Service Address *</label>
       <input type="text" id="address" name="address" required>
 
-      <!-- GPS button below -->
-      <button type="button" id="gpsBtn" style="margin-bottom:15px;">📍 Use My Location</button>
+      <button type="button" id="getLocation">Use GPS for Lat/Lon</button>
+
+      <label for="service">Service Selected *</label>
+      <input type="text" id="service" name="service" readonly required>
 
       <label for="date">Preferred Date *</label>
       <input type="date" id="date" name="date" required>
 
       <label for="time">Preferred Time *</label>
-      <input type="time" id="time" name="time" required>
+      <input type="time" id="time" name="time" min="09:00" max="17:00" step="3600" required>
 
       <button type="submit">Submit Booking</button>
-
-      <div class="legal">
-        ⚠️ All bookings must be pre-scheduled. Jobs performed without confirmation are not guaranteed. By booking, you agree to the appointment date, time, service scope, and quoted labour price. Cancellations within 24 hours may incur a charge.
-      </div>
     </form>
   </div>
-
-  <!-- WhatsApp CTA Card -->
-  <div class="card">
-    <h2>Fast WhatsApp Booking</h2>
-    <a class="whatsapp-btn" id="whatsappBtn" target="_blank">Book via WhatsApp</a>
-  </div>
-
 </div>
 
-<!-- Thank You Popup -->
-<div id="thankYouPopup">
-  <div>
-    <h2>Thank You! ✅</h2>
-    <p>Your booking has been submitted successfully. Here are your details:</p>
-    <ul id="bookingDetails" style="list-style:none; padding:0;"></ul>
-    <button id="closePopup">Close</button>
+<!-- Confirmation Popup -->
+<div class="popup" id="confirmPopup">
+  <div class="popup-content" id="popupContent">
+    <h3>Booking Submitted!</h3>
+    <p id="popupDetails"></p>
+    <button onclick="closePopup()">Close</button>
   </div>
 </div>
 
 <script>
+// Pricing Constants
+const callOut = 50;
+const weekendSurcharge = 55;
+const oohSurcharge = 65;
+
+// Service Base Prices
+const baseOptions = [
+  {name: "Front Brake Pads", base: 80},
+  {name: "Rear Brake Pads", base: 75},
+  {name: "Full Brake Replacement", base: 150},
+  {name: "Battery Replacement", base: 60},
+  {name: "Oil & Filter", base: 50},
+  {name: "Suspension Job", base: 120},
+  {name: "Diagnostics", base: 40}
+];
+
+// DOM Elements
+const quickService = document.getElementById('quickService');
+const quickDay = document.getElementById('quickDay');
+const quickTime = document.getElementById('quickTime');
+const quickQuote = document.getElementById('quickQuote');
+const quickBook = document.getElementById('quickBook');
+const hoverPrice = document.getElementById('hoverPrice');
 const form = document.getElementById('bookingForm');
-const whatsappBtn = document.getElementById('whatsappBtn');
-const gpsBtn = document.getElementById('gpsBtn');
-const addressInput = document.getElementById('address');
-const thankYouPopup = document.getElementById('thankYouPopup');
-const bookingDetails = document.getElementById('bookingDetails');
-const closePopup = document.getElementById('closePopup');
 
-let lastSubmission = 0;
+// Timestamp for anti-spam
+let formStartTime = Date.now();
 
-gpsBtn.addEventListener('click', () => {
-  if(navigator.geolocation){
-    gpsBtn.textContent = "Locating...";
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude.toFixed(6);
-        const lon = position.coords.longitude.toFixed(6);
-        addressInput.value = `Lat: ${lat}, Lon: ${lon}`;
-        gpsBtn.textContent = "📍 Use My Location";
-      },
-      () => { alert("Unable to get location."); gpsBtn.textContent = "📍 Use My Location"; },
-      {enableHighAccuracy:true, timeout:10000}
-    );
-  } else { alert("Geolocation not supported."); }
+// Calculate total
+function calculateQuote() {
+  const serviceOption = quickService.selectedOptions[0];
+  if(!serviceOption || !quickDay.value || !quickTime.value) return 0;
+
+  const base = parseFloat(serviceOption.dataset.base);
+  const day = new Date(quickDay.value).getDay();
+  const hour = parseInt(quickTime.value.split(":")[0]);
+  let surcharge = 0;
+
+  if(day === 0 || day === 6) surcharge = weekendSurcharge;
+  else if(hour < 9 || hour >= 17) surcharge = oohSurcharge;
+
+  const total = base + callOut + surcharge;
+  quickQuote.textContent = `Total Quote: £${total.toFixed(2)}`;
+  return total;
+}
+
+// Populate Service Options dynamically
+function updateServiceOptions() {
+  if(!quickDay.value || !quickTime.value) return;
+
+  const day = new Date(quickDay.value).getDay();
+  const hour = parseInt(quickTime.value.split(":")[0]);
+  let surcharge = 0;
+  let labelSuffix = "";
+
+  if(day === 0 || day === 6) { surcharge = weekendSurcharge; labelSuffix=" (Weekend +£55)"; }
+  else if(hour < 9 || hour >= 17) { surcharge = oohSurcharge; labelSuffix=" (Out-of-Hours +£65)"; }
+  else { surcharge = 0; labelSuffix=" (Weekday)"; }
+
+  quickService.innerHTML = '<option value="">-- Select --</option>';
+  baseOptions.forEach(opt=>{
+    const total = opt.base + callOut + surcharge;
+    const option = document.createElement("option");
+    option.value = opt.name;
+    option.dataset.base = opt.base;
+    option.textContent = `${opt.name} – £${total.toFixed(2)}${labelSuffix}`;
+    option.title = `Total Price: £${total.toFixed(2)}`;
+    quickService.appendChild(option);
+  });
+  calculateQuote();
+}
+
+// Event Listeners
+quickDay.addEventListener('change', updateServiceOptions);
+quickTime.addEventListener('change', updateServiceOptions);
+quickService.addEventListener('change', calculateQuote);
+
+// Hover price preview
+quickService.addEventListener('mousemove', () => {
+  const option = quickService.selectedOptions[0];
+  if(!option || option.value==="") return;
+  hoverPrice.textContent = option.title;
+});
+quickService.addEventListener('mouseleave', () => {
+  hoverPrice.textContent = "Hover over a service to see total price";
 });
 
-form.addEventListener('submit', function(e) {
+// Quick Book Button
+quickBook.addEventListener('click', () => {
+  const serviceOption = quickService.selectedOptions[0];
+  if(!serviceOption || !quickDay.value || !quickTime.value){
+    alert("Please select service, day, and time."); return;
+  }
+  const total = calculateQuote();
+  form.service.value = `${serviceOption.value} – £${total.toFixed(2)}`;
+  form.date.value = quickDay.value;
+  form.time.value = quickTime.value;
+  form.scrollIntoView({behavior:'smooth'});
+});
+
+// GPS Button
+document.getElementById('getLocation').addEventListener('click', () => {
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const lat = pos.coords.latitude.toFixed(6);
+      const lon = pos.coords.longitude.toFixed(6);
+      document.getElementById('address').value = `Lat: ${lat}, Lon: ${lon}`;
+    },()=>alert("Unable to get location."));
+  } else alert("Geolocation not supported.");
+});
+
+// Form Submission with Popup & WhatsApp + Anti-Spam
+form.addEventListener('submit',(e)=>{
   e.preventDefault();
-  if(form.website.value) return; // Honeypot
 
-  const now = new Date().toISOString();
-  if(new Date().getTime() - lastSubmission < 30000){ alert("Please wait 30 seconds."); return; }
-  lastSubmission = new Date().getTime();
+  // Honeypot check
+  if(form.website.value){
+    alert("Bot detected. Submission blocked.");
+    return;
+  }
 
+  // Timestamp anti-spam
+  const now = Date.now();
+  const diffSeconds = (now - formStartTime) / 1000;
+  if(diffSeconds < 5){
+    alert("Form submitted too quickly. Please try again.");
+    return;
+  }
+
+  const timestamp = new Date().toLocaleString();
   const name = form.name.value;
   const phone = form.phone.value;
   const email = form.email.value;
   const vehicle = form.vehicle.value;
-  const service = form.service.value;
   const address = form.address.value;
+  const service = form.service.value;
   const date = form.date.value;
   const time = form.time.value;
-  const timestamp = now;
 
-  // WhatsApp pre-fill
-  const waMessage = `Hello SOS Mechanics,%0ATimestamp: ${timestamp}%0AName: ${encodeURIComponent(name)}%0APhone: ${encodeURIComponent(phone)}%0AEmail: ${encodeURIComponent(email)}%0AVehicle: ${encodeURIComponent(vehicle)}%0AService: ${encodeURIComponent(service)}%0AAddress: ${encodeURIComponent(address)}%0APreferred Date & Time: ${encodeURIComponent(date)} ${encodeURIComponent(time)}`;
-  whatsappBtn.href = `https://wa.me/447405937104?text=${waMessage}`;
+  // WhatsApp message
+  let mapLink = address;
+  if(address.startsWith("Lat:")){
+    const coords = address.replace("Lat:","").split(",").map(s=>s.replace("Lon:","").trim());
+    const lat = coords[0].trim();
+    const lon = coords[1].trim();
+    mapLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+  }
 
-  // Send to Formspree
-  fetch(form.action, {
-    method: 'POST',
-    body: new FormData(form),
-    headers: { 'Accept': 'application/json' }
-  }).then(response => {
-    bookingDetails.innerHTML = `
-      <li><strong>Name:</strong> ${name}</li>
-      <li><strong>Phone:</strong> ${phone}</li>
-      <li><strong>Email:</strong> ${email}</li>
-      <li><strong>Vehicle:</strong> ${vehicle}</li>
-      <li><strong>Service:</strong> ${service}</li>
-      <li><strong>Address:</strong> ${address}</li>
-      <li><strong>Date & Time:</strong> ${date} ${time}</li>
-    `;
-    thankYouPopup.style.display = 'flex';
-    form.reset();
-  }).catch(error => {
-    alert("There was an error submitting your booking. Please try again.");
-    console.error(error);
-  });
+  const waMessage = `Hello SOS Mechanics,%0ATimestamp: ${timestamp}%0AName: ${encodeURIComponent(name)}%0APhone: ${encodeURIComponent(phone)}%0AEmail: ${encodeURIComponent(email)}%0AVehicle: ${encodeURIComponent(vehicle)}%0AService: ${encodeURIComponent(service)}%0ALocation: ${encodeURIComponent(mapLink)}%0ADate & Time: ${encodeURIComponent(date)} ${encodeURIComponent(time)}`;
+  window.open(`https://wa.me/447405937104?text=${waMessage}`,'_blank');
+
+  // Show popup
+  const popupDetails = document.getElementById('popupDetails');
+  popupDetails.innerHTML = `
+    <strong>Name:</strong> ${name}<br>
+    <strong>Phone:</strong> ${phone}<br>
+    <strong>Email:</strong> ${email}<br>
+    <strong>Vehicle:</strong> ${vehicle}<br>
+    <strong>Service:</strong> ${service}<br>
+    <strong>Address:</strong> ${address}<br>
+    <strong>Date & Time:</strong> ${date} ${time}<br>
+    <strong>Timestamp:</strong> ${timestamp}
+  `;
+  document.getElementById('confirmPopup').style.display='flex';
+  form.reset();
+  quickQuote.textContent="Total Quote: £0";
+  hoverPrice.textContent="Hover over a service to see total price";
+  formStartTime = Date.now(); // reset anti-spam timer
 });
 
-closePopup.addEventListener('click', () => {
-  thankYouPopup.style.display = 'none';
-});
+// Close popup
+function closePopup(){document.getElementById('confirmPopup').style.display='none';}
 </script>
-
 </body>
 </html>

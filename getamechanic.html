@@ -10,11 +10,11 @@ body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; padding:0; 
 .container { max-width:800px; margin:20px auto; padding:20px; }
 h1, h2 { color:#6f2dff; text-align:center; }
 .card { background:#fff; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:20px; margin:20px 0; }
-label { display:block; margin:10px 0 5px; }
-input, select, textarea { width:100%; padding:10px; border:1px solid #ccc; border-radius:5px; }
+label { display:block; margin:10px 0 5px; font-size:18px; font-weight:bold; }
+input, select, textarea { width:100%; padding:12px; font-size:16px; border:1px solid #ccc; border-radius:5px; }
 button { background:#6f2dff; color:#fff; border:none; padding:15px; font-size:16px; border-radius:5px; cursor:pointer; margin-top:10px; }
 button:hover { background:#5a24cc; }
-#quickQuote, #hoverPrice { font-weight:bold; margin-top:10px; color:#222; }
+#quickQuote, #hoverPrice { font-weight:bold; margin-top:10px; color:#222; font-size:16px; }
 .popup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; }
 .popup-content { background:#fff; padding:30px; border-radius:10px; max-width:400px; text-align:center; }
 </style>
@@ -113,8 +113,12 @@ const quickBook = document.getElementById('quickBook');
 const hoverPrice = document.getElementById('hoverPrice');
 const form = document.getElementById('bookingForm');
 
-// Timestamp for anti-spam
-let formStartTime = Date.now();
+// Limit date picker to today + 1 week
+const today = new Date();
+const maxDate = new Date();
+maxDate.setDate(today.getDate() + 7);
+quickDay.min = today.toISOString().split('T')[0];
+quickDay.max = maxDate.toISOString().split('T')[0];
 
 // Calculate total
 function calculateQuote() {
@@ -200,19 +204,17 @@ document.getElementById('getLocation').addEventListener('click', () => {
 });
 
 // Form Submission with Popup & WhatsApp + Anti-Spam
+let formStartTime = Date.now();
 form.addEventListener('submit',(e)=>{
   e.preventDefault();
 
-  // Honeypot check
   if(form.website.value){
     alert("Bot detected. Submission blocked.");
     return;
   }
 
-  // Timestamp anti-spam
   const now = Date.now();
-  const diffSeconds = (now - formStartTime) / 1000;
-  if(diffSeconds < 5){
+  if((now - formStartTime)/1000 < 5){
     alert("Form submitted too quickly. Please try again.");
     return;
   }
@@ -227,7 +229,7 @@ form.addEventListener('submit',(e)=>{
   const date = form.date.value;
   const time = form.time.value;
 
-  // WhatsApp message
+  // WhatsApp link
   let mapLink = address;
   if(address.startsWith("Lat:")){
     const coords = address.replace("Lat:","").split(",").map(s=>s.replace("Lon:","").trim());
@@ -255,10 +257,9 @@ form.addEventListener('submit',(e)=>{
   form.reset();
   quickQuote.textContent="Total Quote: £0";
   hoverPrice.textContent="Hover over a service to see total price";
-  formStartTime = Date.now(); // reset anti-spam timer
+  formStartTime = Date.now();
 });
 
-// Close popup
 function closePopup(){document.getElementById('confirmPopup').style.display='none';}
 </script>
 </body>

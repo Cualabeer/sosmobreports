@@ -1,244 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mechanics | Mobile Mechanic Medway | Emergency Car Repairs</title>
-<meta name="description" content="Book SOS Mechanics, your trusted mobile mechanic in Medway. Weekday, weekend, and out-of-hours service. Quick quote & WhatsApp booking. Emergency call-outs available.">
-<meta name="robots" content="index, follow">
-<meta name="keywords" content="Mobile Mechanic Medway, SOS Mechanics, Emergency Car Repair, Weekend Mechanic, Out-of-Hours Mechanic, Brake Repair, Battery Replacement">
-<link rel="canonical" href="https://www.sosmechanics.co.uk/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOS Mechanics | Medway Mobile Mechanic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #7a00ff; --whatsapp: #25D366; --bg: #f6f7fb; --white: #ffffff; }
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #111; overflow-x: hidden; }
+        .container { max-width: 900px; margin: auto; padding: 20px; }
+        
+        h1, h2 { text-align: center; margin-bottom: 5px; }
+        .subtext { text-align: center; color: #555; margin-bottom: 25px; font-size: 14px; }
 
-<!-- LocalBusiness Schema -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "AutoRepair",
-  "name": "SOS Mechanics",
-  "image": "https://www.sosmechanics.co.uk/logo.png",
-  "url": "https://www.sosmechanics.co.uk/",
-  "telephone": "+447405937104",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Changa, Medway",
-    "addressLocality": "Medway",
-    "postalCode": "ME7",
-    "addressCountry": "GB"
-  },
-  "priceRange": "£80–£600",
-  "areaServed": "Medway",
-  "openingHours": "Mo-Su 08:00-20:00"
-}
-</script>
+        /* Infinite-feeling horizontal scroll */
+        .cards { 
+            display: flex; 
+            gap: 16px; 
+            overflow-x: auto; 
+            padding: 10px 5px 25px; 
+            scroll-snap-type: x mandatory; 
+            scrollbar-width: none; /* Hide scrollbar Firefox */
+        }
+        .cards::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
 
-<style>
-body { font-family: Arial, sans-serif; background:#f5f5f5; color:#111; margin:0; padding:0; overflow-x:hidden; }
-.container { max-width:800px; margin:20px auto; padding:10px; }
-h1,h2{text-align:center;color:#6f2dff;}
-h2{font-weight:400;margin-bottom:10px; font-size: 1.2rem;}
-.card { background:#fff; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.1); padding:20px; margin:20px 0; transition: transform 0.3s ease;}
-.card:hover{transform: translateY(-4px);}
-label { display:block; margin:15px 0 5px; font-size:16px; font-weight:bold; }
-input, select, textarea { width:100%; padding:12px; font-size:16px; border:1px solid #ccc; border-radius:8px; box-sizing: border-box;}
-input:focus, select:focus{border-color:#6f2dff;outline:none;}
-button { background:#6f2dff; color:#fff; border:none; padding:14px; font-size:16px; border-radius:8px; cursor:pointer; width:100%; margin-top:10px; font-weight: bold;}
-button:hover{background:#5a24cc;}
-#quickQuote,#hoverPrice{font-weight:bold;margin-top:10px;color:#222;text-align: center;}
-.popup{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:999; padding: 20px;}
-.popup-content{background:#fff;padding:25px;border-radius:12px;max-width:450px;width:100%;text-align:center;}
-#carousel{display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:16px; padding-bottom:15px;}
-.carousel-card{flex:0 0 260px; background:#f9f9f9; border: 2px solid #eee; border-radius:12px; padding:15px; scroll-snap-align:start; cursor: pointer;}
-.carousel-card:hover{border-color: #6f2dff;}
-.premium-badge { color: #d4af37; font-weight: bold; font-size: 0.8rem; display: block; margin-top: 5px; }
-</style>
+        .card {
+            min-width: 240px; background: var(--white); border-radius: 18px; padding: 20px;
+            scroll-snap-align: center; box-shadow: 0 4px 15px rgba(0,0,0,.06);
+            border: 2px solid transparent; text-align: center; transition: 0.3s;
+        }
+        .card.selected { border-color: var(--primary); background: #f4eeff; transform: scale(1.02); }
+        .price { font-size: 24px; font-weight: 800; color: var(--primary); margin: 8px 0; }
+        .hours { font-size: 12px; color: #777; font-weight: 600; text-transform: uppercase; }
+        
+        form { background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,.05); }
+        input, select, button { width: 100%; padding: 14px; margin-top: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 16px; }
+        button { background: var(--primary); color: var(--white); border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.98); }
+
+        .gps-btn { background: #f0f0f0; color: #333; font-size: 14px; border: 1px dashed #bbb; }
+        
+        /* Modal */
+        #choiceModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .choice-box { background: white; padding: 30px; width: 100%; max-width: 400px; border-radius: 24px; text-align: center; }
+        .wa-btn { background: var(--whatsapp); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>SOS Mechanics</h1>
-  <h2>Mobile Mechanic Medway - Quick Quote & Booking</h2>
+    <h1>SOS Mechanics</h1>
+    <p class="subtext">£50/hr Labour + £50 Call-out. Medway & Surrounding.</p>
 
-  <!-- Service Selection -->
-  <div class="card">
-    <label for="vehicle">1. Enter Vehicle (Make/Model) *</label>
-    <input type="text" id="vehicle" placeholder="e.g. BMW 3 Series or Ford Transit" required>
-    
-    <label style="margin-top:20px;">2. Select Service</label>
-    <div id="carousel"></div>
-    <p id="hoverPrice">Tap a service to select</p>
-    <div style="background:#f0f0f0; padding:15px; border-radius:8px; margin-top:10px;">
-        <p id="quickQuote" style="font-size:1.2rem; margin:0;">Total Quote: £0</p>
+    <h2>1. Booking Slot</h2>
+    <div style="display: flex; gap: 10px;">
+        <input id="date" type="date">
+        <select id="time"></select>
     </div>
-    <button id="quickBook">Proceed to Booking</button>
-  </div>
 
-  <!-- Booking Form -->
-  <div class="card" id="bookingCard">
-    <form id="bookingForm">
-      <label for="name">Full Name *</label><input type="text" id="name" required>
-      <label for="phone">Phone Number *</label><input type="tel" id="phone" required>
-      <label for="email">Email</label><input type="email" id="email">
-      <label for="address">Service Location (Address or GPS) *</label>
-      <input type="text" id="address" placeholder="Enter street address" required>
-      <button type="button" id="getLocation" style="background:#444;">📍 Use My Current Location</button>
-      
-      <label for="service">Selected Service</label>
-      <input type="text" id="service" readonly style="background:#eee;">
-      
-      <label for="date">Preferred Date *</label><input type="date" id="date" required>
-      <label for="time">Preferred Time *</label>
-      <select id="time" required></select>
-      
-      <button type="submit" style="background:#25D366; margin-top:30px; font-size:1.2rem;">Confirm via WhatsApp</button>
+    <h2 style="margin-top:25px;">2. Most Requested Services</h2>
+    <p style="text-align: center; font-size: 12px; color: #999; margin-top: -10px;">(Swipe left/right to browse)</p>
+    <div class="cards" id="services"></div>
+
+    <form id="bookingForm" action="https://formspree.io/f/xaqdykza" method="POST">
+        <input type="hidden" name="Service" id="serviceField">
+        <input type="hidden" name="Price" id="priceField">
+        
+        <input required id="userName" name="Name" placeholder="Full Name">
+        <input required id="userPhone" name="Phone" type="tel" placeholder="Mobile Number">
+        <input required id="userVehicle" name="Vehicle" placeholder="Vehicle Make & Model">
+        <input id="location" name="Location" placeholder="GPS Link (Optional)" readonly>
+        <button type="button" class="gps-btn" onclick="getLocation()">📍 Tap to Share GPS Location</button>
+
+        <button type="submit" style="margin-top: 25px;">Confirm Booking</button>
     </form>
-  </div>
 </div>
 
-<!-- Popup -->
-<div class="popup" id="confirmPopup">
-  <div class="popup-content">
-    <h3 style="color:#6f2dff;">Booking Details Generated!</h3>
-    <div id="popupDetails" style="margin:20px 0;"></div>
-    <button onclick="closePopup()">Edit Details</button>
-  </div>
+<div id="choiceModal">
+    <div class="choice-box">
+        <h3>Booking Summary</h3>
+        <p id="summaryText" style="font-weight: bold; color: var(--primary);"></p>
+        <button class="wa-btn" onclick="handleBooking('whatsapp')"><i class="fab fa-whatsapp"></i> WhatsApp Booking (Fastest)</button>
+        <button style="background: #333;" onclick="handleBooking('form')">Submit Email Request</button>
+    </div>
 </div>
 
 <script>
-const callOut = 50;
-const premiumFee = 30;
-const weekendPercent = 0.2;
-const oohPercent = 0.35;
-const premiumBrands = ['mercedes', 'bmw', 'audi', 'vw', 'volkswagen', 'porsche', 'land rover', 'range rover', 'lexus', 'tesla', 'jaguar'];
+const myNumber = "447405937104";
+const HOURLY_RATE = 50;
+const CALLOUT_FEE = 50;
 
-const baseOptions = [
-  {name: "Diagnostic / Call-Out Fee", base: 85},
-  {name: "Full Service", base: 160},
-  {name: "Major Service (Vans)", base: 220},
-  {name: "Front Brake Pads", base: 80},
-  {name: "Rear Brake Pads", base: 80},
-  {name: "Front Brake Pads & Discs", base: 140},
-  {name: "Rear Brake Pads & Discs", base: 140},
-  {name: "Timing Belt (Cambelt)", base: 350},
-  {name: "Clutch Replacement", base: 450},
-  {name: "DPF Forced Regeneration", base: 95},
-  {name: "AdBlue System Reset", base: 85},
-  {name: "Battery Replacement & Coding", base: 75},
-  {name: "Air Con Regas", base: 90},
-  {name: "Emergency Non-Starter", base: 110}
+// Top 15 Most Requested Services + Custom
+const services = [
+    { name: "Front Brake Pads", hrs: 1.5 },
+    { name: "Rear Brake Pads", hrs: 1.5 },
+    { name: "Full Service", hrs: 3.0 },
+    { name: "Interim Service", hrs: 1.5 },
+    { name: "Battery Replacement", hrs: 0.8 },
+    { name: "Diagnostic Check", hrs: 1.0 },
+    { name: "Alternator Change", hrs: 2.5 },
+    { name: "Starter Motor", hrs: 2.0 },
+    { name: "Water Pump", hrs: 3.5 },
+    { name: "Brake Discs & Pads", hrs: 2.5 },
+    { name: "Oil & Filter Change", hrs: 1.0 },
+    { name: "Suspension Coil Spring", hrs: 1.5 },
+    { name: "Drive Belt / Aux Belt", hrs: 1.0 },
+    { name: "Spark Plug Refresh", hrs: 1.2 },
+    { name: "Pre-MOT Inspection", hrs: 1.5 },
+    { name: "Other Repair", hrs: 1.0 }
 ];
 
-const carousel = document.getElementById('carousel');
-const vehicleInput = document.getElementById('vehicle');
-const dateInput = document.getElementById('date');
-const timeSelect = document.getElementById('time');
-const serviceDisplay = document.getElementById('service');
-const quickQuote = document.getElementById('quickQuote');
+let selectedService = null;
+const dateInput = document.getElementById("date");
+const timeSelect = document.getElementById("time");
 
-// Set min date to today
 dateInput.min = new Date().toISOString().split("T")[0];
+dateInput.value = dateInput.min;
 
-function populateTimePicker(){
-  timeSelect.innerHTML = '';
-  for(let h=8; h<=20; h++){
-    const t = `${h.toString().padStart(2,'0')}:00`;
-    const opt = document.createElement('option');
-    opt.value = t; opt.textContent = t;
+for(let h=8; h<=20; h++) {
+    let opt = document.createElement("option");
+    opt.value = h; opt.text = h + ":00";
     timeSelect.appendChild(opt);
-  }
-}
-populateTimePicker();
-
-function calculateTotal(base) {
-  const vehicleName = vehicleInput.value.toLowerCase();
-  const dateVal = new Date(dateInput.value || new Date());
-  const day = dateVal.getDay();
-  const hour = parseInt(timeSelect.value.split(':')[0]);
-
-  let total = base + callOut;
-
-  // Add Premium Fee
-  if (premiumBrands.some(brand => vehicleName.includes(brand))) {
-    total += premiumFee;
-  }
-
-  // Surcharges
-  if (day === 6 || day === 0) total += base * weekendPercent;
-  else if (hour < 9 || hour > 17) total += base * oohPercent;
-
-  return total;
 }
 
-function populateCarousel(){
-  carousel.innerHTML = '';
-  const isPremium = premiumBrands.some(brand => vehicleInput.value.toLowerCase().includes(brand));
-  
-  baseOptions.forEach(opt => {
-    const total = calculateTotal(opt.base);
-    const card = document.createElement('div');
-    card.className = 'carousel-card';
-    card.innerHTML = `<strong>${opt.name}</strong><br>£${total.toFixed(2)}${isPremium ? '<span class="premium-badge">✨ High-End Brand Rate</span>' : ''}`;
-    
-    card.onclick = () => {
-      serviceDisplay.value = `${opt.name} - £${total.toFixed(2)}`;
-      quickQuote.textContent = `Total Quote: £${total.toFixed(2)}`;
-    };
-    carousel.appendChild(card);
-  });
+function calcTotal(hours) {
+    let total = (hours * HOURLY_RATE) + CALLOUT_FEE;
+    const d = new Date(dateInput.value);
+    const h = parseInt(timeSelect.value);
+    if(d.getDay() === 0 || d.getDay() === 6) total *= 1.2;
+    else if(h < 9 || h >= 17) total *= 1.35;
+    return total.toFixed(2);
 }
 
-vehicleInput.addEventListener('input', populateCarousel);
-dateInput.addEventListener('change', populateCarousel);
-timeSelect.addEventListener('change', populateCarousel);
-populateCarousel();
-
-document.getElementById('getLocation').onclick = () => {
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos => {
-      document.getElementById('address').value = `Lat: ${pos.coords.latitude.toFixed(6)}, Lon: ${pos.coords.longitude.toFixed(6)}`;
+function render() {
+    const container = document.getElementById("services");
+    container.innerHTML = "";
+    services.forEach((s, index) => {
+        const price = calcTotal(s.hrs);
+        const card = document.createElement("div");
+        card.className = `card ${selectedService?.name === s.name ? 'selected' : ''}`;
+        card.id = `svc-${index}`;
+        card.innerHTML = `
+            <div class="hours">${s.hrs} HR Est.</div>
+            <h3>${s.name}</h3>
+            <div class="price">£${price}</div>
+            <button type="button" onclick="select(${index})">
+                ${selectedService?.name === s.name ? 'Selected' : 'Select'}
+            </button>
+        `;
+        container.appendChild(card);
+        if(selectedService?.name === s.name) {
+            document.getElementById("serviceField").value = s.name;
+            document.getElementById("priceField").value = "£" + price;
+        }
     });
-  }
+}
+
+function select(index) {
+    selectedService = services[index];
+    render();
+}
+
+function getLocation() {
+    navigator.geolocation.getCurrentPosition(p => {
+        document.getElementById("location").value = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
+    });
+}
+
+document.getElementById("bookingForm").onsubmit = function(e) {
+    e.preventDefault();
+    if(!selectedService) return alert("Please select a service card first!");
+    document.getElementById("summaryText").innerText = `${selectedService.name} - ${document.getElementById("priceField").value}`;
+    document.getElementById("choiceModal").style.display = "flex";
 };
 
-document.getElementById('bookingForm').onsubmit = (e) => {
-  e.preventDefault();
-  const f = e.target;
-  const d = new Date(f.date.value);
-  const formattedDate = d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+function handleBooking(type) {
+    const name = document.getElementById("userName").value;
+    const vehicle = document.getElementById("userVehicle").value;
+    const svc = document.getElementById("serviceField").value;
+    const price = document.getElementById("priceField").value;
+    const date = dateInput.value;
+    const time = timeSelect.value + ":00";
+    const loc = document.getElementById("location").value || "No GPS provided";
 
-  let mapsUrl = "";
-  if (f.address.value.includes("Lat:")) {
-      const coords = f.address.value.match(/[-+]?[0-9]*\.?[0-9]+/g);
-      mapsUrl = `https://www.google.com/maps?q=${coords[0]},${coords[1]}`;
-  } else {
-      mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(f.address.value)}`;
-  }
+    const msg = `Hi SOS Mechanics! %0A%0A*New Booking Request*%0A*Name:* ${name}%0A*Vehicle:* ${vehicle}%0A*Service:* ${svc}%0A*Price:* ${price}%0A*Date:* ${date} at ${time}%0A*Location:* ${loc}`;
 
-  const msg = `*NEW SOS BOOKING*%0A` +
-    `--------------------------%0A` +
-    `*Service Date:* ${encodeURIComponent(formattedDate)}%0A` +
-    `*Service Time:* ${encodeURIComponent(f.time.value)}%0A` +
-    `--------------------------%0A` +
-    `*Customer:* ${encodeURIComponent(name.value)}%0A` +
-    `*Phone:* ${encodeURIComponent(phone.value)}%0A` +
-    `*Vehicle:* ${encodeURIComponent(vehicle.value)}%0A` +
-    `*Service:* ${encodeURIComponent(service.value)}%0A` +
-    `*Location Link:* ${mapsUrl}`;
+    if(type === 'whatsapp') {
+        window.open(`https://wa.me/${myNumber}?text=${msg}`, '_blank');
+        document.getElementById("choiceModal").style.display = "none";
+    } else {
+        document.getElementById("bookingForm").submit();
+    }
+}
 
-  window.open(`https://wa.me/447405937104?text=${msg}`, '_blank');
-
-  document.getElementById('popupDetails').innerHTML = `
-    <div style="text-align:left; border: 1px solid #eee; padding: 15px; border-radius: 8px;">
-      <strong>Scheduled:</strong> ${formattedDate}<br>
-      <strong>Time:</strong> ${f.time.value}<br><hr>
-      <strong>Vehicle:</strong> ${vehicle.value}<br>
-      <strong>Service:</strong> ${service.value}<br>
-      <strong>Location:</strong> ${f.address.value}
-    </div>`;
-  document.getElementById('confirmPopup').style.display = 'flex';
-};
-
-function closePopup(){ document.getElementById('confirmPopup').style.display='none'; }
-document.getElementById('quickBook').onclick = () => document.getElementById('bookingCard').scrollIntoView({behavior:'smooth'});
+dateInput.onchange = timeSelect.onchange = render;
+render();
 </script>
 
 </body>

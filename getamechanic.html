@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOS Mechanics – Mobile Mechanic Medway, Kent | Car Repair at Home</title>
+<meta name="description" content="SOS Mechanics offers fast, pre-booked mobile car repair in Medway, Kent. Brakes, battery, oil, suspension & diagnostics at your location. Book now!">
+<meta name="keywords" content="mobile mechanic Medway, car repair at home, SOS Mechanics, brake replacement Medway, battery replacement Medway, BMW repair Medway">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoRepair",
+  "name": "SOS Mechanics",
+  "image": "https://yourwebsite.com/logo.png",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Mobile service – location varies",
+    "addressLocality": "Medway",
+    "addressRegion": "Kent",
+    "postalCode": "",
+    "addressCountry": "UK"
+  },
+  "telephone": "+447405937104",
+  "priceRange": "££",
+  "url": "https://yourwebsite.com",
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 51.38,
+    "longitude": 0.52
+  },
+  "areaServed": {
+    "@type": "Place",
+    "name": "Medway, Kent"
+  }
+}
+</script>
+
+<style>
+body {font-family: Arial, sans-serif; margin:0; background:#f5f5f5; color:#333;}
+a {text-decoration:none;}
+h1,h2,h3 {color:#b400ff;}
+.container {max-width:900px; margin:auto; padding:20px;}
+.card {background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:30px; margin-bottom:30px;}
+label {display:block; margin:10px 0 5px;}
+input, select, textarea {width:100%; padding:10px; border-radius:5px; border:1px solid #ccc; margin-bottom:10px;}
+button {background:#b400ff; color:#fff; font-size:1.1em; padding:15px; border:none; border-radius:8px; cursor:pointer; transition:0.2s;}
+button:hover {background:#8e00cc;}
+.whatsapp-btn {display:block; text-align:center; margin:20px 0; padding:15px; font-weight:bold; background:#b400ff; border-radius:8px; color:#fff;}
+.legal {font-size:0.85em; color:#666; margin-top:10px;}
+.gps-container {display:flex; gap:10px;}
+.gps-container button {flex:none; padding:10px;}
+#thankYouPopup {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center;}
+#thankYouPopup div {background:#fff; padding:30px; border-radius:12px; max-width:500px; width:90%; text-align:left; position:relative;}
+#thankYouPopup button {margin-top:20px; background:#b400ff; color:#fff; padding:12px 20px; border:none; border-radius:8px; cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Hero / Info Card -->
+  <div class="card">
+    <h1>SOS Mechanics – Mobile Car Service</h1>
+    <p>Pre-booked appointments only. Weekday & weekend emergency slots available. Fully equipped mobile van arrives at your location in Medway, Kent.</p>
+    <p>📞 Call or WhatsApp: <strong>07405 937104</strong></p>
+  </div>
+
+  <!-- Booking Form Card -->
+  <div class="card">
+    <h2>Book Your Job</h2>
+    <form id="bookingForm" action="https://formspree.io/f/xaqdykza" method="POST">
+      <input type="text" name="website" style="display:none">
+      <input type="hidden" name="_subject" value="New SOS Booking">
+      <input type="hidden" name="_cc" value="mobile@sosmechanics.co.uk">
+
+      <label for="name">Full Name *</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="phone">Phone Number *</label>
+      <input type="tel" id="phone" name="phone" required>
+
+      <label for="email">Email *</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="vehicle">Vehicle Make/Model/Year *</label>
+      <input type="text" id="vehicle" name="vehicle" required>
+
+      <label for="service">Service Required *</label>
+      <select id="service" name="service" required>
+        <option value="">Select a service</option>
+        <option value="Brakes">Brakes</option>
+        <option value="Battery">Battery Replacement</option>
+        <option value="Oil">Oil & Filter</option>
+        <option value="Suspension">Suspension Jobs</option>
+        <option value="Diagnostics">Diagnostics</option>
+      </select>
+
+      <label for="address">Address (or GPS coordinates) *</label>
+      <div class="gps-container">
+        <input type="text" id="address" name="address" required style="flex:1;">
+        <button type="button" id="gpsBtn">📍 Use My Location</button>
+      </div>
+
+      <label for="date">Preferred Date *</label>
+      <input type="date" id="date" name="date" required>
+
+      <label for="time">Preferred Time *</label>
+      <input type="time" id="time" name="time" required>
+
+      <button type="submit">Submit Booking</button>
+
+      <div class="legal">
+        ⚠️ All bookings must be pre-scheduled. Jobs performed without confirmation are not guaranteed. By booking, you agree to the appointment date, time, service scope, and quoted labour price. Cancellations within 24 hours may incur a charge.
+      </div>
+    </form>
+  </div>
+
+  <!-- WhatsApp CTA Card -->
+  <div class="card">
+    <h2>Fast WhatsApp Booking</h2>
+    <a class="whatsapp-btn" id="whatsappBtn" target="_blank">Book via WhatsApp</a>
+  </div>
+
+</div>
+
+<!-- Thank You Popup -->
+<div id="thankYouPopup">
+  <div>
+    <h2>Thank You! ✅</h2>
+    <p>Your booking has been submitted successfully. Here are your details:</p>
+    <ul id="bookingDetails" style="list-style:none; padding:0;"></ul>
+    <button id="closePopup">Close</button>
+  </div>
+</div>
+
+<script>
+const form = document.getElementById('bookingForm');
+const whatsappBtn = document.getElementById('whatsappBtn');
+const gpsBtn = document.getElementById('gpsBtn');
+const addressInput = document.getElementById('address');
+const thankYouPopup = document.getElementById('thankYouPopup');
+const bookingDetails = document.getElementById('bookingDetails');
+const closePopup = document.getElementById('closePopup');
+
+let lastSubmission = 0;
+
+gpsBtn.addEventListener('click', () => {
+  if(navigator.geolocation){
+    gpsBtn.textContent = "Locating...";
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude.toFixed(6);
+        const lon = position.coords.longitude.toFixed(6);
+        addressInput.value = `Lat: ${lat}, Lon: ${lon}`;
+        gpsBtn.textContent = "📍 Use My Location";
+      },
+      () => { alert("Unable to get location."); gpsBtn.textContent = "📍 Use My Location"; },
+      {enableHighAccuracy:true, timeout:10000}
+    );
+  } else { alert("Geolocation not supported."); }
+});
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  if(form.website.value) return; // Honeypot
+
+  const now = new Date().toISOString();
+  if(new Date().getTime() - lastSubmission < 30000){ alert("Please wait 30 seconds."); return; }
+  lastSubmission = new Date().getTime();
+
+  const name = form.name.value;
+  const phone = form.phone.value;
+  const email = form.email.value;
+  const vehicle = form.vehicle.value;
+  const service = form.service.value;
+  const address = form.address.value;
+  const date = form.date.value;
+  const time = form.time.value;
+  const timestamp = now;
+
+  // WhatsApp pre-fill
+  const waMessage = `Hello SOS Mechanics,%0ATimestamp: ${timestamp}%0AName: ${encodeURIComponent(name)}%0APhone: ${encodeURIComponent(phone)}%0AEmail: ${encodeURIComponent(email)}%0AVehicle: ${encodeURIComponent(vehicle)}%0AService: ${encodeURIComponent(service)}%0AAddress: ${encodeURIComponent(address)}%0APreferred Date & Time: ${encodeURIComponent(date)} ${encodeURIComponent(time)}`;
+  whatsappBtn.href = `https://wa.me/447405937104?text=${waMessage}`;
+
+  // Send to Formspree
+  fetch(form.action, {
+    method: 'POST',
+    body: new FormData(form),
+    headers: { 'Accept': 'application/json' }
+  }).then(response => {
+    bookingDetails.innerHTML = `
+      <li><strong>Name:</strong> ${name}</li>
+      <li><strong>Phone:</strong> ${phone}</li>
+      <li><strong>Email:</strong> ${email}</li>
+      <li><strong>Vehicle:</strong> ${vehicle}</li>
+      <li><strong>Service:</strong> ${service}</li>
+      <li><strong>Address:</strong> ${address}</li>
+      <li><strong>Date & Time:</strong> ${date} ${time}</li>
+    `;
+    thankYouPopup.style.display = 'flex';
+    form.reset();
+  }).catch(error => {
+    alert("There was an error submitting your booking. Please try again.");
+    console.error(error);
+  });
+});
+
+closePopup.addEventListener('click', () => {
+  thankYouPopup.style.display = 'none';
+});
+</script>
+
+</body>
+</html>

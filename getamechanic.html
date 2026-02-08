@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- 1. 🚀 MASTER SEO BLOCK (STAYS HERE) -->
+    <!-- 🚀 1. MASTER SEO BLOCK -->
     <title>SOS Mechanics | Mobile Mechanic Medway | £50 Diag & Fixed Labour</title>
-    <meta name="description" content="Medway's #1 Labour-Only Mobile Mechanic. £50 Call-out & Diag. Professional car repairs at £50/hr labour. You supply the parts, we fit them in Chatham, Gillingham, Rochester.">
-    <meta name="keywords" content="mobile mechanic medway, car repairs gillingham, chatham mechanic, fit my own car parts kent">
+    <meta name="description" content="Medway's #1 Labour-Only Mobile Mechanic. £50 Call-out & Diag. Professional car repairs at £50/hr labour. You supply parts, we fit them in Chatham, Gillingham, Rochester.">
+    <meta name="keywords" content="mobile mechanic medway, car repairs gillingham, chatham mechanic, fit my own car parts kent, SOS Mechanics">
     
     <!-- Local SEO Geo Tags -->
     <meta name="geo.region" content="GB-KEN">
@@ -15,7 +15,7 @@
     <meta name="geo.position" content="51.388;-0.539">
     <meta name="ICBM" content="51.388, -0.539">
 
-    <!-- 2. 🤖 GOOGLE SCHEMA (Rich Results) -->
+    <!-- 🤖 2. GOOGLE SCHEMA (Rich Results for Local Business) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -41,71 +41,102 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; color: #111; line-height: 1.4; }
         
-        .header { background: #111; color: white; padding: 15px; text-align: center; }
-        .container { max-width: 600px; margin: auto; padding: 15px; }
+        .header { background: #111; color: white; padding: 15px; text-align: center; font-weight: bold; }
+        .container { max-width: 600px; margin: auto; padding: 15px; padding-bottom: 50px; }
         h1 { color: var(--primary); margin: 10px 0; font-size: 28px; text-align: center; }
         
         /* Service Carousel */
-        .section-header { font-weight: 800; font-size: 18px; margin: 20px 0 10px; }
+        .section-header { font-weight: 800; font-size: 18px; margin: 20px 0 10px; display: flex; justify-content: space-between; align-items: center; }
         .carousel { display: flex; gap: 12px; overflow-x: auto; padding: 10px 5px 25px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .carousel::-webkit-scrollbar { display: none; }
+        
         .card { 
             min-width: 250px; background: white; padding: 20px; border-radius: 20px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 2px solid transparent; 
-            scroll-snap-align: center; transition: 0.3s;
+            scroll-snap-align: center; transition: 0.3s; cursor: pointer;
         }
         .card.selected { border-color: var(--primary); background: #f4eeff; transform: translateY(-3px); }
         .tag { font-size: 10px; font-weight: bold; background: #eee; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
         .price { font-size: 32px; font-weight: 800; color: var(--primary); margin: 10px 0; }
 
-        /* Form */
+        /* Booking Form */
         .booking-form { background: white; padding: 25px; border-radius: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        input, select, .main-btn { width: 100%; padding: 15px; margin-top: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 16px; }
-        .main-btn { background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; }
-        .select-btn { width: 100%; padding: 10px; border-radius: 10px; border: none; background: #eee; font-weight: 600; cursor: pointer; }
-        .selected .select-btn { background: var(--primary); color: white; }
+        .input-group { margin-bottom: 15px; }
+        label { font-size: 12px; font-weight: 700; color: #666; text-transform: uppercase; margin-left: 5px; }
+        input, select, .main-btn { width: 100%; padding: 14px; margin-top: 5px; border-radius: 12px; border: 1px solid #ddd; font-size: 16px; outline: none; }
+        
+        .main-btn { background: var(--primary); color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 20px; font-size: 18px; }
+        .premium-alert { display: none; background: #fff3cd; color: #856404; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600; margin-top: 10px; border: 1px solid #ffeeba; }
 
         /* Modal */
         #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         .modal-box { background: white; padding: 30px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; }
         .summary { text-align: left; background: #f9f9f9; padding: 15px; border-radius: 15px; margin: 20px 0; font-size: 14px; border: 1px solid #eee; }
-        .wa-btn { background: var(--whatsapp); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; border-radius: 12px; font-weight: 700; }
+        .wa-btn { background: var(--whatsapp); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 12px; font-weight: 700; }
     </style>
 </head>
 <body>
 
-<div class="header">🛠️ MEDWAY'S LABOUR-ONLY MOBILE MECHANIC</div>
+<div class="header">🛠️ SOS MECHANICS | MEDWAY MOBILE SERVICE</div>
 
 <div class="container">
     <h1>SOS Mechanics</h1>
-    <p style="text-align: center; color: #666;">Professional tools. Expert fitment. <strong>You supply the parts.</strong></p>
+    <p style="text-align: center; color: #666; margin-top:-5px;">Professional Labour-Only Repairs.</p>
 
     <div class="section-header">1. Select Service</div>
     <div class="carousel" id="carousel"></div>
 
     <div class="booking-form">
-        <div class="section-header">2. Booking Details</div>
-        <div style="display: flex; gap: 10px;">
-            <input type="date" id="date" required onchange="renderCards()">
-            <select id="time" required></select>
+        <div class="section-header">2. Customer Info</div>
+        <div class="input-group">
+            <label>Name</label>
+            <input id="name" type="text" placeholder="Your Name" required>
         </div>
-        <input id="name" placeholder="Your Full Name" required>
-        <input id="vehicle" placeholder="Vehicle Reg / Make & Model" required>
-        <button type="button" onclick="getGPS()" style="background:#f0f0f0; color:#444; border:1px dashed #ccc; font-size:12px;">📍 Tap to Share GPS Location</button>
+        <div class="input-group">
+            <label>Phone Number</label>
+            <input id="tel" type="tel" placeholder="Mobile Number" required>
+        </div>
+
+        <div class="section-header">3. Vehicle Details</div>
+        <div style="display: flex; gap: 10px;">
+            <div class="input-group" style="flex: 1;">
+                <label>Reg</label>
+                <input id="reg" type="text" placeholder="AB12 CDE" style="text-transform: uppercase;">
+            </div>
+            <div class="input-group" style="flex: 2;">
+                <label>Make & Model</label>
+                <input id="vehicle" type="text" placeholder="e.g. Audi A3" oninput="checkPremium()">
+            </div>
+        </div>
+
+        <div id="premiumNote" class="premium-alert">
+            ✨ Premium Brand Fee (£20) added for specialist tool requirements.
+        </div>
+
+        <div class="section-header">4. Date & Time</div>
+        <div style="display: flex; gap: 10px;">
+            <input type="date" id="date" onchange="renderCards()">
+            <select id="time"></select>
+        </div>
+
+        <button type="button" onclick="getGPS()" style="background:none; border:none; color:var(--primary); font-size:12px; margin-top:15px; cursor:pointer;">
+            📍 Tap to Share GPS Location
+        </button>
         <input type="hidden" id="gps">
-        <button class="main-btn" onclick="showSummary()">Confirm & Generate Quote</button>
+
+        <button class="main-btn" onclick="showSummary()">Confirm & WhatsApp Quote</button>
     </div>
 
-    <!-- SEO FOOTER FOR GOOGLE -->
-    <div style="margin-top:40px; font-size:12px; color:#999; border-top:1px solid #ddd; padding-top:20px;">
+    <!-- 📜 SEO FOOTER -->
+    <footer style="margin-top:40px; font-size:12px; color:#999; border-top:1px solid #ddd; padding-top:20px;">
         <h3>Mobile Car Repairs Medway</h3>
-        <p>Providing professional mobile mechanic services in Chatham, Gillingham, Rochester, and Strood. We specialize in labour-only repairs including brake pads, alternators, and diagnostics.</p>
-    </div>
+        <p>Expert mobile mechanic services in Chatham, Gillingham, Rochester, and Strood. Specialized in labour-only repairs: brakes, alternators, and diagnostics for all makes including Audi, BMW, and Mercedes.</p>
+    </footer>
 </div>
 
 <div id="modal">
     <div class="modal-box">
-        <h2 style="margin:0;">Booking Summary</h2>
+        <h2 style="margin:0;">Job Summary</h2>
         <div id="summary" class="summary"></div>
         <a id="waLink" href="#" class="wa-btn">
             <i class="fab fa-whatsapp"></i> Send to Mechanic
@@ -115,6 +146,9 @@
 </div>
 
 <script>
+const MY_PHONE = "447405937104";
+const PREMIUM_FEE = 20;
+
 const services = [
     { name: "Fault Diagnostics", hrs: 1, type: "Diag" },
     { name: "Front Brake Pads", hrs: 1.5, type: "Repair" },
@@ -123,32 +157,41 @@ const services = [
     { name: "Alternator Fitment", hrs: 2.5, type: "Repair" },
     { name: "Starter Motor", hrs: 2, type: "Repair" },
     { name: "Full Service (Labour)", hrs: 2.5, type: "Repair" },
-    { name: "Oil & Filter Change", hrs: 1, type: "Repair" },
-    { name: "Water Pump Fit", hrs: 3.5, type: "Repair" },
-    { name: "Battery Replacement", hrs: 1, type: "Repair" }
+    { name: "Oil & Filter Change", hrs: 1, type: "Repair" }
 ];
 
 let selectedIdx = null;
-const dateEl = document.getElementById('date');
-const timeEl = document.getElementById('time');
 
-// Set Min Date & Times
-dateEl.min = new Date().toISOString().split("T")[0];
-dateEl.value = dateEl.min;
+// Setup inputs
+const dateInput = document.getElementById('date');
+dateInput.min = new Date().toISOString().split("T")[0];
+dateInput.value = dateInput.min;
+
+const timeSelect = document.getElementById('time');
 for(let i=8; i<=19; i++) {
     let opt = document.createElement('option');
     opt.value = i+":00"; opt.text = i+":00";
-    timeEl.appendChild(opt);
+    timeSelect.appendChild(opt);
+}
+
+function checkPremium() {
+    const val = document.getElementById('vehicle').value.toLowerCase();
+    const isPremium = val.includes("bmw") || val.includes("mercedes") || val.includes("audi") || val.includes("merc");
+    document.getElementById('premiumNote').style.display = isPremium ? 'block' : 'none';
+    renderCards();
 }
 
 function renderCards() {
     const list = document.getElementById('carousel');
     list.innerHTML = '';
-    const isWeekend = [0, 6].includes(new Date(dateEl.value).getDay());
+    const isWeekend = [0, 6].includes(new Date(dateInput.value).getDay());
+    const val = document.getElementById('vehicle').value.toLowerCase();
+    const isPremium = val.includes("bmw") || val.includes("mercedes") || val.includes("audi") || val.includes("merc");
 
     services.forEach((s, i) => {
         let price = s.hrs * 50;
         if(isWeekend) price *= 1.2;
+        if(isPremium) price += PREMIUM_FEE;
 
         const div = document.createElement('div');
         div.className = `card ${selectedIdx === i ? 'selected' : ''}`;
@@ -157,7 +200,7 @@ function renderCards() {
             <span class="tag">${s.type}</span>
             <div style="font-weight:700; height:45px; margin-top:10px;">${s.name}</div>
             <div class="price">£${price.toFixed(2)}</div>
-            <button class="select-btn">${selectedIdx === i ? 'SELECTED' : 'SELECT'}</button>
+            <div style="font-size:11px; color:#888;">${selectedIdx === i ? '✓ SELECTED' : 'Tap to select'}</div>
         `;
         list.appendChild(div);
     });
@@ -166,37 +209,47 @@ function renderCards() {
 function getGPS() {
     navigator.geolocation.getCurrentPosition(p => {
         document.getElementById('gps').value = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-        alert("Location attached!");
+        alert("GPS Location attached!");
     });
 }
 
 function showSummary() {
-    if(selectedIdx === null) return alert("Select a service first!");
+    const name = document.getElementById('name').value;
+    const tel = document.getElementById('tel').value;
+    const vehicle = document.getElementById('vehicle').value;
+    const reg = document.getElementById('reg').value;
+
+    if(selectedIdx === null || !name || !tel || !vehicle) return alert("Fill in all details and select a service!");
+
     const s = services[selectedIdx];
-    const isWeekend = [0, 6].includes(new Date(dateEl.value).getDay());
-    const finalPrice = (s.hrs * 50 * (isWeekend ? 1.2 : 1)).toFixed(2);
+    const isWeekend = [0, 6].includes(new Date(dateInput.value).getDay());
+    const isPremium = vehicle.toLowerCase().includes("bmw") || vehicle.toLowerCase().includes("mercedes") || vehicle.toLowerCase().includes("audi") || vehicle.toLowerCase().includes("merc");
     
+    let finalPrice = s.hrs * 50;
+    if(isWeekend) finalPrice *= 1.2;
+    if(isPremium) finalPrice += PREMIUM_FEE;
+
     document.getElementById('summary').innerHTML = `
         <strong>Service:</strong> ${s.name}<br>
-        <strong>Quote:</strong> £${finalPrice} (Labour Only)<br>
-        <strong>When:</strong> ${dateEl.value} @ ${timeEl.value}<br>
-        <strong>Vehicle:</strong> ${document.getElementById('vehicle').value}
+        <strong>Total Labour:</strong> £${finalPrice.toFixed(2)}<br>
+        <strong>Vehicle:</strong> ${vehicle} (${reg.toUpperCase()})<br>
+        <strong>Customer:</strong> ${name}<br>
+        <strong>Time:</strong> ${dateInput.value} @ ${timeSelect.value}
     `;
 
-    const text = `*NEW BOOKING: SOS MECHANICS*%0A%0A` +
+    const text = `*NEW JOB: SOS MECHANICS*%0A%0A` +
                  `*Service:* ${s.name}%0A` +
-                 `*Quote:* £${finalPrice}%0A` +
-                 `*Date/Time:* ${dateEl.value} @ ${timeEl.value}%0A` +
-                 `*Vehicle:* ${document.getElementById('vehicle').value}%0A` +
-                 `*Customer:* ${document.getElementById('name').value}%0A` +
-                 `*GPS:* ${document.getElementById('gps').value || 'Not provided'}`;
+                 `*Quote:* £${finalPrice.toFixed(2)}%0A` +
+                 `*Vehicle:* ${vehicle} (${reg.toUpperCase()})%0A` +
+                 `*Name:* ${name}%0A` +
+                 `*Tel:* ${tel}%0A` +
+                 `*GPS:* ${document.getElementById('gps').value || 'None'}`;
 
-    document.getElementById('waLink').href = `https://wa.me/447405937104?text=${text}`;
+    document.getElementById('waLink').href = `https://wa.me/${MY_PHONE}?text=${text}`;
     document.getElementById('modal').style.display = 'flex';
 }
 
 function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
 renderCards();
 </script>
 

@@ -112,11 +112,14 @@ const callOut=50;
 const weekendPercent=0.2;
 const oohPercent=0.35;
 const baseOptions=[
-  {name:"Front Brake Pads",base:80},
-  {name:"Rear Brake Pads",base:75},
-  {name:"Full Brake Replacement",base:150},
+  {name:"Front Brake Pads",base:50},
+  {name:"Rear Brake Pads",base:50},
+  {name:"Coolant leak test",base:45},
+  {name:"Front Brake Replacement",base:100},
+  {name:"Rear Brake Replacement",base:100},
   {name:"Battery Replacement",base:60},
   {name:"Oil & Filter",base:50},
+  {name:"Full Service",base:75},
   {name:"Suspension Job",base:120},
   {name:"Diagnostics",base:40}
 ];
@@ -204,7 +207,7 @@ form.addEventListener('submit',e=>{
     const coords=address.value.replace("Lat:","").split(",").map(s=>s.replace("Lon:","").trim());
     mapLink=`https://www.google.com/maps/search/?api=1&query=${coords[0]},${coords[1]}`;
   }
-  const waMessage=`Hello SOS Mechanics,%0ABooking Timestamp: ${timestamp}%0A%0ACustomer Details:%0AName: ${encodeURIComponent(name.value)}%0APhone: ${encodeURIComponent(phone.value)}%0AEmail: ${encodeURIComponent(email.value)}%0AVehicle: ${encodeURIComponent(vehicle.value)}%0A%0AService:%0A${encodeURIComponent(service.value)}%0A%0AService Date & Time:%0A${encodeURIComponent(date.value)} at ${encodeURIComponent(time.value)}%0A%0ALocation:%0A${encodeURIComponent(mapLink)}`;
+  const waMessage=`NEW QUOTE SOS Mechanics,%0ABooking Timestamp: ${timestamp}%0A%0ACustomer Details:%0AName: ${encodeURIComponent(name.value)}%0APhone: ${encodeURIComponent(phone.value)}%0AEmail: ${encodeURIComponent(email.value)}%0AVehicle: ${encodeURIComponent(vehicle.value)}%0A%0AService:%0A${encodeURIComponent(service.value)}%0A%0AService Date & Time:%0A${encodeURIComponent(date.value)} at ${encodeURIComponent(time.value)}%0A%0ALocation:%0A${encodeURIComponent(mapLink)}`;
   window.open(`https://wa.me/447405937104?text=${waMessage}`,'_blank');
   
   const popup=document.getElementById('confirmPopup');

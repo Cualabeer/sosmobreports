@@ -15,11 +15,9 @@
 
         .content { max-width: 1100px; margin: auto; padding: 20px; }
         
-        /* TRUST BAR */
         .trust-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 40px; }
         .trust-bar span { display: block; color: var(--neon); font-size: 1.8rem; font-weight: bold; }
 
-        /* COMPARISON TABLE */
         .comp-table { width: 100%; border-collapse: collapse; margin: 30px 0; background: rgba(255,255,255,0.03); border-radius: 10px; overflow: hidden; }
         .comp-table th, .comp-table td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .comp-table th { background: var(--purp); color: var(--neon); }
@@ -27,14 +25,12 @@
 
         .section-title { color: var(--neon); border-left: 5px solid var(--pink); padding-left: 15px; margin: 50px 0 20px; font-size: 1.8rem; }
         
-        /* SWIPE CARDS */
         .swipe-container { display: flex; overflow-x: auto; gap: 20px; padding: 10px 0; scrollbar-width: none; }
         .card { flex: 0 0 280px; background: var(--purp); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; }
         .price { font-size: 2rem; font-weight: bold; color: var(--neon); margin: 15px 0; }
         .add-btn { width: 100%; padding: 12px; border-radius: 30px; border: 2px solid var(--pink); background: none; color: white; font-weight: bold; cursor: pointer; }
         .add-btn.added { background: var(--pink); box-shadow: 0 0 15px var(--pink); }
 
-        /* BASKET & MODAL */
         .basket { position: fixed; bottom: 0; width: 100%; background: #000; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-top: 3px solid var(--pink); box-sizing: border-box; z-index: 999; }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; box-sizing: border-box; }
         .modal-content { background: var(--purp); padding: 30px; border-radius: 20px; width: 100%; max-width: 450px; border: 1px solid var(--neon); }
@@ -191,8 +187,12 @@
         const addr = document.getElementById('addr').value;
         const issue = document.getElementById('issue').value;
         if(!name || !reg || !addr) return alert("Fill in required fields.");
-        const msg = `🚨 *SOS BOOKING*\n\n*Name:* ${name}\n*Reg:* ${reg}\n*Address:* ${addr}\n\n*Services:* ${basket.join(", ")}\n*Total:* £${totalVal}\n*Details:* ${issue}`;
-        window.open(`https://wa.me/447405937104?text=${encodeURIComponent(msg)}`);
+        
+        const msg = `🚨 *NEW SOS BOOKING*\n\n*Name:* ${name}\n*Reg:* ${reg}\n*Address:* ${addr}\n\n*Services:* ${basket.join(", ")}\n*Total Estimate:* £${totalVal}\n\n*Details:* ${issue}`;
+        
+        // Dynamic WhatsApp Link using your number
+        const waLink = `https://wa.me/447405937104?text=${encodeURIComponent(msg)}`;
+        window.open(waLink, '_blank');
     }
 
     build();

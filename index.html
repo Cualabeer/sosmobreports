@@ -1,116 +1,241 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS Mechanics – Control Panel</title>
-
-<style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  background: #f6f7f8;
-  color: #111;
-}
-
-header {
-  background: #ffffff;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 2px solid #00e676;
-}
-
-header img {
-  height: 42px;
-}
-
-header h1 {
-  font-size: 1.1em;
-  margin: 0;
-  font-weight: 600;
-}
-
-.panel {
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  max-width: 560px;
-  margin: auto;
-}
-
-.tile {
-  padding: 22px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #00ff7f, #00e676);
-  color: #000;
-  font-size: 1.05em;
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-}
-
-.tile.secondary {
-  background: #ffffff;
-  color: #00b85c;
-  border: 2px solid #00e676;
-  box-shadow: none;
-}
-
-.tile span {
-  display: block;
-  font-size: 0.85em;
-  font-weight: 400;
-  margin-top: 6px;
-  opacity: 0.85;
-}
-
-.footer {
-  text-align: center;
-  font-size: 0.75em;
-  color: #777;
-  padding: 24px 10px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO: Medway/Kent Hyper-Local Optimization -->
+    <title>SOS Mechanics | #1 Emergency Mobile Mechanic Medway Kent | 2026 Rates</title>
+    <meta name="description" content="Leading mobile mechanic in Medway, Kent. 24/7 emergency car repairs in Gillingham, Chatham, Rochester & Rainham. Book 2026 mobile servicing at your door.">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0c0819; color: #ffffff; overflow-x: hidden; }
+        .airline-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+        .airline-card:hover { border-color: #9333ea; background: rgba(255, 255, 255, 0.05); }
+        .glass-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); color: white; transition: all 0.3s ease; }
+        .glass-input:focus { border-color: #9333ea; box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.3); outline: none; }
+        @keyframes pulse-purple { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .locating { animation: pulse-purple 1.5s infinite; }
+        @media print { .no-print { display: none; } body { background: white; color: black; } }
+    </style>
 </head>
 
-<body>
+<body x-data="{ 
+    step: 1, 
+    confirmed: false,
+    name: '',
+    reg: '', 
+    postcode: '', 
+    isLocating: false,
+    locStatus: 'Use Precise Location',
+    bookingRef: '',
+    timestamp: '',
+    cart: [],
+    
+    majorJobs: {
+        'Clutch Replacement': 895,
+        'Full Engine Service & MOT': 349,
+        'Gearbox Repair (Mobile)': 1200
+    },
+    smallerJobs: {
+        'Mobile Brake Overhaul': 420,
+        'Suspension Spring Replacement': 185,
+        'EV Priority Service': 210
+    },
+    minorJobs: {
+        'Emergency Diagnostics': 125,
+        'Battery Replacement': 95,
+        'Puncture Repair': 65
+    },
 
-<header>
-  <img src="assets/logo.png" alt="SOS Mechanics">
-  <h1>SOS Mechanics · Mobile Control Panel</h1>
-</header>
+    getAllServices() {
+        return { ...this.majorJobs, ...this.smallerJobs, ...this.minorJobs };
+    },
 
-<main class="panel">
+    getTotal() { 
+        let all = this.getAllServices();
+        return this.cart.reduce((sum, item) => sum + (all[item] || 0), 0); 
+    },
 
-  <a href="consent.html" class="tile">
-    Customer Consent
-    <span>Authorisation & liability agreement</span>
-  </a>
+    addToCart(item) { if (!this.cart.includes(item)) this.cart.push(item); },
+    removeItem(item) { this.cart = this.cart.filter(i => i !== item); },
+    
+    async getLocation() {
+        if (!navigator.geolocation) return;
+        this.isLocating = true;
+        this.locStatus = 'Locating...';
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+                const res = await fetch(`https://api.postcodes.io/postcodes?lon=${pos.coords.longitude}&lat=${pos.coords.latitude}`);
+                const data = await res.json();
+                if (data.result) this.postcode = data.result[0].postcode;
+                this.locStatus = 'Location Found';
+            } catch { this.locStatus = 'Error'; }
+            finally { this.isLocating = false; }
+        });
+    },
 
-  <a href="sos-report.html" class="tile">
-    Create SOSREPORT
-    <span>Diagnostics · Findings · Repairs</span>
-  </a>
+    confirmBooking() {
+        this.bookingRef = 'SOS-' + Math.random().toString(36).substr(2, 7).toUpperCase();
+        this.timestamp = new Date().toLocaleString('en-GB', { dateStyle: 'full', timeStyle: 'short' });
+        this.confirmed = true;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}" x-cloak>
 
-  <a href="photos.html" class="tile secondary">
-    Capture Vehicle Photos
-    <span>Evidence & condition records</span>
-  </a>
+    <header class="w-full bg-[#130d2b] border-b border-white/5 sticky top-0 z-50 no-print">
+        <nav class="max-w-6xl mx-auto px-6 flex justify-between items-center h-20">
+            <div class="text-xl font-black tracking-tighter uppercase">
+                <span class="text-purple-500 italic">SOS</span> Mechanics
+            </div>
+            <div class="text-[10px] font-bold text-purple-400 bg-purple-400/10 px-3 py-1 rounded-full border border-purple-400/20 uppercase">2026 Fleet</div>
+        </nav>
+    </header>
 
-  <a href="history.html" class="tile secondary">
-    Previous Reports
-    <span>Search past jobs & PDFs</span>
-  </a>
+    <main class="max-w-6xl mx-auto p-4 md:p-6 mt-4">
+        
+        <!-- STEP-BY-STEP FLOW -->
+        <div x-show="!confirmed" class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+            <div class="flex-1 space-y-10">
+                
+                <!-- STEP 1 -->
+                <section x-show="step === 1" class="airline-card rounded-3xl p-8">
+                    <h1 class="text-3xl font-extrabold mb-6 italic">Passenger Check-in</h1>
+                    <input type="text" x-model="name" placeholder="Full Name" class="glass-input w-full p-5 rounded-2xl text-xl font-semibold mb-6">
+                    <button @click="if(name) step = 2" class="w-full bg-purple-600 py-5 rounded-2xl font-black tracking-widest">CONTINUE</button>
+                </section>
 
-</main>
+                <!-- STEP 2 -->
+                <section x-show="step === 2" class="airline-card rounded-3xl p-8">
+                    <h2 class="text-3xl font-extrabold mb-6 italic">Vehicle Manifest</h2>
+                    <input type="text" x-model="reg" placeholder="ENTER REG" class="glass-input w-full text-center text-3xl font-black py-6 rounded-2xl uppercase mb-6 tracking-widest">
+                    <input type="text" x-model="postcode" placeholder="POSTCODE" class="glass-input w-full p-5 rounded-2xl mb-6">
+                    <div class="flex gap-4">
+                        <button @click="step = 1" class="flex-1 bg-white/5 py-5 rounded-2xl font-bold">Back</button>
+                        <button @click="if(reg && postcode) step = 3" class="flex-[2] bg-purple-600 py-5 rounded-2xl font-black">NEXT</button>
+                    </div>
+                </section>
 
-<div class="footer">
-  Professional mobile mechanic workflow · On-site use
-</div>
+                <!-- STEP 3: CATEGORIZED SERVICES -->
+                <section x-show="step === 3" class="space-y-10">
+                    <div>
+                        <h2 class="text-xs font-black text-purple-400 uppercase tracking-[0.3em] mb-4">Class I: Major Operations</h2>
+                        <div class="grid gap-3">
+                            <template x-for="(price, item) in majorJobs">
+                                <button @click="addToCart(item)" class="airline-card p-5 rounded-2xl flex justify-between items-center">
+                                    <span class="font-bold text-lg" x-text="item"></span>
+                                    <span class="text-xl font-black" x-text="'£' + price"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
 
-</body>
-</html>
+                    <div>
+                        <h2 class="text-xs font-black text-gray-400 uppercase tracking-[0.3em] mb-4">Class II: Smaller Jobs</h2>
+                        <div class="grid gap-3">
+                            <template x-for="(price, item) in smallerJobs">
+                                <button @click="addToCart(item)" class="airline-card p-4 rounded-xl flex justify-between items-center border-dashed">
+                                    <span class="font-semibold text-gray-200" x-text="item"></span>
+                                    <span class="font-bold" x-text="'£' + price"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-xs font-black text-gray-600 uppercase tracking-[0.3em] mb-4">Class III: Minor Jobs</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <template x-for="(price, item) in minorJobs">
+                                <button @click="addToCart(item)" class="airline-card p-3 rounded-lg flex justify-between items-center text-xs opacity-70 hover:opacity-100">
+                                    <span x-text="item"></span>
+                                    <span class="font-bold" x-text="'£' + price"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                    <button @click="step = 2" class="text-gray-500 font-bold text-[10px] uppercase">← Change Vehicle Details</button>
+                </section>
+            </div>
+
+            <!-- SIDEBAR -->
+            <aside class="w-full lg:w-96">
+                <div class="bg-white text-[#0c0819] rounded-3xl overflow-hidden shadow-2xl p-8 sticky top-28">
+                    <p class="text-[10px] font-black uppercase text-gray-400 mb-6">Live Itinerary</p>
+                    <div class="min-h-[60px] mb-6">
+                        <template x-for="s in cart">
+                            <div class="flex justify-between items-center mb-3 text-sm font-bold border-b border-gray-50 pb-2">
+                                <span x-text="s"></span>
+                                <button @click="removeItem(s)" class="text-red-500 text-[10px]">X</button>
+                            </div>
+                        </template>
+                    </div>
+                    <button @click="getLocation()" class="w-full mb-4 bg-gray-50 text-[10px] font-black py-4 rounded-xl uppercase tracking-widest" :class="isLocating ? 'locating' : ''" x-text="locStatus"></button>
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-xs font-bold uppercase text-gray-400">Total</span>
+                        <span class="text-3xl font-black" x-text="'£' + getTotal()"></span>
+                    </div>
+                    <button @click="confirmBooking()" class="w-full bg-black text-white font-black py-5 rounded-xl tracking-widest disabled:opacity-20 transition-transform active:scale-95" :disabled="!name || !reg || cart.length === 0">CONFIRM DEPLOYMENT</button>
+                </div>
+            </aside>
+        </div>
+
+        <!-- FINAL TICKET SUMMARY -->
+        <div x-show="confirmed" x-transition class="max-w-3xl mx-auto pb-12">
+            <div class="bg-white text-[#0c0819] rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100">
+                <div class="bg-purple-600 p-8 md:p-12 text-white flex flex-col md:flex-row justify-between items-start gap-8 md:gap-0">
+                    <div>
+                        <h1 class="text-3xl md:text-5xl font-black tracking-tighter mb-2 uppercase italic">Deployment Active</h1>
+                        <p class="text-purple-200 font-bold uppercase tracking-[0.2em] text-[10px]">SOS Mechanics Priority Fleet • Medway Unit</p>
+                    </div>
+                    <div class="text-left md:text-right w-full md:w-auto">
+                        <p class="text-[9px] font-black opacity-70 uppercase mb-2 tracking-widest">Booking Reference</p>
+                        <div class="inline-block transform -rotate-3 md:-rotate-12 bg-white/10 px-5 py-2 rounded-lg border border-white/30">
+                            <p class="font-mono font-bold text-sm md:text-lg text-white tracking-[0.3em]" x-text="bookingRef"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8 md:p-12 space-y-10">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-10 border-b border-gray-100">
+                        <div class="bg-gray-50 p-5 rounded-2xl">
+                            <p class="text-[9px] font-bold text-gray-400 uppercase mb-1">Passenger</p>
+                            <p class="font-black text-lg" x-text="name"></p>
+                        </div>
+                        <div class="bg-gray-50 p-5 rounded-2xl border-l-4 border-purple-500">
+                            <p class="text-[9px] font-bold text-gray-400 uppercase mb-1">Vehicle</p>
+                            <p class="font-black text-lg" x-text="reg"></p>
+                        </div>
+                        <div class="bg-gray-50 p-5 rounded-2xl">
+                            <p class="text-[9px] font-bold text-gray-400 uppercase mb-1">Medway Zone</p>
+                            <p class="font-black text-lg uppercase" x-text="postcode"></p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Manifest Details</p>
+                        <div class="space-y-4">
+                            <template x-for="item in cart">
+                                <div class="flex justify-between items-center text-sm md:text-base border-b border-gray-50 pb-3">
+                                    <span class="font-bold text-gray-800 uppercase italic text-xs md:text-sm" x-text="item"></span>
+                                    <span class="font-mono font-bold text-purple-600" x-text="'£' + getAllServices()[item]"></span>
+                                </div>
+                            </template>
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center pt-8 border-t-2 border-black mt-6 gap-4">
+                                <span class="font-black text-2xl italic uppercase block">Total Charge Paid</span>
+                                <span class="text-4xl md:text-5xl font-black text-purple-600" x-text="'£' + getTotal()"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#f8f9ff] rounded-[2rem] p-6 flex flex-col md:flex-row justify-between items-center gap-6 border border-purple-100">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Issued At</p>
+                            <p class="text-xs font-bold" x-text="timestamp"></p>
+                        </div>
+                        <p class="text-xs font-black text-green-600 flex items-center gap-2">
+                            <span class="relative flex h-2 w-2

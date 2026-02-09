@@ -7,106 +7,98 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         [x-cloak] { display: none !important; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #080511; color: #fff; scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #080511; color: #fff; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .ticket { background: white; color: #080511; border-radius: 2.5rem; position: relative; }
         .premium-btn { background: linear-gradient(135deg, #9333ea 0%, #c026d3 100%); transition: all 0.3s ease; }
-        .premium-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px #9333ea; }
         
-        /* Ticket Aesthetic */
-        .ticket { background: white; color: #080511; position: relative; border-radius: 2rem; }
-        .ticket-cutout { position: absolute; width: 30px; height: 30px; background: #080511; border-radius: 50%; top: 50%; transform: translateY(-50%); }
-        .cutout-l { left: -15px; }
-        .cutout-r { right: -15px; }
-        
-        @media print { .no-print { display: none !important; } .ticket { box-shadow: none !important; border: 1px solid #eee; } }
+        /* Pulse for location button */
+        .pulse-geo { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        @media print { .no-print { display: none !important; } }
     </style>
 </head>
 
 <body x-data="{ 
-    step: 1, confirmed: false, showAll: false,
+    step: 1, confirmed: false, showAll: false, locating: false,
     name: '', reg: '', postcode: '', cart: [],
     
     services: {
-        'Mechanical': {
-            'Clutch Replacement': 895,
-            'Cambelt & Water Pump': 450,
-            'Brake Pads & Discs': 260,
-            'Suspension Coil Spring': 185
-        },
-        'Maintenance': {
-            'Full Engine Service': 195,
-            'Interim Service': 95,
-            'MOT Pre-Inspection': 45,
-            'Air Con Regas': 75
-        },
-        'Diagnostics & Electrical': {
-            'Full Computer Diagnostic': 65,
-            'Battery Replacement': 110,
-            'Electrical Fault Find': 85,
-            'DPF Cleaning': 150
-        }
+        'Mechanical': { 'Clutch Replacement': 895, 'Cambelt & Water Pump': 450, 'Brake Pads & Discs': 260, 'Suspension Coil': 185 },
+        'Maintenance': { 'Full Engine Service': 195, 'Interim Service': 95, 'MOT Pre-Check': 45, 'Air Con Regas': 75 },
+        'Diagnostics': { 'Full Diagnostic': 65, 'Battery Swap': 110, 'Electrical Fault': 85, 'DPF Cleaning': 150 }
+    },
+
+    getLocation() {
+        this.locating = true;
+        if (!navigator.geolocation) { alert('Geolocation not supported'); this.locating = false; return; }
+        
+        navigator.geolocation.getCurrentPosition(pos => {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`)
+                .then(res => res.json())
+                .then(data => {
+                    this.postcode = data.address.postcode || 'ME1 1AA';
+                    this.locating = false;
+                }).catch(() => { this.postcode = 'ME1'; this.locating = false; });
+        }, () => { alert('Permission denied'); this.locating = false; });
     },
 
     getTotal() {
         let total = 0;
-        Object.values(this.services).forEach(cat => {
-            Object.entries(cat).forEach(([name, price]) => {
-                if (this.cart.includes(name)) total += price;
-            });
-        });
+        const all = Object.assign({}, ...Object.values(this.services));
+        this.cart.forEach(item => total += all[item]);
         return total;
-    },
-
-    toggleService(name) {
-        if (this.cart.includes(name)) this.cart = this.cart.filter(i => i !== name);
-        else this.cart.push(name);
     }
 }" x-cloak>
 
-    <!-- Navigation -->
     <nav class="max-w-5xl mx-auto px-6 py-8 flex justify-between items-center no-print">
-        <div class="text-2xl font-black tracking-tighter">SOS<span class="text-purple-500">.</span>MECHANICS</div>
-        <div class="text-[10px] font-bold bg-white/5 border border-white/10 px-4 py-2 rounded-full uppercase tracking-widest text-white/40">Medway Hub v2.0</div>
+        <div class="text-2xl font-black italic tracking-tighter">SOS<span class="text-purple-500">.</span></div>
+        <div class="text-[10px] font-bold text-white/30 tracking-[0.3em] uppercase">Priority Deployment</div>
     </nav>
 
     <main class="max-w-4xl mx-auto p-6">
         
-        <!-- STEP 1: Details & Selection -->
-        <div x-show="!confirmed" class="space-y-8">
-            <header class="text-center mb-12">
-                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tighter mb-4 italic">MOBILE <span class="text-purple-500">DEPLOYMENT</span></h1>
-                <p class="text-white/40 font-medium">Enter your details and select services to generate your ticket.</p>
-            </header>
-
-            <!-- Inputs -->
+        <!-- Booking View -->
+        <div x-show="!confirmed" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input x-model="name" type="text" placeholder="Full Name" class="glass p-5 rounded-2xl outline-none focus:border-purple-500 transition">
-                <input x-model="reg" type="text" placeholder="REGISTRATION" class="glass p-5 rounded-2xl outline-none focus:border-purple-500 transition text-center font-black uppercase tracking-widest">
-                <input x-model="postcode" type="text" placeholder="Postcode (ME)" class="glass p-5 rounded-2xl outline-none focus:border-purple-500 transition">
+                <input x-model="name" placeholder="Driver Name" class="glass p-5 rounded-2xl outline-none focus:border-purple-500">
+                <input x-model="reg" placeholder="VEHICLE REG" class="glass p-5 rounded-2xl outline-none focus:border-purple-500 text-center font-black uppercase tracking-widest">
+                
+                <!-- Location Field with Button -->
+                <div class="relative">
+                    <input x-model="postcode" placeholder="Postcode" class="glass p-5 pr-14 rounded-2xl w-full outline-none focus:border-purple-500 uppercase">
+                    <button @click="getLocation()" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 hover:bg-white/10 rounded-xl transition" :class="locating && 'pulse-geo'">
+                        <svg x-show="!locating" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <svg x-show="locating" class="animate-spin h-5 w-5 text-purple-500" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </button>
+                </div>
             </div>
 
-            <!-- Service Selection -->
-            <div class="glass rounded-[2rem] p-8">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-xl font-bold italic uppercase tracking-tight">Select Services</h2>
-                    <button @click="showAll = !showAll" class="text-xs font-black text-purple-400 uppercase tracking-widest" x-text="showAll ? 'Collapse' : 'View All Services'"></button>
+            <div class="glass rounded-[2.5rem] p-8 md:p-12">
+                <div class="flex justify-between items-center mb-10">
+                    <h2 class="text-xl font-extrabold uppercase italic tracking-tighter">Service Selection</h2>
+                    <button @click="showAll = !showAll" class="text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 border border-white/10 rounded-full hover:bg-white/5" x-text="showAll ? 'View Featured' : 'View Full List'"></button>
                 </div>
 
-                <div class="space-y-10">
+                <div class="space-y-8">
                     <template x-for="(items, category) in services">
                         <div x-show="showAll || category === 'Mechanical'">
-                            <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] mb-4" x-text="category"></p>
+                            <p class="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-4" x-text="category"></p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <template x-for="(price, item) in items">
-                                    <button @click="toggleService(item)" 
+                                    <button @click="cart.includes(item) ? cart = cart.filter(i => i!==item) : cart.push(item)"
                                             :class="cart.includes(item) ? 'bg-purple-600 border-purple-400' : 'bg-white/5 border-white/10'"
-                                            class="flex justify-between items-center p-4 rounded-xl border transition-all text-left">
-                                        <span class="font-bold text-sm" x-text="item"></span>
-                                        <span class="font-mono text-xs opacity-60" x-text="'£' + price"></span>
+                                            class="flex justify-between p-4 rounded-xl border text-sm font-bold transition-all">
+                                        <span x-text="item"></span>
+                                        <span class="opacity-50" x-text="'£'+price"></span>
                                     </button>
                                 </template>
                             </div>
@@ -115,88 +107,44 @@
                 </div>
 
                 <button @click="confirmed = true" :disabled="!name || !reg || cart.length === 0" 
-                        class="w-full mt-10 premium-btn py-6 rounded-2xl font-black tracking-widest uppercase disabled:opacity-20 shadow-xl">
-                    Generate Service Ticket
+                        class="w-full mt-12 premium-btn py-6 rounded-2xl font-black tracking-[0.2em] uppercase shadow-2xl disabled:opacity-20">
+                    Generate My Ticket
                 </button>
             </div>
         </div>
 
-        <!-- STEP 2: The Beautiful Ticket Summary -->
-        <div x-show="confirmed" x-transition class="max-w-2xl mx-auto pb-20">
-            <div class="ticket shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden">
-                <div class="ticket-cutout cutout-l"></div>
-                <div class="ticket-cutout cutout-r"></div>
-
-                <!-- Ticket Header -->
-                <div class="bg-black text-white p-10 md:p-14 relative overflow-hidden">
-                    <div class="relative z-10 flex justify-between items-start">
-                        <div>
-                            <p class="text-purple-500 text-[10px] font-black tracking-[0.4em] uppercase mb-4">Official Receipt</p>
-                            <h2 class="text-5xl font-black italic tracking-tighter leading-none uppercase">Service<br>Manifest</h2>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[9px] font-bold opacity-40 uppercase mb-1">ID Ref</p>
-                            <p class="font-mono font-bold text-xl" x-text="'#'+Math.random().toString(36).substr(2,5).toUpperCase()"></p>
-                        </div>
+        <!-- Summary View -->
+        <div x-show="confirmed" x-transition class="pb-20">
+            <div class="ticket shadow-[0_40px_80px_-15px_rgba(0,0,0,0.9)] overflow-hidden">
+                <div class="bg-black text-white p-12 relative overflow-hidden">
+                    <h2 class="text-6xl font-black italic tracking-tighter uppercase leading-none">Job<br><span class="text-purple-500">Receipt</span></h2>
+                    <div class="mt-8 flex gap-8 border-t border-white/10 pt-8">
+                        <div><p class="text-[8px] font-bold text-white/40 uppercase">Reg</p><p class="font-black text-xl" x-text="reg"></p></div>
+                        <div><p class="text-[8px] font-bold text-white/40 uppercase">Zone</p><p class="font-black text-xl uppercase" x-text="postcode"></p></div>
                     </div>
-                    <!-- Decorative Background Circle -->
-                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-purple-600/20 rounded-full blur-3xl"></div>
                 </div>
 
-                <!-- Ticket Body -->
-                <div class="p-10 md:p-14">
-                    <!-- User Info Bar -->
-                    <div class="flex flex-wrap gap-8 pb-10 border-b border-gray-100">
-                        <div>
-                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Passenger</p>
-                            <p class="font-bold text-lg leading-none" x-text="name"></p>
-                        </div>
-                        <div>
-                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Vehicle</p>
-                            <p class="font-black text-lg text-purple-600 leading-none" x-text="reg"></p>
-                        </div>
-                        <div>
-                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Medway Zone</p>
-                            <p class="font-bold text-lg leading-none uppercase" x-text="postcode"></p>
-                        </div>
-                    </div>
-
-                    <!-- Work Items -->
-                    <div class="py-10 space-y-4">
+                <div class="p-12">
+                    <div class="space-y-4 mb-12">
                         <template x-for="item in cart">
-                            <div class="flex justify-between items-center group">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
-                                    <span class="font-bold text-sm uppercase tracking-tight text-gray-700" x-text="item"></span>
-                                </div>
-                                <div class="flex-grow border-b border-dotted border-gray-200 mx-4"></div>
-                                <span class="font-mono font-bold text-gray-900" x-text="'£' + (Object.assign({}, ...Object.values(services))[item])"></span>
+                            <div class="flex justify-between font-bold text-gray-800 uppercase text-xs">
+                                <span x-text="item"></span>
+                                <span class="font-mono" x-text="'£' + (Object.assign({}, ...Object.values(services))[item])"></span>
                             </div>
                         </template>
                     </div>
 
-                    <!-- Total Block -->
                     <div class="bg-gray-50 rounded-3xl p-8 flex justify-between items-center">
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Grand Total</p>
-                            <p class="text-xs text-gray-400">Mobile Unit Call-out Included</p>
-                        </div>
-                        <div class="text-5xl font-black tracking-tighter text-purple-600" x-text="'£' + getTotal()"></div>
+                        <div><p class="text-[9px] font-black text-gray-400 uppercase">Total Estimate</p><p class="text-xs text-gray-400 italic">SOS Mobile Support 2026</p></div>
+                        <div class="text-5xl font-black text-purple-600 tracking-tighter" x-text="'£' + getTotal()"></div>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="mt-12 flex flex-col md:flex-row gap-4 no-print">
-                        <button onclick="window.print()" class="flex-1 bg-black text-white font-black py-5 rounded-2xl text-xs uppercase tracking-widest hover:opacity-80 transition">
-                            Print / Save PDF
-                        </button>
-                        <button @click="confirmed = false; cart = [];" class="flex-1 border-2 border-gray-100 text-gray-400 font-black py-5 rounded-2xl text-xs uppercase tracking-widest hover:bg-gray-50 transition">
-                            New Booking
-                        </button>
+                    <div class="mt-12 flex gap-4 no-print">
+                        <button onclick="window.print()" class="flex-1 bg-black text-white font-black py-5 rounded-2xl text-[10px] uppercase tracking-widest">Print Receipt</button>
+                        <button @click="confirmed = false" class="flex-1 border border-gray-200 text-gray-400 font-black py-5 rounded-2xl text-[10px] uppercase tracking-widest">Back</button>
                     </div>
                 </div>
             </div>
-            
-            <p class="text-center mt-10 text-[9px] font-black text-white/20 uppercase tracking-[0.6em]">SOS Mechanics Medway Fleet 2026</p>
         </div>
     </main>
 

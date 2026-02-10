@@ -1,262 +1,223 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOS MECHANICS | 24/7 Mobile Mechanic Medway</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
-<style>
-    :root { --neon:#CCFF00; }
-    body { font-family:'Plus Jakarta Sans',sans-serif; background:#06040d; color:#fff; overflow-x:hidden; scroll-behavior:smooth; }
-    .neon-lime { color:var(--neon); text-shadow:0 0 20px rgba(204,255,0,0.4); }
-    .glass { background:rgba(255,255,255,0.03); backdrop-filter:blur(15px); border:1px solid rgba(255,255,255,0.1); }
-    .btn-neon { background:var(--neon); color:#000; font-weight:800; transition:all 0.3s; }
-    .btn-neon:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(204,255,0,0.6); }
-    #cart-slide { position:fixed; right:-400px; top:0; width:350px; height:100%; background:#0a0812; border-left:1px solid rgba(255,255,255,0.1); z-index:2000; transition:right 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-    #cart-slide.open { right:0; }
-    .cart-badge { background:var(--neon); color:#000; padding:2px 6px; border-radius:50%; font-size:10px; position:absolute; top:-5px; right:-10px; }
-    .vehicle-btn { border:1px solid rgba(255,255,255,0.1); padding:8px; border-radius:8px; font-size:11px; cursor:pointer; flex:1; text-align:center; transition:0.3s; }
-    .vehicle-btn.active { background:var(--neon); color:#000; border-color:var(--neon); font-weight:bold; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOS MECHANICS | 12-Group Service Matrix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon: #CCFF00; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #06040d; color: #fff; overflow-x: hidden; scroll-behavior: smooth; }
+        .neon-lime { color: var(--neon); text-shadow: 0 0 15px rgba(204,255,0,0.3); }
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .btn-neon { background: var(--neon); color: #000; font-weight: 800; transition: all 0.2s ease; cursor: pointer; border: none; }
+        .btn-neon:hover { transform: scale(1.03); box-shadow: 0 0 15px var(--neon); }
+        #cart-slide { position: fixed; right: -400px; top: 0; width: 380px; height: 100%; background: #0a0812; z-index: 2000; transition: right 0.3s ease; border-left: 1px solid rgba(255,255,255,0.1); }
+        #cart-slide.open { right: 0; }
+        .vehicle-tab { border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 12px; font-size: 12px; cursor: pointer; flex: 1; text-align: center; font-weight: 600; opacity: 0.6; }
+        .vehicle-tab.active { background: var(--neon); color: #000; opacity: 1; border-color: var(--neon); }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--neon); }
+        input:checked + .slider:before { transform: translateX(20px); background-color: #000; }
+    </style>
 </head>
 <body>
 
-<!-- Top Navigation -->
-<nav class="fixed top-0 w-full z-[1000] bg-black/80 backdrop-blur-md border-b border-white/5">
-  <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
-    <div class="text-xl font-black italic uppercase tracking-tighter">SOS<span class="neon-lime">MECHANICS</span></div>
-    <div class="flex items-center gap-6">
-      <a href="#services" class="uppercase text-xs font-bold hover:neon-lime transition-colors">Services</a>
-      <button id="cart-btn-nav" class="relative uppercase text-xs font-bold neon-lime">
-        Cart <span id="cart-count-badge" class="cart-badge">0</span>
-      </button>
+<nav class="fixed top-0 w-full z-[1000] bg-black/60 backdrop-blur-lg border-b border-white/5">
+    <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+        <div class="text-xl font-black italic uppercase tracking-tighter">SOS<span class="neon-lime">MECHANICS</span></div>
+        <button id="open-cart" class="glass px-4 py-2 rounded-full text-xs font-bold neon-lime">CART (<span id="cart-count">0</span>)</button>
     </div>
-  </div>
 </nav>
 
-<!-- Hero Section -->
-<header class="min-h-screen flex flex-col items-center justify-center text-center p-6 pt-24">
-  <div class="inline-block px-4 py-1 border border-[#CCFF00]/30 rounded-full text-[#CCFF00] text-[10px] uppercase font-bold tracking-widest mb-4">Medway Response Unit Active</div>
-  <h1 class="text-6xl lg:text-[7.5rem] font-black uppercase italic leading-[0.85] mb-8 tracking-tighter">Roadside <br><span class="neon-lime">Evolution</span></h1>
-  
-  <!-- Postcode Checker -->
-  <div class="glass p-2 rounded-2xl mb-8 flex flex-col sm:flex-row gap-2 max-w-md w-full">
-    <input type="text" id="postcode-input" placeholder="Enter Medway Postcode (e.g. ME1)" class="bg-transparent px-4 py-3 outline-none text-sm flex-1 uppercase">
-    <button onclick="checkArea()" class="btn-neon px-6 py-3 rounded-xl text-xs uppercase">Check Coverage</button>
-  </div>
-  <p id="area-status" class="text-sm font-bold mb-8 h-4"></p>
-
-  <div class="flex gap-4">
-    <a href="https://wa.me/07405937104" class="btn-neon px-10 py-4 rounded-2xl text-sm uppercase tracking-wider">Call Dispatch</a>
-    <a href="#services" class="glass px-10 py-4 rounded-2xl font-bold text-sm uppercase tracking-wider border border-white/10">Pricing</a>
-  </div>
+<header class="min-h-[60vh] flex flex-col items-center justify-center text-center px-6 pt-32">
+    <h1 class="text-5xl lg:text-[6rem] font-black uppercase italic tracking-tighter mb-4">Service <span class="neon-lime">Matrix</span></h1>
+    <p class="text-white/40 max-w-2xl mb-10">Choose from our comprehensive range of 24/7 mobile services. Fixed-rate labor prices shown below.</p>
 </header>
 
-<!-- Services Section -->
-<section id="services" class="max-w-7xl mx-auto px-6 py-20">
-    <div class="mb-12">
-        <h2 class="text-4xl font-black uppercase italic">Fixed Rate <span class="neon-lime">Services</span></h2>
-        <p class="text-white/40">Select your vehicle type in the cart for accurate pricing.</p>
+<section class="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+    
+    <!-- 1. Diagnostics -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">1. Diagnostics</h3>
+        <div class="space-y-3" id="group-1"></div>
     </div>
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Service Card Template -->
-        <div class="glass p-6 rounded-2xl border-l-2 border-[#CCFF00]/30 hover:border-[#CCFF00] transition-all group">
-            <h3 class="text-lg font-black uppercase mb-4 neon-lime">Diagnostics</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center group-hover:translate-x-1 transition-transform">
-                    <span class="text-sm opacity-80">Dealer ECU Scan</span>
-                    <button class="add-btn btn-neon w-8 h-8 rounded-lg" data-name="ECU Scan" data-price="50">+</button>
-                </div>
-                <div class="flex justify-between items-center group-hover:translate-x-1 transition-transform">
-                    <span class="text-sm opacity-80">Engine Fault Tracing</span>
-                    <button class="add-btn btn-neon w-8 h-8 rounded-lg" data-name="Engine Fault" data-price="70">+</button>
-                </div>
-                <div class="flex justify-between items-center group-hover:translate-x-1 transition-transform">
-                    <span class="text-sm opacity-80">Electrical Repair</span>
-                    <button class="add-btn btn-neon w-8 h-8 rounded-lg" data-name="Electrical" data-price="65">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="glass p-6 rounded-2xl border-l-2 border-[#CCFF00]/30 hover:border-[#CCFF00] transition-all group">
-            <h3 class="text-lg font-black uppercase mb-4 neon-lime">Common Repairs</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center group-hover:translate-x-1 transition-transform">
-                    <span class="text-sm opacity-80">Brake Pad Fitment</span>
-                    <button class="add-btn btn-neon w-8 h-8 rounded-lg" data-name="Brake Pads" data-price="80">+</button>
-                </div>
-                <div class="flex justify-between items-center group-hover:translate-x-1 transition-transform">
-                    <span class="text-sm opacity-80">Battery Replacement</span>
-                    <button class="add-btn btn-neon w-8 h-8 rounded-lg" data-name="Battery Fit" data-price="45">+</button>
-                </div>
-                <div class="flex justify-between items-center group-hover:translate-x-1 transition-transform">
-                    <span class="text-sm opacity-80">Alternator Repair</span>
-                    <button class="add-btn btn-neon w-8 h-8 rounded-lg" data-name="Alternator" data-price="120">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="glass p-6 rounded-2xl border-l-2 border-[#CCFF00]/30 hover:border-[#CCFF00] transition-all group">
-            <h3 class="text-lg font-black uppercase mb-4 neon-lime">Roadside</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center group-hover:translate-x-1 transition-transform">
-                    <span class="text-sm opacity-80">Emergency Jumpstart</span>
-                    <button class="add-btn btn-neon w-8 h-8 rounded-lg" data-name="Jumpstart" data-price="35">+</button>
-                </div>
-                <div class="flex justify-between items-center group-hover:translate-x-1 transition-transform">
-                    <span class="text-sm opacity-80">Lockout Recovery</span>
-                    <button class="add-btn btn-neon w-8 h-8 rounded-lg" data-name="Lockout" data-price="50">+</button>
-                </div>
-                <div class="flex justify-between items-center group-hover:translate-x-1 transition-transform">
-                    <span class="text-sm opacity-80">Fuel Drain (Wrong Fuel)</span>
-                    <button class="add-btn btn-neon w-8 h-8 rounded-lg" data-name="Fuel Drain" data-price="140">+</button>
-                </div>
-            </div>
-        </div>
+    <!-- 2. Brakes -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">2. Braking Systems</h3>
+        <div class="space-y-3" id="group-2"></div>
     </div>
+
+    <!-- 3. Suspension -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">3. Suspension</h3>
+        <div class="space-y-3" id="group-3"></div>
+    </div>
+
+    <!-- 4. Engine -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">4. Engine & Drivetrain</h3>
+        <div class="space-y-3" id="group-4"></div>
+    </div>
+
+    <!-- 5. Battery -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">5. Battery & Power</h3>
+        <div class="space-y-3" id="group-5"></div>
+    </div>
+
+    <!-- 6. Cooling -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">6. Cooling & Climate</h3>
+        <div class="space-y-3" id="group-6"></div>
+    </div>
+
+    <!-- 7. Exhaust -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">7. Exhaust & Emissions</h3>
+        <div class="space-y-3" id="group-7"></div>
+    </div>
+
+    <!-- 8. Wheels -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">8. Wheels & Tyres</h3>
+        <div class="space-y-3" id="group-8"></div>
+    </div>
+
+    <!-- 9. Electrical -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">9. Electrical</h3>
+        <div class="space-y-3" id="group-9"></div>
+    </div>
+
+    <!-- 10. Recovery -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">10. Roadside Recovery</h3>
+        <div class="space-y-3" id="group-10"></div>
+    </div>
+
+    <!-- 11. Transmission -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">11. Transmission</h3>
+        <div class="space-y-3" id="group-11"></div>
+    </div>
+
+    <!-- 12. Miscellaneous -->
+    <div class="glass p-6 rounded-3xl">
+        <h3 class="text-lg font-black neon-lime uppercase mb-4 italic">12. Miscellaneous</h3>
+        <div class="space-y-3" id="group-12"></div>
+    </div>
+
 </section>
 
-<!-- Shopping Cart Sidebar -->
-<div id="cart-slide" class="flex flex-col">
-    <div class="p-6 border-b border-white/10 flex justify-between items-center">
-        <h3 class="text-xl font-black uppercase italic">Job <span class="neon-lime">List</span></h3>
-        <button id="cart-close" class="text-white/40 hover:text-white font-bold">CLOSE</button>
+<!-- Sidebar -->
+<div id="cart-slide" class="flex flex-col shadow-2xl">
+    <div class="p-8 border-b border-white/5 flex justify-between items-center">
+        <h2 class="text-2xl font-black uppercase italic">Estimate</h2>
+        <button id="close-cart" class="text-white/30 font-bold">✕</button>
     </div>
-
-    <!-- Vehicle Selector -->
-    <div class="p-6 bg-white/5">
-        <p class="text-[10px] uppercase font-bold tracking-widest opacity-50 mb-3">Rate Multiplier</p>
-        <div class="flex gap-2">
-            <div class="vehicle-btn active" onclick="setVehicle('standard', 1, this)">Standard</div>
-            <div class="vehicle-btn" onclick="setVehicle('prestige', 1.25, this)">Prestige</div>
-            <div class="vehicle-btn" onclick="setVehicle('van', 1.15, this)">Van</div>
+    <div class="p-6 bg-white/5 border-b border-white/5">
+        <div class="flex gap-2 mb-4">
+            <div id="t-std" class="vehicle-tab active" onclick="setRate('standard', 1, 't-std')">STD</div>
+            <div id="t-pre" class="vehicle-tab" onclick="setRate('prestige', 1.25, 't-pre')">PRESTIGE</div>
+            <div id="t-van" class="vehicle-tab" onclick="setRate('van', 1.15, 't-van')">VAN</div>
         </div>
-        <p id="multiplier-note" class="text-[9px] mt-2 text-white/40 italic">*Prestige +25%, Van +15% for heavy-duty components.</p>
-    </div>
-
-    <!-- Cart Items -->
-    <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4">
-        <!-- Items inject here -->
-    </div>
-
-    <!-- Footer / Checkout -->
-    <div class="p-6 border-t border-white/10 bg-black/40">
-        <div class="flex justify-between items-center mb-6">
-            <span class="text-white/40 font-bold uppercase text-xs">Estimated Total</span>
-            <span id="cart-total" class="text-2xl font-black neon-lime">£0</span>
+        <div class="flex items-center justify-between glass p-3 rounded-xl">
+            <span class="text-xs font-bold">Parts Sourcing Deposit (+£40)</span>
+            <label class="switch"><input type="checkbox" id="parts-toggle" onchange="renderCart()"><span class="slider"></span></label>
         </div>
-        <button onclick="requestBooking()" class="w-full btn-neon py-4 rounded-xl uppercase tracking-tighter">Request Booking via WhatsApp</button>
+    </div>
+    <div id="cart-content" class="flex-1 overflow-y-auto p-6 space-y-3"></div>
+    <div class="p-8 bg-black/40 border-t border-white/5">
+        <div class="flex justify-between items-end mb-6">
+            <span class="text-white/40 uppercase text-[10px] font-black tracking-widest">Total</span>
+            <span id="cart-total" class="text-4xl font-black neon-lime tracking-tighter">£0</span>
+        </div>
+        <button onclick="sendBooking()" class="w-full btn-neon py-5 rounded-2xl uppercase tracking-wider text-sm">Send Dispatch Request</button>
     </div>
 </div>
 
 <script>
-    // State
+    // 12 Groups Data
+    const serviceData = {
+        1: [
+            {n:"ECU Full Scan", p:50}, {n:"Engine Fault Tracing", p:70}, {n:"ABS/Airbag Reset", p:45}, 
+            {n:"Live Data Logging", p:60}, {n:"DPF Regen Request", p:80}, {n:"Service Light Reset", p:25}
+        ],
+        2: [
+            {n:"Front Pads Fit", p:80}, {n:"Rear Pads Fit", p:85}, {n:"Front Discs/Pads", p:120}, 
+            {n:"Brake Fluid Flush", p:45}, {n:"Caliper Replacement", p:70}, {n:"Handbrake Adjust", p:35}
+        ],
+        3: [
+            {n:"Shock Absorber", p:90}, {n:"Coil Spring", p:80}, {n:"Wishbone/Arm", p:85}, 
+            {n:"Anti-Roll Bar Link", p:40}, {n:"Tie Rod End", p:45}, {n:"Wheel Bearing", p:95}
+        ],
+        4: [
+            {n:"Oil & Filter Change", p:40}, {n:"Spark Plugs (x4)", p:45}, {n:"Fuel Filter Fit", p:35}, 
+            {n:"Drive Belt Fit", p:50}, {n:"Engine Mount", p:80}, {n:"Rocker Gasket", p:75}
+        ],
+        5: [
+            {n:"Battery Replace", p:40}, {n:"Alternator Fit", p:110}, {n:"Starter Motor", p:100}, 
+            {n:"Jumpstart Medway", p:35}, {n:"Cranking Test", p:20}, {n:"Battery Coding", p:30}
+        ],
+        6: [
+            {n:"Radiator Swap", p:110}, {n:"Thermostat Fit", p:60}, {n:"Water Pump", p:130}, 
+            {n:"Coolant Flush", p:50}, {n:"Heater Matrix Flush", p:70}, {n:"Fan Assembly", p:85}
+        ],
+        7: [
+            {n:"Back Box Fit", p:65}, {n:"Exhaust Leak Weld", p:80}, {n:"EGR Valve Clean", p:75}, 
+            {n:"Oxygen Sensor Swap", p:60}, {n:"DPF Forced Clean", p:140}, {n:"Catalytic Lock", p:50}
+        ],
+        8: [
+            {n:"Tyre Change (On Rim)", p:25}, {n:"Puncture Repair", p:20}, {n:"Wheel Balance", p:15}, 
+            {n:"Locking Nut Removal", p:40}, {n:"Alloy Swap (Full Set)", p:60}, {n:"Spare Fitment", p:30}
+        ],
+        9: [
+            {n:"H7/H4 Bulb Fit", p:10}, {n:"Window Regulator", p:85}, {n:"Central Lock Motor", p:70}, 
+            {n:"Fuse Box Diagnosis", p:60}, {n:"Wiring Loom Repair", p:90}, {n:"Towbar Wiring", p:100}
+        ],
+        10: [
+            {n:"Winch Recovery", p:120}, {n:"Flatbed Recovery", p:150}, {n:"Off-Road Snatch", p:100}, 
+            {n:"Roadside Triage", p:40}, {n:"Lockout Entry", p:60}, {n:"Fuel Delivery (5L)", p:30}
+        ],
+        11: [
+            {n:"Clutch Slave Cylinder", p:70}, {n:"Gear Linkage Fix", p:85}, {n:"CV Boot Swap", p:60}, 
+            {n:"Driveshaft Fitment", p:95}, {n:"Auto Fluid Drain", p:110}, {n:"Diff Fluid Swap", p:50}
+        ],
+        12: [
+            {n:"Wiper Blade Set", p:15}, {n:"Screenwash System", p:25}, {n:"Fuel Drain (Wrong Fuel)", p:160}, 
+            {n:"Pre-Purchase Check", p:90}, {n:"Headlight Polish", p:35}, {n:"AdBlue Top-up", p:20}
+        ]
+    };
+
     let cart = [];
-    let currentMultiplier = 1;
-    let currentVehicle = 'standard';
-    const medwayPostcodes = ['ME1', 'ME2', 'ME3', 'ME4', 'ME5', 'ME6', 'ME7', 'ME8'];
+    let multiplier = 1;
+    let vehicleType = 'standard';
 
-    // UI Elements
-    const cartSlide = document.getElementById('cart-slide');
-    const cartItems = document.getElementById('cart-items');
-    const cartTotal = document.getElementById('cart-total');
-    const cartBadge = document.getElementById('cart-count-badge');
-
-    // 1. Service Area Checker
-    function checkArea() {
-        const input = document.getElementById('postcode-input').value.toUpperCase().trim();
-        const status = document.getElementById('area-status');
-        
-        const isCovered = medwayPostcodes.some(pc => input.startsWith(pc));
-        
-        if(isCovered) {
-            status.innerText = "✓ UNIT DEPLOYABLE TO YOUR LOCATION";
-            status.className = "text-sm font-bold mb-8 text-[#CCFF00]";
-        } else {
-            status.innerText = "✕ OUTSIDE IMMEDIATE ZONE (CONTACT FOR QUOTE)";
-            status.className = "text-sm font-bold mb-8 text-red-500";
-        }
-    }
-
-    // 2. Cart Toggle
-    document.getElementById('cart-btn-nav').addEventListener('click', () => cartSlide.classList.add('open'));
-    document.getElementById('cart-close').addEventListener('click', () => cartSlide.classList.remove('open'));
-
-    // 3. Vehicle Type Selection
-    function setVehicle(type, multiplier, el) {
-        currentVehicle = type;
-        currentMultiplier = multiplier;
-        
-        document.querySelectorAll('.vehicle-btn').forEach(btn => btn.classList.remove('active'));
-        el.classList.add('active');
-        
-        // Recalculate existing items if needed or just apply to new ones? 
-        // We'll apply it to the whole current booking.
-        renderCart();
-    }
-
-    // 4. Adding Items
-    document.querySelectorAll('.add-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const name = btn.dataset.name;
-            const price = parseFloat(btn.dataset.price);
-            
-            cart.push({ name, basePrice: price });
-            renderCart();
-            cartSlide.classList.add('open');
+    // Populate Groups
+    Object.keys(serviceData).forEach(id => {
+        const container = document.getElementById(`group-${id}`);
+        serviceData[id].forEach(item => {
+            const row = document.createElement('div');
+            row.className = "flex justify-between items-center py-1";
+            row.innerHTML = `<span class="text-xs font-medium">${item.n} <b class="neon-lime ml-1">£${item.p}</b></span>
+                             <button class="add-btn btn-neon px-3 py-1 rounded text-[10px]" data-name="${item.n}" data-price="${item.p}">ADD</button>`;
+            container.appendChild(row);
         });
     });
 
-    // 5. Render Cart
-    function renderCart() {
-        cartItems.innerHTML = '';
-        let total = 0;
+    // Cart Logic
+    const cartSlide = document.getElementById('cart-slide');
+    const cartContent = document.getElementById('cart-content');
 
-        if(cart.length === 0) {
-            cartItems.innerHTML = '<p class="text-white/20 text-center py-10 uppercase text-xs tracking-widest">No services selected</p>';
-        }
+    document.getElementById('open-cart').onclick = () => cartSlide.classList.add('open');
+    document.getElementById('close-cart').onclick = () => cartSlide.classList.remove('open');
 
-        cart.forEach((item, index) => {
-            const finalPrice = Math.round(item.basePrice * currentMultiplier);
-            total += finalPrice;
-
-            const div = document.createElement('div');
-            div.className = "glass p-4 rounded-xl flex justify-between items-center";
-            div.innerHTML = `
-                <div>
-                    <p class="text-sm font-bold">${item.name}</p>
-                    <p class="text-[10px] uppercase text-white/40">${currentVehicle} Rate</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span class="font-black">£${finalPrice}</span>
-                    <button onclick="removeItem(${index})" class="text-red-500 text-xs">✕</button>
-                </div>
-            `;
-            cartItems.appendChild(div);
-        });
-
-        cartTotal.innerText = `£${total}`;
-        cartBadge.innerText = cart.length;
-    }
-
-    function removeItem(index) {
-        cart.splice(index, 1);
-        renderCart();
-    }
-
-    // 6. WhatsApp Booking Dispatch
-    function requestBooking() {
-        if(cart.length === 0) return alert("Please select a service first.");
-
-        let total = 0;
-        let summary = `*NEW BOOKING REQUEST*%0A------------------%0A*Vehicle Type:* ${currentVehicle.toUpperCase()}%0A%0A*Services:*%0A`;
-        
-        cart.forEach(item => {
-            const price = Math.round(item.basePrice * currentMultiplier);
-            summary += `- ${item.name}: £${price}%0a`;
-            total += price;
-        });
-
-        summary += `%0a*Total Estimated: £${total}*%0A------------------
+    function setRate(type, mult, id) {
+        vehicleType = type; multiplier = mult;
+        document.querySelectorAll('.

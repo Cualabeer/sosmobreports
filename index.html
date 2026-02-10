@@ -1,196 +1,248 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SOS ELITE | REBUILT ENGINE v6</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
-    
-    <style>
-        [x-cloak] { display: none !important; }
-        html, body { background: #06040d; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        .neon-lime { color: #CCFF00; text-shadow: 0 0 20px rgba(204, 255, 0, 0.5); }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .active-glow { border: 2px solid #CCFF00 !important; box-shadow: 0 0 30px rgba(204, 255, 0, 0.3) !important; }
-        
-        .ghost-price {
-            position: absolute; bottom: 60px; right: -10px; font-size: 130px; font-weight: 900;
-            color: rgba(204, 255, 0, 0.15); line-height: 0.8; z-index: 0; pointer-events: none; font-style: italic;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        #ticket-wrapper { background: white; color: #000; width: 100%; border-radius: 2.5rem; overflow: hidden; margin: 0 auto; position: relative; box-shadow: 0 40px 100px rgba(0,0,0,1); }
-        .pdf-header { background: #000; color: #fff; padding: 45px 30px; text-align: center; border-bottom: 12px solid #CCFF00; }
-        .pdf-body { padding: 40px 30px; background: #fff; position: relative; z-index: 1; }
-        
-        @keyframes pulse-ring { 0% { transform: scale(0.33); opacity: 1; } 80%, 100% { opacity: 0; } }
-        .gps-pulse { position: relative; width: 10px; height: 10px; background: #CCFF00; border-radius: 50%; }
-        .gps-pulse::before { content: ''; position: absolute; width: 300%; height: 300%; top: -100%; left: -100%; border: 2px solid #CCFF00; border-radius: 50%; animation: pulse-ring 1.5s infinite; }
-    </style>
+<!-- SEO -->
+<title>SOS MECHANICS | #1 Mobile Mechanic Medway | 24/7 Roadside Repair</title>
+<meta name="description" content="SOS Mechanics: Medway's premier 24/7 mobile mechanic. Professional roadside repairs, engine diagnostics, and battery replacement in Rochester, Chatham, Gillingham & Strood.">
+<link rel="canonical" href="https://sosmechanics.co.uk/">
+
+<!-- GEO -->
+<meta name="geo.region" content="GB-KNT">
+<meta name="geo.placename" content="Medway">
+<meta name="geo.position" content="51.3799;-0.5005">
+<meta name="ICBM" content="51.3799, -0.5005">
+
+<!-- STRUCTURED DATA -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoRepair",
+  "@id": "https://sosmechanics.co.uk/#autorepair",
+  "name": "SOS Mechanics Medway",
+  "url": "https://sosmechanics.co.uk/",
+  "image": "https://sosmechanics.co.uk/logo.png",
+  "telephone": "+447405937104",
+  "priceRange": "££",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Medway",
+    "addressRegion": "Kent",
+    "addressCountry": "GB"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 51.3799,
+    "longitude": -0.5005
+  },
+  "openingHoursSpecification": [{
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+    "opens": "00:00",
+    "closes": "23:59"
+  }],
+  "areaServed": [
+    { "@type": "AdministrativeArea", "name": "Medway" },
+    { "@type": "AdministrativeArea", "name": "Kent" }
+  ],
+  "sameAs": [
+    "https://www.google.com/maps?cid=YOUR_GBP_CID",
+    "https://wa.me/447405937104"
+  ]
+}
+</script>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root { --neon:#CCFF00; }
+body { background:#06040d; color:#fff; font-family:'Plus Jakarta Sans',sans-serif; overflow-x:hidden; }
+.hero-gradient { background:radial-gradient(circle at 50% 50%, rgba(204,255,0,.08), #06040d 100%); }
+.neon-lime { color:var(--neon); text-shadow:0 0 20px rgba(204,255,0,.4); }
+.glass { background:rgba(255,255,255,.03); backdrop-filter:blur(15px); border:1px solid rgba(255,255,255,.1); }
+.scanline { position:fixed; top:0; left:0; width:100%; height:5px; background:rgba(204,255,0,.05); animation:scanline 8s linear infinite; z-index:100; pointer-events:none; }
+@keyframes scanline { from{transform:translateY(-100%)} to{transform:translateY(1200%)} }
+html { scroll-behavior:smooth }
+::-webkit-scrollbar { width:0 }
+</style>
 </head>
 
-<body x-data="{ 
-    confirmed: false, searchQuery: '', activeGroup: null, 
-    name: '', tel: '', reg: '', vname: '', 
-    address: 'LOCKING GPS...', lat: '', lon: '', gpsLocked: false,
-    cart: [], bookingRef: '', stamp: '',
-    isOOH: false, oohCharge: 0, weekendMultiplier: 1.0,
+<body class="hero-gradient">
+<div class="scanline"></div>
 
-    groups: [
-        { name: 'Braking Systems', icon: '🛑', s: [{n:'Pads & Discs', p:185}, {n:'Caliper Swap', p:120}, {n:'Fluid Service', p:55}] },
-        { name: 'Power/Electrics', icon: '⚡', s: [{n:'AGM Battery', p:195}, {n:'Alternator', p:220}, {n:'Starter Motor', p:185}] },
-        { name: 'AI Diagnostics', icon: '💻', s: [{n:'Global Scan', p:65}, {n:'Fault Trace', p:85}, {n:'Sensor Fit', p:75}] },
-        { name: 'Routine Service', icon: '📅', s: [{n:'Full Service', p:185}, {n:'Interim', p:95}, {n:'Oil Change', p:65}] },
-        { name: 'Engine Timing', icon: '⏲️', s: [{n:'Cambelt Kit', p:350}, {n:'Water Pump', p:130}, {n:'Aux Belt', p:55}] },
-        { name: 'Chassis/Susp', icon: '🚜', s: [{n:'Coil Spring', p:115}, {n:'Wishbone', p:130}, {n:'Shock Absorber', p:145}] }
-    ],
+<!-- NAV -->
+<nav class="fixed top-0 w-full p-6 lg:p-10 flex justify-between items-center z-[1000] mix-blend-difference">
+  <div class="text-xl font-black italic uppercase tracking-tighter">
+    SOS<span class="neon-lime">MECHANICS</span>
+  </div>
+  <div class="glass px-4 py-2 rounded-full hidden md:flex items-center gap-3">
+    <div class="w-2 h-2 bg-[#CCFF00] rounded-full animate-pulse"></div>
+    <span class="text-[9px] font-black uppercase tracking-widest neon-lime">
+      Medway Response Unit Active
+    </span>
+  </div>
+</nav>
 
-    init() {
-        const h = new Date().getHours();
-        const d = new Date().getDay();
-        if (h < 8 || h >= 18) { this.isOOH = true; this.oohCharge = 45; }
-        if (d === 0 || d === 6) { this.weekendMultiplier = 1.25; }
-        this.getGPS();
-    },
+<!-- HERO -->
+<header class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+  <span class="text-[9px] font-black uppercase tracking-[0.4em] neon-lime mb-10 glass px-6 py-2 rounded-full">
+    24/7 Mobile Mechanic Medway Town
+  </span>
 
-    getGPS() {
-        if (!navigator.geolocation) { this.address = 'GPS NOT SUPPORTED'; return; }
-        navigator.geolocation.getCurrentPosition((pos) => {
-            this.lat = pos.coords.latitude.toFixed(6);
-            this.lon = pos.coords.longitude.toFixed(6);
-            this.gpsLocked = true;
-            this.address = 'GPS SIGNAL SECURE';
-        }, (err) => { this.address = 'ENABLE GPS TO START'; }, { enableHighAccuracy: true });
-    },
+  <h1 class="text-6xl lg:text-[9rem] font-black uppercase italic leading-[0.85] mb-8 tracking-tighter">
+    Roadside <br><span class="neon-lime">Evolution.</span>
+  </h1>
 
-    processAI() {
-        let q = this.searchQuery.toLowerCase();
-        const map = {'brake':0,'stop':0,'battery':1,'alternator':1,'start':1,'diag':2,'scan':2,'light':2,'service':3,'oil':3,'belt':4,'timing':4,'spring':5,'susp':5};
-        this.activeGroup = null;
-        Object.keys(map).forEach(k => { if(q.includes(k)) this.activeGroup = map[k]; });
-    },
+  <p class="text-white/40 text-sm lg:text-xl font-medium max-w-2xl mx-auto mb-14">
+    Medway's leading emergency response mechanics. Expert roadside repair, dealer-level diagnostics, and
+    <a href="#mobile-mechanic-medway" class="neon-lime hover:underline">
+      mobile mechanic services in Medway
+    </a>
+    across Rochester, Chatham, and Gillingham.
+  </p>
 
-    toggle(item) {
-        let exists = this.cart.find(i => i.n === item.n);
-        if(exists) { this.cart = this.cart.filter(i => i.n !== item.n); }
-        else { this.cart.push(item); }
-    },
+  <div class="flex flex-col sm:flex-row gap-6">
+    <a href="https://wa.me/447405937104?text=Mobile%20Mechanic%20Medway%20Request"
+       class="bg-[#CCFF00] text-black px-16 py-7 rounded-2xl font-black uppercase tracking-[0.2em] text-sm hover:scale-105 transition-all shadow-[0_0_60px_rgba(204,255,0,0.3)]">
+      Book Dispatch Now
+    </a>
+    <a href="#mobile-mechanic-medway"
+       class="glass text-white px-16 py-7 rounded-2xl font-black uppercase tracking-[0.2em] text-sm hover:bg-white/10 transition-all">
+      Expert Services
+    </a>
+  </div>
 
-    calcPrice(p) { return Math.round(p * this.weekendMultiplier); },
-    getTotal() { return this.cart.reduce((s, i) => s + this.calcPrice(i.p), 0) + this.oohCharge; },
+  <a href="tel:+447405937104"
+     class="mt-8 text-[10px] uppercase tracking-widest text-white/30 hover:text-[#CCFF00]">
+    Call 07405 937104
+  </a>
+</header>
 
-    finalize() {
-        if(!this.reg || this.cart.length === 0) { alert('ENTER REG & SELECT JOB'); return; }
-        this.bookingRef = 'SOS-' + Math.random().toString(36).substr(2,6).toUpperCase();
-        this.stamp = new Date().toLocaleString('en-GB').replace(',', ' @');
-        this.confirmed = true;
-        window.scrollTo(0,0);
-    },
+<!-- SERVICES -->
+<section id="mobile-mechanic-medway" class="py-32 px-6 lg:px-20 max-w-7xl mx-auto">
+  <div class="mb-20">
+    <h2 class="text-[#CCFF00] font-black text-[10px] uppercase tracking-[0.5em] mb-4">Mechanical Capabilities</h2>
+    <h3 class="text-5xl lg:text-7xl font-black italic uppercase tracking-tighter">
+      Mobile Mechanic <br><span class="text-white/20">Medway Services</span>
+    </h3>
+  </div>
 
-    sendWhatsApp() {
-        let msg = `*🔧 NEW SOS BOOKING REQUEST*%0A---------------------------%0A*Service:* ${this.cart.map(i=>i.n).join(', ')}%0A*Labour:* £${this.getTotal()}.00%0A*Date/Time:* ${this.stamp}%0A---------------------------%0A*CUSTOMER:* ${this.name}%0A*PHONE:* ${this.tel}%0A*VEHICLE:* ${this.vname} [${this.reg.toUpperCase()}]%0A%0A*📍 LOCATION:*%0Ahttps://www.google.com/maps?q=${this.lat},${this.lon}`;
-        window.open(`https://wa.me/447405937104?text=${msg}`, '_blank');
-    }
-}" x-init="init()" x-cloak>
+  <div class="grid lg:grid-cols-3 gap-6">
+    <article class="glass p-10 rounded-[2.5rem] border-l-4 border-[#CCFF00]">
+      <h4 class="text-xl font-black uppercase italic mb-4">Diagnostics Kent</h4>
+      <p class="text-white/40 text-sm leading-relaxed mb-6">
+        Advanced ECU scanning and fault tracing for BMW, Mercedes, Audi, and Ford.
+        On-site coding and electrical repair.
+      </p>
+      <span class="text-[9px] font-black uppercase tracking-widest text-[#CCFF00]/50">
+        Diagnostics • Rochester • Chatham
+      </span>
+    </article>
 
-    <div class="max-w-md mx-auto p-5 pb-44">
-        
-        <header class="flex justify-between items-center py-8">
-            <h1 class="text-4xl font-black italic neon-lime uppercase tracking-tighter">SOS ELITE</h1>
-            <div class="flex items-center gap-2 glass px-4 py-2 rounded-full border-[#CCFF00]/40">
-                <span class="text-[7px] font-black uppercase tracking-widest neon-lime" x-text="address"></span>
-                <div class="gps-pulse" x-show="gpsLocked"></div>
-            </div>
-        </header>
+    <article class="glass p-10 rounded-[2.5rem] border-l-4 border-[#CCFF00]">
+      <h4 class="text-xl font-black uppercase italic mb-4">Emergency Repair</h4>
+      <p class="text-white/40 text-sm leading-relaxed mb-6">
+        Braking systems, clutches, suspension, and cambelts fitted at your home or roadside
+        in Gillingham and Strood.
+      </p>
+      <span class="text-[9px] font-black uppercase tracking-widest text-[#CCFF00]/50">
+        Roadside Repair • Mobile Unit
+      </span>
+    </article>
 
-        <!-- STACKED INPUTS -->
-        <div x-show="!confirmed" class="space-y-4">
-            <input x-model="searchQuery" @input="processAI()" placeholder="NEURAL SEARCH (E.G. BRAKES)" class="w-full bg-black border border-white/10 rounded-2xl p-6 text-xs font-black uppercase focus:ring-1 focus:ring-[#CCFF00] outline-none">
+    <article class="glass p-10 rounded-[2.5rem] border-l-4 border-[#CCFF00]">
+      <h4 class="text-xl font-black uppercase italic mb-4">Battery & Power</h4>
+      <p class="text-white/40 text-sm leading-relaxed mb-6">
+        24/7 mobile battery replacement and alternator fitting.
+        AGM batteries stocked for start-stop vehicles.
+      </p>
+      <span class="text-[9px] font-black uppercase tracking-widest text-[#CCFF00]/50">
+        Battery Fit • 24hr Dispatch
+      </span>
+    </article>
+  </div>
+</section>
 
-            <div class="space-y-3">
-                <input x-model="name" placeholder="CLIENT NAME" class="w-full glass p-5 rounded-2xl font-bold uppercase text-xs outline-none">
-                <input x-model="tel" placeholder="CONTACT NUMBER" class="w-full glass p-5 rounded-2xl font-bold uppercase text-xs outline-none">
-                <input x-model="vname" placeholder="VEHICLE (E.G. BMW 1 SERIES)" class="w-full glass p-5 rounded-2xl font-bold uppercase text-xs outline-none">
-                <input x-model="reg" placeholder="VEHICLE REG" class="w-full glass p-6 rounded-2xl text-center font-black uppercase tracking-[0.4em] neon-lime text-2xl">
-            </div>
-            
-            <div class="grid gap-3 pt-4">
-                <template x-for="(group, index) in groups" :key="index">
-                    <div class="glass rounded-3xl overflow-hidden" :class="activeGroup === index ? 'active-glow' : ''">
-                        <button @click="activeGroup = (activeGroup === index ? null : index)" class="w-full flex justify-between p-6 text-[10px] font-black uppercase">
-                            <span x-text="group.icon + ' ' + group.name"></span>
-                            <span class="neon-lime" x-text="activeGroup === index ? '−' : '+'"></span>
-                        </button>
-                        <div x-show="activeGroup === index" class="p-4 bg-black/40 grid gap-2">
-                            <template x-for="item in group.s" :key="item.n">
-                                <button @click="toggle(item)" 
-                                    :class="cart.find(i => i.n === item.n) ? 'bg-[#CCFF00] text-black' : 'bg-white/5'" 
-                                    class="flex justify-between p-5 rounded-2xl text-[9px] font-black uppercase transition-all">
-                                    <span x-text="item.n"></span><span x-text="'£' + calcPrice(item.p)"></span>
-                                </button>
-                            </template>
-                        </div>
-                    </div>
-                </template>
-            </div>
+<!-- PROTOCOL -->
+<section class="py-32 bg-white/5 border-y border-white/5">
+  <div class="max-w-4xl mx-auto text-center px-6">
+    <h2 class="text-5xl lg:text-8xl font-black italic uppercase tracking-tighter mb-16">
+      The <span class="neon-lime">Protocol.</span>
+    </h2>
 
-            <button @click="finalize()" class="fixed bottom-6 left-5 right-5 bg-[#CCFF00] text-black py-7 rounded-2xl font-black uppercase tracking-widest shadow-2xl z-50">
-                Confirm Booking
-            </button>
-        </div>
-
-        <!-- MANIFEST -->
-        <div x-show="confirmed" x-transition class="pt-5 flex flex-col items-center">
-            <div id="ticket-wrapper">
-                <div class="pdf-header">
-                    <h2 class="text-3xl font-black italic uppercase">Job Manifest</h2>
-                    <p class="text-[9px] font-black text-[#CCFF00] tracking-widest">DISPATCH VERIFIED</p>
-                </div>
-                <div class="pdf-body">
-                    <div class="ghost-price" x-text="'£'+getTotal()"></div>
-                    
-                    <div class="mb-6">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Job Reference</p>
-                        <p class="text-2xl font-black text-red-600 font-mono" x-text="bookingRef"></p>
-                    </div>
-
-                    <div class="mb-6">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Deployment GPS</p>
-                        <p class="text-[12px] font-black" x-text="lat + ', ' + lon"></p>
-                    </div>
-
-                    <div class="mb-6">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Client & Vehicle</p>
-                        <p class="text-[14px] font-black" x-text="name"></p>
-                        <p class="text-[14px] font-black" x-text="vname + ' [' + reg.toUpperCase() + ']'"></p>
-                    </div>
-
-                    <div class="border-t border-dashed border-gray-200 pt-6">
-                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-4">Labour Selection</p>
-                        <template x-for="item in cart" :key="item.n">
-                            <div class="flex justify-between font-black text-[12px] uppercase mb-2">
-                                <span x-text="item.n"></span><span x-text="'£'+calcPrice(item.p)"></span>
-                            </div>
-                        </template>
-                        <template x-if="isOOH">
-                            <div class="flex justify-between font-black text-[12px] text-red-600 uppercase border-t pt-2 mt-2">
-                                <span>OOH SURGE</span><span>+£45</span>
-                            </div>
-                        </template>
-                    </div>
-
-                    <div class="mt-10 pt-6 border-t border-gray-100 text-[7px] text-gray-400 uppercase font-bold leading-relaxed">
-                        Labor work liability: SOS Elite holds no liability for pre-existing vehicle faults discovered during labor. All work is performed on a "best-effort" basis. Digital verification via WhatsApp confirms acceptance.
-                    </div>
-                </div>
-            </div>
-
-            <button @click="sendWhatsApp()" class="mt-8 w-full bg-[#CCFF00] text-black py-6 rounded-2xl font-black uppercase tracking-widest shadow-2xl">Send to Dispatch Engine</button>
-            <button @click="confirmed = false" class="mt-4 text-[10px] font-black uppercase text-white/30 tracking-widest underline">Edit Booking</button>
-        </div>
+    <div class="grid md:grid-cols-3 gap-12 text-left mb-16">
+      <div>
+        <h4 class="text-[#CCFF00] font-black text-2xl mb-2">01. GPS PIN</h4>
+        <p class="text-[10px] font-bold uppercase tracking-widest leading-relaxed text-white/40">
+          Send your location and registration via WhatsApp for immediate triage.
+        </p>
+      </div>
+      <div>
+        <h4 class="text-[#CCFF00] font-black text-2xl mb-2">02. QUOTE</h4>
+        <p class="text-[10px] font-bold uppercase tracking-widest leading-relaxed text-white/40">
+          Receive transparent pricing and live arrival time within minutes.
+        </p>
+      </div>
+      <div>
+        <h4 class="text-[#CCFF00] font-black text-2xl mb-2">03. FIX</h4>
+        <p class="text-[10px] font-bold uppercase tracking-widest leading-relaxed text-white/40">
+          Fully equipped mobile unit resolves the fault on-site.
+        </p>
+      </div>
     </div>
+
+    <a href="https://wa.me/447405937104?text=Mobile%20Mechanic%20Medway%20Request"
+       class="inline-block bg-[#CCFF00] text-black px-20 py-8 rounded-full font-black uppercase tracking-[0.3em] text-sm hover:scale-105 transition-all shadow-[0_0_80px_rgba(204,255,0,0.4)]">
+      Message Engineer Directly
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="py-20 px-6 lg:px-20 bg-black">
+  <div class="max-w-7xl mx-auto grid lg:grid-cols-4 gap-12">
+    <div>
+      <div class="text-xl font-black italic uppercase mb-6">
+        SOS<span class="neon-lime">MECHANICS</span>
+      </div>
+      <p class="text-[10px] font-bold text-white/20 uppercase tracking-widest leading-loose">
+        Mobile Mechanic Medway & Kent. 24/7 Roadside Assistance and Emergency Repairs.
+      </p>
+
+      <div class="mt-6 text-[10px] font-bold uppercase tracking-widest text-white/30">
+        <span>24/7 Mobile Mechanic Medway</span><br>
+        <a href="tel:+447405937104" class="neon-lime hover:underline">
+          07405 937104
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <h4 class="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-6">Coverage Area</h4>
+      <div class="text-[11px] font-bold uppercase tracking-widest text-white/50 space-y-2">
+        <p>Rochester • Chatham • Strood</p>
+        <p>Gillingham • Rainham • Kent</p>
+        <p>Sittingbourne • Maidstone</p>
+      </div>
+    </div>
+
+    <div>
+      <h4 class="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-6">Network Status</h4>
+      <div class="glass px-4 py-2 rounded-lg inline-flex items-center gap-3">
+        <div class="w-1.5 h-1.5 bg-[#CCFF00] rounded-full shadow-[0_0_10px_#CCFF00]"></div>
+        <span class="text-[10px] font-mono font-bold text-[#CCFF00]">ALL UNITS DEPLOYED</span>
+      </div>
+    </div>
+
+    <div class="text-[9px] font-black uppercase tracking-widest opacity-20 text-right self-end leading-loose">
+      © 2026 SOS Mechanics Medway <br>
+      #1 Mobile Mechanic Rochester & Chatham
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>
